@@ -3,10 +3,44 @@ import logo from "/logo.png";
 import useAuth from "../Hooks/useAuth";
 import { TbLayoutDashboard } from "react-icons/tb";
 import { FiUser } from "react-icons/fi";
+import { MdLogout } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
+import { toast } from "react-toastify";
+import { FaUsers } from "react-icons/fa";
+import { TbPackages } from "react-icons/tb";
+
+// ✅ Reusable Sidebar Item
+const SidebarItem = ({ to, onClick, children }) => {
+  if (to) {
+    return (
+      <NavLink
+        to={to}
+        end
+        onClick={onClick}
+        className={({ isActive }) =>
+          `flex items-center gap-2 rounded-md px-2 py-2 transition-colors w-full text-left ${
+            isActive
+              ? "bg-primary/20 text-primary font-bold"
+              : "hover:bg-base-300"
+          }`
+        }
+      >
+        {children}
+      </NavLink>
+    );
+  }
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 rounded-md px-2 py-2 hover:bg-base-300 transition-colors w-full text-left"
+    >
+      {children}
+    </button>
+  );
+};
 
 const DashboardLayout = () => {
-  const { user } = useAuth();
+  const { user, logOutUser } = useAuth();
   const { roleLoading, role } = useUserRole();
 
   // ✅ Function to close drawer on small devices
@@ -16,6 +50,17 @@ const DashboardLayout = () => {
       drawerCheckbox.checked = false;
       drawerCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
     }
+  };
+
+  // ✅ Logout
+  const handleLogout = () => {
+    logOutUser()
+      .then(() => {
+        toast.warn("You Logout from ShopSphere");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   return (
@@ -48,7 +93,7 @@ const DashboardLayout = () => {
                 </svg>
               </label>
             </div>
-                        <Link
+            <Link
               to="/"
               className="flex items-center gap-1 mx-2"
               onClick={handleLinkClick}
@@ -97,27 +142,50 @@ const DashboardLayout = () => {
 
             {/* Navigation Links */}
             <li className="my-1 font-semibold">
-              <NavLink
-                className="rounded-md"
-                to="/dashboard"
-                end
-                onClick={handleLinkClick}
-              >
-                <TbLayoutDashboard size={19} /> Dashboard
-              </NavLink>
+              <SidebarItem to="/dashboard" onClick={handleLinkClick}>
+                <TbLayoutDashboard size={20} /> Dashboard
+              </SidebarItem>
             </li>
             <li className="my-1 font-semibold">
-              <NavLink
-                className="rounded-md"
+              <SidebarItem
                 to="/dashboard/manageProfile"
                 onClick={handleLinkClick}
               >
-                <FiUser size={17} /> Manage Profile
-              </NavLink>
+                <FiUser size={20} /> Manage Profile
+              </SidebarItem>
+            </li>
+
+
+            {!roleLoading && role === "admin" && (
+              <>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/allProducts"
+                    onClick={handleLinkClick}
+                  >
+                    <TbPackages size={20} /> All Products
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageUsers"
+                    onClick={handleLinkClick}
+                  >
+                    <FaUsers size={20} /> Manage Users
+                  </SidebarItem>
+                </li>
+              </>
+            )}
+
+            
+            <li className="my-1 font-semibold rounded-md">
+              <SidebarItem onClick={handleLogout}>
+                <MdLogout size={20} /> Logout
+              </SidebarItem>
             </li>
           </ul>
 
-          <div className="flex absolute border-t border-gray-200 bottom-0 bg-base-200 py-2 px-4 w-56 lg:w-60 gap-2 items-center">
+          <div className="flex absolute border-t-[1.5px] border-gray-300 bottom-0 bg-base-200 py-2 px-4 w-56 lg:w-60 gap-2 items-center">
             <img
               src={user?.photoURL}
               alt={user?.displayName}
@@ -125,7 +193,7 @@ const DashboardLayout = () => {
             />
             <div>
               <p className="font-bold text-xs">{user?.displayName}</p>
-              <p className="text-xs">
+              <p className="text-xs capitalize">
                 {roleLoading ? (
                   <span className="animate-pulse">Loading...</span>
                 ) : (

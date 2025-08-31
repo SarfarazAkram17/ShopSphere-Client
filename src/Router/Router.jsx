@@ -8,6 +8,8 @@ import ProductDetails from "../Pages/ProductDetails/ProductDetails";
 import DashboardLayout from "../Layouts/DashboardLayout";
 import ManageProfile from "../Pages/Dashboard/ManageProfile/ManageProfile";
 import Dashboard from "../Pages/Dashboard/Dashboard/Dashboard";
+import PrivateRoutes from "../Routes/PrivateRoutes";
+import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -69,7 +71,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    Component: DashboardLayout,
+    element: (
+      <PrivateRoutes>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoutes>
+    ),
     children: [
       {
         index: true,
@@ -78,6 +84,10 @@ export const router = createBrowserRouter([
       {
         path: "manageProfile",
         Component: ManageProfile,
+      },
+      {
+        path: "manageUsers",
+        Component: ManageUsers,
       },
     ],
   },
