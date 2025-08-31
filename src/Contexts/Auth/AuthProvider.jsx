@@ -12,7 +12,7 @@ import {
   sendEmailVerification,
   FacebookAuthProvider,
 } from "firebase/auth";
-// import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { auth } from "../../Firebase/firebase.config";
 import useAxios from "../../Hooks/useAxios";
 
@@ -23,7 +23,7 @@ const facebookProvider = new FacebookAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const axiosInstance = useAxios();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const userEmail = user?.email || user?.providerData?.[0]?.email || "";
@@ -63,8 +63,8 @@ const AuthProvider = ({ children }) => {
 
   const logOutUser = async () => {
     setLoading(true);
-    // queryClient.clear();
-    // await axiosInstance.post("/auth/logout");
+    queryClient.clear();
+    await axiosInstance.post("/auth/logout");
     return signOut(auth);
   };
 

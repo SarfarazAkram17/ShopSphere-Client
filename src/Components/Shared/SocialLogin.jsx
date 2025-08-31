@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import useAxios from "../../Hooks/useAxios";
 import useAuth from "../../Hooks/useAuth";
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import userImage from "../../assets/images/image-upload-icon.png";
@@ -8,10 +8,11 @@ import axios from "axios";
 import SocialLogin from "../../Components/Shared/SocialLogin";
 import useAuth from "../../Hooks/useAuth";
 import Lottie from "lottie-react";
-import registerLottie from '../../assets/animations/register.json'
+import registerLottie from "../../assets/animations/register.json";
 
 const Register = () => {
-  const { createUser, updateUserProfile, sendVerificationEmail, logOutUser } = useAuth();
+  const { createUser, updateUserProfile, sendVerificationEmail, logOutUser } =
+    useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,11 +92,17 @@ const Register = () => {
 
   return (
     <div className="flex flex-col max-w-7xl mx-auto px-4 sm:flex-row gap-6 justify-start items-center md:justify-center">
-      <Lottie className="flex-1" animationData={registerLottie} loop={true}></Lottie>
+      <Lottie
+        className="flex-1"
+        animationData={registerLottie}
+        loop={true}
+      ></Lottie>
       <div className="card w-full flex-1 shadow-xl">
         <div className="card-body">
-          <h1 className="text-2xl md:text-3xl font-extrabold">Create Your Account</h1>
-          <p className="mb-4 text-sm font-semibold">Join Sam's Kitchen today</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold">
+            Create Your Account
+          </h1>
+          <p className="mb-4 text-sm font-semibold">Join ShopSphere today</p>
 
           <form onSubmit={handleSubmit(handleRegister)}>
             <label htmlFor="profileImage" className="cursor-pointer">
