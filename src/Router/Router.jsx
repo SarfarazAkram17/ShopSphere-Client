@@ -5,6 +5,9 @@ import Offers from "../Pages/Offers/Offers";
 import AllProducts from "../Pages/AllProducts/AllProducts";
 import Loader from "../Components/Loader/Loader";
 import ProductDetails from "../Pages/ProductDetails/ProductDetails";
+import DashboardLayout from "../Layouts/DashboardLayout";
+import ManageProfile from "../Pages/Dashboard/ManageProfile/ManageProfile";
+import Dashboard from "../Pages/Dashboard/Dashboard/Dashboard";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -59,9 +62,23 @@ export const router = createBrowserRouter([
         Component: Offers,
       },
       {
-        path: '/products/:id',
-        Component: ProductDetails
-      }
+        path: "/products/:id",
+        Component: ProductDetails,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    Component: DashboardLayout,
+    children: [
+      {
+        index: true,
+        Component: Dashboard,
+      },
+      {
+        path: "manageProfile",
+        Component: ManageProfile,
+      },
     ],
   },
   {

@@ -2,12 +2,10 @@ import { Link, NavLink } from "react-router";
 import {
   FaFacebookF,
   FaInstagram,
-  FaTwitter,
   FaLinkedinIn,
 } from "react-icons/fa";
 import logo from "/logo.png";
-import { FaGithub } from "react-icons/fa6";
-
+import { FaGithub, FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
   const normalClass =
     "px-3 py-0.5 block w-fit text-sm rounded-full font-bold hover:text-primary hover:bg-primary/10";
@@ -79,7 +77,7 @@ const Footer = () => {
               target="_blank"
               className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
             >
-              <FaTwitter />
+              <FaXTwitter />
             </a>
             <a
               href="https://www.github.com/SarfarazAkram17"
