@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { Link, useLocation, useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import userImage from "../../assets/images/image-upload-icon.png";

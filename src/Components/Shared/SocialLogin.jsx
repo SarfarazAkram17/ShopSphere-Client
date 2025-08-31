@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import useAxios from "../../Hooks/useAxios";
 import useAuth from "../../Hooks/useAuth";
 
 const SocialLogin = ({ state, message }) => {
   const axiosInstance = useAxios();
-  const { continueWithGoogle, continueWithFacebook } = useAuth();
+  const { continueWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
@@ -31,28 +31,6 @@ const SocialLogin = ({ state, message }) => {
       .catch((error) => toast.error(error.message));
   };
 
-  const handleFacebookLogin = () => {
-    continueWithFacebook()
-      .then(async (res) => {
-        const email = res.user?.providerData[0]?.email;
-
-        const userInfo = {
-          email,
-          providerId: res.providerId,
-          name: res.user.displayName,
-          role: "customer",
-          photo: res.user.photoURL,
-          createdAt: res.user.metadata.createdAt,
-          last_log_in: Date.now().toString(),
-        };
-
-        await axiosInstance.post("/users", userInfo);
-
-        navigate(state || "/");
-        toast.success(message);
-      })
-      .catch((error) => toast.error(error.message));
-  };
   return (
     <>
       {/* Google */}
@@ -84,23 +62,6 @@ const SocialLogin = ({ state, message }) => {
           </g>
         </svg>
         Continue with Google
-      </button>
-
-      {/* Facebook */}
-      <button onClick={handleFacebookLogin} className="btn">
-        <svg
-          aria-label="Facebook logo"
-          width="20"
-          height="20"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 32 32"
-        >
-          <path
-            fill="#1A77F2"
-            d="M8 12h5V8c0-6 4-7 11-6v5c-4 0-5 0-5 3v2h5l-1 6h-4v12h-6V18H8z"
-          ></path>
-        </svg>
-        Continue with Facebook
       </button>
     </>
   );

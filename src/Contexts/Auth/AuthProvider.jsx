@@ -10,7 +10,6 @@ import {
   signOut,
   sendPasswordResetEmail,
   sendEmailVerification,
-  FacebookAuthProvider,
 } from "firebase/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { auth } from "../../Firebase/firebase.config";
@@ -18,8 +17,6 @@ import useAxios from "../../Hooks/useAxios";
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope("email");
-
-const facebookProvider = new FacebookAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const axiosInstance = useAxios();
@@ -52,11 +49,6 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, googleProvider);
   };
 
-  const continueWithFacebook = () => {
-    setLoading(true);
-    return signInWithPopup(auth, facebookProvider);
-  };
-
   const forgotPassword = (email) => {
     return sendPasswordResetEmail(auth, email);
   };
@@ -74,6 +66,7 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
 
       if (currentUser) {
+        console.log(currentUser)
         const email = currentUser.email || currentUser.providerData[0].email;
         await axiosInstance.post("/auth/jwt", {
           email,
@@ -94,7 +87,6 @@ const AuthProvider = ({ children }) => {
     updateUserProfile,
     sendVerificationEmail,
     continueWithGoogle,
-    continueWithFacebook,
     forgotPassword,
     logOutUser,
   };

@@ -61,21 +61,21 @@ const Footer = () => {
           {/* Social Icons */}
           <div className="flex space-x-3 mt-4">
             <a
-              href="https://www.facebook.com"
+              href="https://www.facebook.com/sarfarazakram17"
               target="_blank"
               className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
             >
               <FaFacebookF />
             </a>
             <a
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/sarfarazakram17"
               target="_blank"
               className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
             >
               <FaInstagram />
             </a>
             <a
-              href="https://x.com"
+              href="https://x.com/SarfarazAkram17"
               target="_blank"
               className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
             >
