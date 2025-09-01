@@ -179,7 +179,7 @@ const DashboardLayout = () => {
                 </li>
                 <li className="my-1 font-semibold rounded-md">
                   <SidebarItem
-                    to="/dashboard/manageVendors"
+                    to="/dashboard/pendingSellers"
                     onClick={handleLinkClick}
                   >
                     <FaStoreAlt size={20} /> Pending Sellers
@@ -187,7 +187,7 @@ const DashboardLayout = () => {
                 </li>
                 <li className="my-1 font-semibold rounded-md">
                   <SidebarItem
-                    to="/dashboard/manageVendors"
+                    to="/dashboard/pendingRiders"
                     onClick={handleLinkClick}
                   >
                     <FaUserClock size={20} /> Pending Riders

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:5001",
+  baseURL: "https://shopsphere-sarfaraz.vercel.app",
   withCredentials: true,
 });
 

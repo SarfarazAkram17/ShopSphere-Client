@@ -12,6 +12,12 @@ import PrivateRoutes from "../Routes/PrivateRoutes";
 import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
 import BecomeARider from "../Pages/Dashboard/BecomeARider/BecomeARider";
 import BecomeASeller from "../Pages/Dashboard/BecomeASeller/BecomeASeller";
+import MyOrders from "../Pages/Dashboard/MyOrders/MyOrders";
+import ManageSellers from "../Pages/Dashboard/ManageSellers/ManageSellers";
+import PendingSellers from "../Pages/Dashboard/PendingSellers/PendingSellers";
+import PendingRiders from "../Pages/Dashboard/PendingRiders/PendingRiders";
+import CustomerRoutes from "../Routes/CustomerRoutes";
+import AdminRoutes from "../Routes/AdminRoutes";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -79,6 +85,7 @@ export const router = createBrowserRouter([
       </PrivateRoutes>
     ),
     children: [
+      // all user routes
       {
         index: true,
         Component: Dashboard,
@@ -87,17 +94,73 @@ export const router = createBrowserRouter([
         path: "manageProfile",
         Component: ManageProfile,
       },
+
+      // customer routes
       {
-        path: "manageUsers",
-        Component: ManageUsers,
+        path: "myOrders",
+        element: (
+          <CustomerRoutes>
+            <MyOrders></MyOrders>
+          </CustomerRoutes>
+        ),
       },
       {
         path: "becomeARider",
-        Component: BecomeARider,
+        element: (
+          <CustomerRoutes>
+            <BecomeARider></BecomeARider>
+          </CustomerRoutes>
+        ),
       },
       {
         path: "becomeASeller",
-        Component: BecomeASeller,
+        element: (
+          <CustomerRoutes>
+            <BecomeASeller></BecomeASeller>
+          </CustomerRoutes>
+        ),
+      },
+
+      // admin routes
+      {
+        path: "manageUsers",
+        element: (
+          <AdminRoutes>
+            <ManageUsers></ManageUsers>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "allProducts",
+        element: (
+          <AdminRoutes>
+            <AllProducts></AllProducts>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "manageSellers",
+        element: (
+          <AdminRoutes>
+            <ManageSellers></ManageSellers>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "pendingSellers",
+        element: (
+          <AdminRoutes>
+            <PendingSellers></PendingSellers>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "pendingRiders",
+        element: (
+          <AdminRoutes>
+            <PendingRiders></PendingRiders>
+          </AdminRoutes>
+        ),
       },
     ],
   },
