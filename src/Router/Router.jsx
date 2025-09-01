@@ -10,6 +10,8 @@ import ManageProfile from "../Pages/Dashboard/ManageProfile/ManageProfile";
 import Dashboard from "../Pages/Dashboard/Dashboard/Dashboard";
 import PrivateRoutes from "../Routes/PrivateRoutes";
 import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
+import BecomeARider from "../Pages/Dashboard/BecomeARider/BecomeARider";
+import BecomeASeller from "../Pages/Dashboard/BecomeASeller/BecomeASeller";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -88,6 +90,14 @@ export const router = createBrowserRouter([
       {
         path: "manageUsers",
         Component: ManageUsers,
+      },
+      {
+        path: "becomeARider",
+        Component: BecomeARider,
+      },
+      {
+        path: "becomeASeller",
+        Component: BecomeASeller,
       },
     ],
   },

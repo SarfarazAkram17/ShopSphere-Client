@@ -5,15 +5,15 @@
 @plugin "daisyui/theme" {
   name: "light";
 
-  --color-primary: #0D9488;
+  --color-primary: #019E97;
   --color-secondary: #0EA5E9;
   --color-warning: #F59E0B;
   --color-info: #3abff8;
 }
 
 .active {
-  background-color: #0D948820;
-  color: #0D9488;
+  background-color: #019E9720;
+  color: #019E97;
   font-weight: bold;
 }
 

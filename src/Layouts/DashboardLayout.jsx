@@ -1,15 +1,14 @@
 import { Link, NavLink, Outlet } from "react-router";
 import logo from "/logo.png";
 import useAuth from "../Hooks/useAuth";
-import { TbLayoutDashboard } from "react-icons/tb";
+import { TbLayoutDashboard, TbPackages } from "react-icons/tb";
 import { FiUser } from "react-icons/fi";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdStorefront } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
 import { toast } from "react-toastify";
-import { FaUsers } from "react-icons/fa";
-import { TbPackages } from "react-icons/tb";
+import { FaMotorcycle, FaStoreAlt, FaUserClock, FaUsers, FaUsersCog } from "react-icons/fa";
+import { LuCodesandbox } from "react-icons/lu";
 
-// ✅ Reusable Sidebar Item
 const SidebarItem = ({ to, onClick, children }) => {
   if (to) {
     return (
@@ -43,7 +42,6 @@ const DashboardLayout = () => {
   const { user, logOutUser } = useAuth();
   const { roleLoading, role } = useUserRole();
 
-  // ✅ Function to close drawer on small devices
   const handleLinkClick = () => {
     const drawerCheckbox = document.getElementById("my-drawer-2");
     if (drawerCheckbox && window.innerWidth < 1024) {
@@ -52,7 +50,6 @@ const DashboardLayout = () => {
     }
   };
 
-  // ✅ Logout
   const handleLogout = () => {
     logOutUser()
       .then(() => {
@@ -110,7 +107,7 @@ const DashboardLayout = () => {
           </div>
 
           {/* Page Content */}
-          <div className="mt-12 mb-16">
+          <div className="pt-12 pb-16">
             <Outlet />
           </div>
         </div>
@@ -127,7 +124,7 @@ const DashboardLayout = () => {
             {/* Logo */}
             <Link
               to="/"
-              className="flex items-center gap-1 mb-4"
+              className="flex items-center gap-1 mb-2"
               onClick={handleLinkClick}
             >
               <img
@@ -154,8 +151,6 @@ const DashboardLayout = () => {
                 <FiUser size={20} /> Manage Profile
               </SidebarItem>
             </li>
-
-
             {!roleLoading && role === "admin" && (
               <>
                 <li className="my-1 font-semibold rounded-md">
@@ -174,10 +169,61 @@ const DashboardLayout = () => {
                     <FaUsers size={20} /> Manage Users
                   </SidebarItem>
                 </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageSellers"
+                    onClick={handleLinkClick}
+                  >
+                    <FaUsersCog size={20} /> Manage Sellers
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageVendors"
+                    onClick={handleLinkClick}
+                  >
+                    <FaStoreAlt size={20} /> Pending Sellers
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageVendors"
+                    onClick={handleLinkClick}
+                  >
+                    <FaUserClock size={20} /> Pending Riders
+                  </SidebarItem>
+                </li>
+              </>
+            )}
+            {!roleLoading && role === "customer" && (
+              <>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/myOrders"
+                    onClick={handleLinkClick}
+                  >
+                    <LuCodesandbox size={20} /> My Orders
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/becomeASeller"
+                    onClick={handleLinkClick}
+                  >
+                    <MdStorefront size={20} /> Become a Seller
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/becomeARider"
+                    onClick={handleLinkClick}
+                  >
+                    <FaMotorcycle size={20} /> Become a Rider
+                  </SidebarItem>
+                </li>
               </>
             )}
 
-            
             <li className="my-1 font-semibold rounded-md">
               <SidebarItem onClick={handleLogout}>
                 <MdLogout size={20} /> Logout

@@ -149,16 +149,6 @@ const ManageProfile = () => {
           </div>
         </div>
 
-        {!roleLoading && role === "customer" && (
-          <div className="mt-10">
-            <Link to="/dashboard/beARider">
-              <button className="text-white btn btn-primary">
-                Be a Rider
-              </button>
-            </Link>{" "}
-          </div>
-        )}
-
         {isModalOpen && (
           <>
             <div

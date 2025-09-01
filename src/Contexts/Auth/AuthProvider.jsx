@@ -66,7 +66,6 @@ const AuthProvider = ({ children }) => {
       setLoading(false);
 
       if (currentUser) {
-        console.log(currentUser)
         const email = currentUser.email || currentUser.providerData[0].email;
         await axiosInstance.post("/auth/jwt", {
           email,
