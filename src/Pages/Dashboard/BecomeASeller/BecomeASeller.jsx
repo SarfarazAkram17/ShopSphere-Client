@@ -143,8 +143,8 @@ const BecomeASeller = () => {
 
     try {
       // Upload images
-      const logoUrl = await uploadToCloudinary(logoFile)
-      const coverUrl = await uploadToCloudinary(coverFile)
+      const logoUrl = await uploadToCloudinary(logoFile);
+      const coverUrl = await uploadToCloudinary(coverFile);
 
       const sellerApplication = {
         name: data.name,
@@ -189,11 +189,9 @@ const BecomeASeller = () => {
           timerProgressBar: true,
           showConfirmButton: false,
         });
-      } else {
-        toast.info(res.data.message);
       }
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.response.data.message);
     } finally {
       setSubmitting(false);
     }
@@ -202,7 +200,7 @@ const BecomeASeller = () => {
   return (
     <div className="px-4 mb-8">
       <h1 className="text-3xl sm:text-4xl text-primary font-bold text-center mb-5">
-        Become a seller at ShopSphere
+        Become a Seller at ShopSphere
       </h1>
       <p className="mb-10 text-center text-xs leading-relaxed max-w-2xl mx-auto">
         Join ShopSphere as a seller and grow your business online! Fill out the
@@ -358,22 +356,20 @@ const BecomeASeller = () => {
             />
           </div>
 
-          {/* Categories */}
+          {/* Stripe Account ID */}
           <div>
-            <label className="text-xs font-semibold">
-              Categories <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={categories.map((c) => ({ value: c, label: c }))}
-              value={selectedCategories}
-              onChange={handleCategoryChange}
-              isMulti
-              placeholder="Select Categories"
-              className="text-xs xl:text-sm mt-1"
+            <label className="text-xs font-semibold">Stripe Account ID</label>
+            <input
+              type="text"
+              placeholder="Enter your Stripe Account ID"
+              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
+              {...register("stripeAccountId", {
+                required: "Stripe Account ID is required",
+              })}
             />
-            {errors.categories && (
+            {errors.stripeAccountId && (
               <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.categories.message}
+                {errors.stripeAccountId.message}
               </span>
             )}
           </div>
@@ -457,20 +453,22 @@ const BecomeASeller = () => {
             )}
           </div>
 
-          {/* Stripe Account ID */}
+          {/* Product Categories */}
           <div>
-            <label className="text-xs font-semibold">Stripe Account ID</label>
-            <input
-              type="text"
-              placeholder="Enter your Stripe Account ID"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("stripeAccountId", {
-                required: "Stripe Account ID is required",
-              })}
+            <label className="text-xs font-semibold">
+              Product Categories <span className="text-red-500">*</span>
+            </label>
+            <Select
+              options={categories.map((c) => ({ value: c, label: c }))}
+              value={selectedCategories}
+              onChange={handleCategoryChange}
+              isMulti
+              placeholder="Select Product Categories"
+              className="text-xs xl:text-sm mt-1"
             />
-            {errors.stripeAccountId && (
+            {errors.categories && (
               <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.stripeAccountId.message}
+                {errors.categories.message}
               </span>
             )}
           </div>

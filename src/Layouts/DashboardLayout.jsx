@@ -6,7 +6,7 @@ import { FiUser } from "react-icons/fi";
 import { MdLogout, MdStorefront } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
 import { toast } from "react-toastify";
-import { FaMotorcycle, FaStoreAlt, FaUserClock, FaUsers, FaUsersCog } from "react-icons/fa";
+import { FaMotorcycle, FaStoreAlt, FaUserClock, FaUsers, FaUsersCog, FaUserTie } from "react-icons/fa";
 import { LuCodesandbox } from "react-icons/lu";
 
 const SidebarItem = ({ to, onClick, children }) => {
@@ -61,7 +61,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-[1500px] mx-auto">
       <div className="drawer lg:drawer-open">
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
@@ -174,7 +174,15 @@ const DashboardLayout = () => {
                     to="/dashboard/manageSellers"
                     onClick={handleLinkClick}
                   >
-                    <FaUsersCog size={20} /> Manage Sellers
+                    <FaUserTie size={20} /> Manage Sellers
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageRiders"
+                    onClick={handleLinkClick}
+                  >
+                    <FaUsersCog size={20} /> Manage Riders
                   </SidebarItem>
                 </li>
                 <li className="my-1 font-semibold rounded-md">
@@ -191,6 +199,14 @@ const DashboardLayout = () => {
                     onClick={handleLinkClick}
                   >
                     <FaUserClock size={20} /> Pending Riders
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/assignRider"
+                    onClick={handleLinkClick}
+                  >
+                    <FaMotorcycle size={20} /> Assign Rider
                   </SidebarItem>
                 </li>
               </>

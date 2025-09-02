@@ -65,7 +65,7 @@ const BecomeARider = () => {
 
     setSelectedDistrict(null);
     setThanas([]);
-    setSelectedThana(null);  // Reset thana selection
+    setSelectedThana(null); // Reset thana selection
     setValue("district", "");
     setValue("thana", "");
     trigger("district");
@@ -88,7 +88,7 @@ const BecomeARider = () => {
       setThanas([]);
     }
 
-    setSelectedThana(null); 
+    setSelectedThana(null);
     setValue("thana", "");
     trigger("thana");
   };
@@ -112,14 +112,16 @@ const BecomeARider = () => {
         region: data.region,
         district: data.district,
         thana: data.thana,
+        stripeAccountId: data.stripeAccountId,
         status: "pending",
-        appliedAt: new Date().toISOString()
+        appliedAt: new Date().toISOString(),
       };
 
       const res = await axiosSecure.post(
         `/riders?email=${userEmail}`,
         riderApplication
       );
+
       if (res.data.insertedId) {
         reset();
         setSelectedRegion(null);
@@ -132,20 +134,13 @@ const BecomeARider = () => {
           icon: "success",
           title: "Application Submitted successfully!",
           text: "Waiting for admin approval.",
-          timer: 2500,
+          timer: 1500,
           timerProgressBar: true,
           showConfirmButton: false,
         });
-      } else {
-        reset();
-        setSelectedRegion(null);
-        setSelectedDistrict(null);
-        setThanas([]);
-        setSelectedThana(null);
-        toast.info(res.data.message);
       }
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.response.data.message);
     } finally {
       setSubmitting(false);
     }
@@ -164,7 +159,7 @@ const BecomeARider = () => {
       </p>
 
       <form onSubmit={handleSubmit(handleSubmitRiderForm)}>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 items-start">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 items-start">
           {/* Name */}
           <div>
             <label className="text-xs font-semibold">
@@ -215,6 +210,7 @@ const BecomeARider = () => {
             <input
               type="number"
               className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
+              placeholder="Enter your age"
               {...register("age", {
                 required: "Age is required",
                 min: {
@@ -237,6 +233,7 @@ const BecomeARider = () => {
             </label>
             <input
               type="number"
+              placeholder="Enter your experience"
               className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
               {...register("experience", {
                 required: "Experience is required",
@@ -256,6 +253,7 @@ const BecomeARider = () => {
             </label>
             <input
               type="tel"
+              placeholder="Enter your phone number"
               className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
               {...register("phone", {
                 required: "Phone number is required",
@@ -264,6 +262,24 @@ const BecomeARider = () => {
             {errors.phone && (
               <span className="text-red-500 text-xs mt-1 font-semibold">
                 {errors.phone.message}
+              </span>
+            )}
+          </div>
+
+          {/* Stripe Account ID */}
+          <div>
+            <label className="text-xs font-semibold">Stripe Account ID</label>
+            <input
+              type="text"
+              placeholder="Enter your Stripe Account ID"
+              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
+              {...register("stripeAccountId", {
+                required: "Stripe Account ID is required",
+              })}
+            />
+            {errors.stripeAccountId && (
+              <span className="text-red-500 text-xs mt-1 font-semibold">
+                {errors.stripeAccountId.message}
               </span>
             )}
           </div>
@@ -308,7 +324,7 @@ const BecomeARider = () => {
           </div>
 
           {/* Thana Select */}
-          <div>
+          <div className="md:col-span-2">
             <label className="text-xs font-semibold">
               Thana <span className="text-red-500">*</span>
             </label>
@@ -335,7 +351,7 @@ const BecomeARider = () => {
         >
           {submitting ? (
             <>
-              <span className="loading loading-spinner text-primary"></span> 
+              <span className="loading loading-spinner text-primary"></span>
               Submitting Application
             </>
           ) : (

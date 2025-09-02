@@ -1,9 +1,5 @@
 import { Link, NavLink } from "react-router";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaLinkedinIn,
-} from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import logo from "/logo.png";
 import { FaGithub, FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
@@ -38,8 +34,8 @@ const Footer = () => {
             </span>
           </Link>
           <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-            Fresh, delicious meals delivered to your door. Experience the taste
-            of love in every bite. 🍴
+            ShopSphere is your trusted online marketplace, connecting customers
+            with verified sellers and fast, reliable riders.
           </p>
         </div>
 

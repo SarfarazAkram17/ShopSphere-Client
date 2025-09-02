@@ -4,7 +4,7 @@ import Footer from "../Components/Shared/Footer";
 
 const RootLayout = () => {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       <div className="sticky z-50 top-0">
         <Navbar></Navbar>
       </div>

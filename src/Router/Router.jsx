@@ -18,6 +18,8 @@ import PendingSellers from "../Pages/Dashboard/PendingSellers/PendingSellers";
 import PendingRiders from "../Pages/Dashboard/PendingRiders/PendingRiders";
 import CustomerRoutes from "../Routes/CustomerRoutes";
 import AdminRoutes from "../Routes/AdminRoutes";
+import ManageRiders from "../Pages/Dashboard/ManageRiders/ManageRiders";
+import AssignRider from "../Pages/Dashboard/AssignRider/AssignRider";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -147,6 +149,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "manageRiders",
+        element: (
+          <AdminRoutes>
+            <ManageRiders></ManageRiders>
+          </AdminRoutes>
+        ),
+      },
+      {
         path: "pendingSellers",
         element: (
           <AdminRoutes>
@@ -159,6 +169,14 @@ export const router = createBrowserRouter([
         element: (
           <AdminRoutes>
             <PendingRiders></PendingRiders>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "assignRider",
+        element: (
+          <AdminRoutes>
+            <AssignRider></AssignRider>
           </AdminRoutes>
         ),
       },
