@@ -20,6 +20,17 @@ import CustomerRoutes from "../Routes/CustomerRoutes";
 import AdminRoutes from "../Routes/AdminRoutes";
 import ManageRiders from "../Pages/Dashboard/ManageRiders/ManageRiders";
 import AssignRider from "../Pages/Dashboard/AssignRider/AssignRider";
+import SellerRoutes from "../Routes/SellerRoutes";
+import Orders from "../Pages/Dashboard/Orders/Orders";
+import MyStore from "../Pages/Dashboard/MyStore/MyStore";
+import ChatCustomer from "../Pages/Dashboard/ChatCustomer/ChatCustomer";
+import Chat from "../Pages/Dashboard/Chat/Chat";
+import LiveChat from "../Pages/Dashboard/LiveChat/LiveChat";
+import RiderRoutes from "../Routes/RiderRoutes";
+import PendingDeliveries from "../Pages/Dashboard/PendingDeliveries/PendingDeliveries";
+import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
+import SellerAndRiderRoutes from "../Routes/SellerAndRiderRoutes";
+import ChatSupport from "../Pages/Dashboard/ChatSupport/ChatSupport";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -122,6 +133,14 @@ export const router = createBrowserRouter([
           </CustomerRoutes>
         ),
       },
+      {
+        path: "chat",
+        element: (
+          <CustomerRoutes>
+            <Chat></Chat>
+          </CustomerRoutes>
+        ),
+      },
 
       // admin routes
       {
@@ -178,6 +197,68 @@ export const router = createBrowserRouter([
           <AdminRoutes>
             <AssignRider></AssignRider>
           </AdminRoutes>
+        ),
+      },
+      {
+        path: "liveChat",
+        element: (
+          <AdminRoutes>
+            <LiveChat></LiveChat>
+          </AdminRoutes>
+        ),
+      },
+
+      // seller routes
+      {
+        path: "orders",
+        element: (
+          <SellerRoutes>
+            <Orders></Orders>
+          </SellerRoutes>
+        ),
+      },
+      {
+        path: "myStore",
+        element: (
+          <SellerRoutes>
+            <MyStore></MyStore>
+          </SellerRoutes>
+        ),
+      },
+      {
+        path: "chatCustomer",
+        element: (
+          <SellerRoutes>
+            <ChatCustomer></ChatCustomer>
+          </SellerRoutes>
+        ),
+      },
+
+      // rider routes
+      {
+        path: "pendingDeliveries",
+        element: (
+          <RiderRoutes>
+            <PendingDeliveries></PendingDeliveries>
+          </RiderRoutes>
+        ),
+      },
+      {
+        path: "completedDeliveries",
+        element: (
+          <RiderRoutes>
+            <CompletedDeliveries></CompletedDeliveries>
+          </RiderRoutes>
+        ),
+      },
+
+      // seller and rider route
+      {
+        path: "chatSupport",
+        element: (
+          <SellerAndRiderRoutes>
+            <ChatSupport></ChatSupport>
+          </SellerAndRiderRoutes>
         ),
       },
     ],

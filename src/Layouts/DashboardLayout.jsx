@@ -7,14 +7,18 @@ import { MdLogout, MdStorefront } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
 import { toast } from "react-toastify";
 import {
+  FaCheckCircle,
   FaMotorcycle,
   FaStoreAlt,
+  FaTasks,
   FaUserClock,
   FaUsers,
   FaUsersCog,
   FaUserTie,
 } from "react-icons/fa";
 import { LuCodesandbox } from "react-icons/lu";
+import { AiFillMessage } from "react-icons/ai";
+import { TiMessages } from "react-icons/ti";
 
 const SidebarItem = ({ to, onClick, children }) => {
   if (to) {
@@ -150,14 +154,16 @@ const DashboardLayout = () => {
                 <TbLayoutDashboard size={20} /> Dashboard
               </SidebarItem>
             </li>
-            <li className="my-1 font-semibold">
-              <SidebarItem
-                to="/dashboard/manageProfile"
-                onClick={handleLinkClick}
-              >
-                <FiUser size={20} /> Manage Profile
-              </SidebarItem>
-            </li>
+            {!roleLoading && role !== "seller" && (
+              <li className="my-1 font-semibold">
+                <SidebarItem
+                  to="/dashboard/manageProfile"
+                  onClick={handleLinkClick}
+                >
+                  <FiUser size={20} /> Manage Profile
+                </SidebarItem>
+              </li>
+            )}
             {!roleLoading && role === "admin" && (
               <>
                 <li className="my-1 font-semibold rounded-md">
@@ -216,6 +222,14 @@ const DashboardLayout = () => {
                     <FaMotorcycle size={20} /> Assign Rider
                   </SidebarItem>
                 </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/liveChat"
+                    onClick={handleLinkClick}
+                  >
+                    <TiMessages size={20} /> Live Chat
+                  </SidebarItem>
+                </li>
               </>
             )}
             {!roleLoading && role === "customer" && (
@@ -242,6 +256,72 @@ const DashboardLayout = () => {
                     onClick={handleLinkClick}
                   >
                     <FaMotorcycle size={20} /> Become a Rider
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem to="/dashboard/chat" onClick={handleLinkClick}>
+                    <AiFillMessage size={20} /> Chat
+                  </SidebarItem>
+                </li>
+              </>
+            )}
+            {!roleLoading && role === "seller" && (
+              <>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/myStore"
+                    onClick={handleLinkClick}
+                  >
+                    <MdStorefront size={20} /> My Store
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem to="/dashboard/orders" onClick={handleLinkClick}>
+                    <LuCodesandbox size={20} /> Orders
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/chatCustomer"
+                    onClick={handleLinkClick}
+                  >
+                    <TiMessages size={20} /> Chat Customer
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/chatSupport"
+                    onClick={handleLinkClick}
+                  >
+                    <AiFillMessage size={20} /> Chat Support
+                  </SidebarItem>
+                </li>
+              </>
+            )}
+            {!roleLoading && role === "rider" && (
+              <>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/pendingDeliveries"
+                    onClick={handleLinkClick}
+                  >
+                    <FaTasks size={20} /> Pending Deliveries
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/completedDeliveries"
+                    onClick={handleLinkClick}
+                  >
+                    <FaCheckCircle size={20} /> Completed Deliveries
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/chatSupport"
+                    onClick={handleLinkClick}
+                  >
+                    <AiFillMessage size={20} /> Chat Support
                   </SidebarItem>
                 </li>
               </>
