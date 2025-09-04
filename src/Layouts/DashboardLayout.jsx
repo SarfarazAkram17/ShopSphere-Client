@@ -163,10 +163,10 @@ const DashboardLayout = () => {
                 </li>
                 <li className="my-1 font-semibold rounded-md">
                   <SidebarItem
-                    to="/dashboard/manageUsers"
+                    to="/dashboard/allUsers"
                     onClick={handleLinkClick}
                   >
-                    <FaUsers size={20} /> Manage Users
+                    <FaUsers size={20} /> All Users
                   </SidebarItem>
                 </li>
                 <li className="my-1 font-semibold rounded-md">

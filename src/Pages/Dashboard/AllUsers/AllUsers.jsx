@@ -19,7 +19,7 @@ const roleOptions = [
   { value: "store owner", label: "Store Owner" },
 ];
 
-const ManageUsers = () => {
+const AllUsers = () => {
   const axiosSecure = useAxiosSecure();
   const { userEmail } = useAuth();
 
@@ -57,7 +57,7 @@ const ManageUsers = () => {
   return (
     <div className="px-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-primary">
-        Manage Users
+        All Users
       </h2>
 
       {/* Filters */}
@@ -156,4 +156,4 @@ const ManageUsers = () => {
   );
 };
 
-export default ManageUsers;
+export default AllUsers;

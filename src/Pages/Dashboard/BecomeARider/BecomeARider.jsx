@@ -112,7 +112,7 @@ const BecomeARider = () => {
         region: data.region,
         district: data.district,
         thana: data.thana,
-        stripeAccountId: data.stripeAccountId,
+        stripeAccountId: data.stripeAccountId.trim(),
         status: "pending",
         appliedAt: new Date().toISOString(),
       };

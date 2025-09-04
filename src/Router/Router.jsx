@@ -9,7 +9,7 @@ import DashboardLayout from "../Layouts/DashboardLayout";
 import ManageProfile from "../Pages/Dashboard/ManageProfile/ManageProfile";
 import Dashboard from "../Pages/Dashboard/Dashboard/Dashboard";
 import PrivateRoutes from "../Routes/PrivateRoutes";
-import ManageUsers from "../Pages/Dashboard/ManageUsers/ManageUsers";
+import AllUsers from "../Pages/Dashboard/AllUsers/AllUsers";
 import BecomeARider from "../Pages/Dashboard/BecomeARider/BecomeARider";
 import BecomeASeller from "../Pages/Dashboard/BecomeASeller/BecomeASeller";
 import MyOrders from "../Pages/Dashboard/MyOrders/MyOrders";
@@ -125,10 +125,10 @@ export const router = createBrowserRouter([
 
       // admin routes
       {
-        path: "manageUsers",
+        path: "allUsers",
         element: (
           <AdminRoutes>
-            <ManageUsers></ManageUsers>
+            <AllUsers></AllUsers>
           </AdminRoutes>
         ),
       },
