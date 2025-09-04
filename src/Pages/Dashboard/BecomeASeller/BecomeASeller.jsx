@@ -160,7 +160,7 @@ const BecomeASeller = () => {
         storeLogo: logoUrl,
         coverImage: coverUrl,
         categories: data.categories,
-        stripeAccountId: data.stripeAccountId,
+        stripeAccountId: data.stripeAccountId.trim(),
         status: "pending",
         appliedAt: new Date().toISOString(),
       };

@@ -4,7 +4,7 @@ import Forbidden from "../../Forbidden/Forbidden";
 import AdminDashboard from "./AdminDashboard";
 import CustomerDashboard from "./CustomerDashboard";
 import RiderDashboard from "./RiderDashboard";
-import StoreOwnerDashboard from "./StoreOwnerDashboard";
+import SellerDashboard from "./SellerDashboard";
 
 const Dashboard = () => {
   const { role, roleLoading } = useUserRole();
@@ -19,8 +19,8 @@ const Dashboard = () => {
     return <RiderDashboard></RiderDashboard>;
   } else if (role === "customer") {
     return <CustomerDashboard></CustomerDashboard>;
-  } else if (role === "store owner") {
-    return <StoreOwnerDashboard></StoreOwnerDashboard>;
+  } else if (role === "seller") {
+    return <SellerDashboard></SellerDashboard>;
   } else {
     return <Forbidden></Forbidden>;
   }

@@ -16,7 +16,7 @@ const roleOptions = [
   { value: "customer", label: "Customer" },
   { value: "rider", label: "Rider" },
   { value: "admin", label: "Admin" },
-  { value: "store owner", label: "Store Owner" },
+  { value: "seller", label: "Seller" },
 ];
 
 const AllUsers = () => {

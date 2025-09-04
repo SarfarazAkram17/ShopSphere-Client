@@ -1,6 +1,6 @@
 import React from 'react';
 
-const StoreOwnerDashboard = () => {
+const SellerDashboard = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const StoreOwnerDashboard = () => {
     );
 };
 
-export default StoreOwnerDashboard;
+export default SellerDashboard;

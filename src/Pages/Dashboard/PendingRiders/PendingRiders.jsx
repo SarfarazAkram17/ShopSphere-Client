@@ -94,7 +94,7 @@ const PendingRiders = () => {
             Pending Rider Applications
           </h1>
           <div className="overflow-x-auto rounded-box border-2 border-base-content/5 bg-base-200">
-            <table className="table table-sm text-center">
+            <table className="table table-xs text-center">
               <thead>
                 <tr>
                   <th>#</th>
@@ -177,10 +177,13 @@ const PendingRiders = () => {
                 <strong>Email:</strong> {selectedRider.email}
               </p>
               <p>
-                <strong>Contact:</strong> {selectedRider.phone}
+                <strong>Phone:</strong> {selectedRider.phone}
               </p>
               <p>
-                <strong>Age:</strong> {selectedRider.age}
+                <strong>Age:</strong> {selectedRider.age} years
+              </p>
+              <p>
+                <strong>Experience:</strong> {selectedRider.experience} years
               </p>
               <p>
                 <strong>Region:</strong> {selectedRider.region}

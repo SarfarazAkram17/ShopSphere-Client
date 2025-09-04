@@ -3,7 +3,7 @@ import useUserRole from "../Hooks/useUserRole";
 import Loader from "../Components/Loader/Loader";
 import { Navigate } from "react-router";
 
-const StoreOwnerRoutes = ({ children }) => {
+const SellerRoutes = ({ children }) => {
   const { user, loading } = useAuth();
   const { role, roleLoading } = useUserRole();
 
@@ -11,11 +11,11 @@ const StoreOwnerRoutes = ({ children }) => {
     return <Loader></Loader>;
   }
 
-  if (!user || role !== "store owner") {
+  if (!user || role !== "seller") {
     return <Navigate to="/forbidden"></Navigate>;
   }
 
   return children;
 };
 
-export default StoreOwnerRoutes;
+export default SellerRoutes;

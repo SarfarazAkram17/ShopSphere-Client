@@ -6,7 +6,14 @@ import { FiUser } from "react-icons/fi";
 import { MdLogout, MdStorefront } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
 import { toast } from "react-toastify";
-import { FaMotorcycle, FaStoreAlt, FaUserClock, FaUsers, FaUsersCog, FaUserTie } from "react-icons/fa";
+import {
+  FaMotorcycle,
+  FaStoreAlt,
+  FaUserClock,
+  FaUsers,
+  FaUsersCog,
+  FaUserTie,
+} from "react-icons/fa";
 import { LuCodesandbox } from "react-icons/lu";
 
 const SidebarItem = ({ to, onClick, children }) => {
