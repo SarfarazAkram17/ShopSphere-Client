@@ -352,7 +352,7 @@ const BecomeARider = () => {
           {submitting ? (
             <>
               <span className="loading loading-spinner text-primary"></span>
-              Submitting Application
+              <span className="animate-pulse">Submitting Application</span>
             </>
           ) : (
             <>Submit Application</>

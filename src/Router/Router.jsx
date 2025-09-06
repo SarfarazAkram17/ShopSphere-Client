@@ -31,6 +31,10 @@ import PendingDeliveries from "../Pages/Dashboard/PendingDeliveries/PendingDeliv
 import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
 import SellerAndRiderRoutes from "../Routes/SellerAndRiderRoutes";
 import ChatSupport from "../Pages/Dashboard/ChatSupport/ChatSupport";
+import UpdateOrderStatus from "../Pages/UpdateOrderStatus/UpdateOrderStatus";
+import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
+import ManageProducts from "../Pages/Dashboard/ManageProducts/ManageProducts";
+import EditProduct from "../Pages/Dashboard/EditProduct/EditProduct";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -200,6 +204,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "updateOrderStatus",
+        element: (
+          <AdminRoutes>
+            <UpdateOrderStatus></UpdateOrderStatus>
+          </AdminRoutes>
+        ),
+      },
+      {
         path: "liveChat",
         element: (
           <AdminRoutes>
@@ -209,6 +221,30 @@ export const router = createBrowserRouter([
       },
 
       // seller routes
+      {
+        path: "addProduct",
+        element: (
+          <SellerRoutes>
+            <AddProduct></AddProduct>
+          </SellerRoutes>
+        ),
+      },
+      {
+        path: "manageProducts",
+        element: (
+          <SellerRoutes>
+            <ManageProducts></ManageProducts>
+          </SellerRoutes>
+        ),
+      },
+      {
+        path: "editProduct",
+        element: (
+          <SellerRoutes>
+            <EditProduct></EditProduct>
+          </SellerRoutes>
+        ),
+      },
       {
         path: "orders",
         element: (

@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet } from "react-router";
 import logo from "/logo.png";
 import useAuth from "../Hooks/useAuth";
 import { TbLayoutDashboard, TbPackages } from "react-icons/tb";
-import { FiUser } from "react-icons/fi";
+import { FiPlusCircle, FiUser } from "react-icons/fi";
 import { MdLogout, MdStorefront } from "react-icons/md";
 import useUserRole from "../Hooks/useUserRole";
 import { toast } from "react-toastify";
@@ -154,16 +154,14 @@ const DashboardLayout = () => {
                 <TbLayoutDashboard size={20} /> Dashboard
               </SidebarItem>
             </li>
-            {!roleLoading && role !== "seller" && (
-              <li className="my-1 font-semibold">
-                <SidebarItem
-                  to="/dashboard/manageProfile"
-                  onClick={handleLinkClick}
-                >
-                  <FiUser size={20} /> Manage Profile
-                </SidebarItem>
-              </li>
-            )}
+            <li className="my-1 font-semibold">
+              <SidebarItem
+                to="/dashboard/manageProfile"
+                onClick={handleLinkClick}
+              >
+                <FiUser size={20} /> Manage Profile
+              </SidebarItem>
+            </li>
             {!roleLoading && role === "admin" && (
               <>
                 <li className="my-1 font-semibold rounded-md">
@@ -224,6 +222,14 @@ const DashboardLayout = () => {
                 </li>
                 <li className="my-1 font-semibold rounded-md">
                   <SidebarItem
+                    to="/dashboard/updateOrderStatus"
+                    onClick={handleLinkClick}
+                  >
+                    <LuCodesandbox size={20} /> Update Order Status
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
                     to="/dashboard/liveChat"
                     onClick={handleLinkClick}
                   >
@@ -273,6 +279,22 @@ const DashboardLayout = () => {
                     onClick={handleLinkClick}
                   >
                     <MdStorefront size={20} /> My Store
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/addProduct"
+                    onClick={handleLinkClick}
+                  >
+                    <FiPlusCircle size={20} /> Add Product
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/manageProducts"
+                    onClick={handleLinkClick}
+                  >
+                    <TbPackages size={20} /> Manage Products
                   </SidebarItem>
                 </li>
                 <li className="my-1 font-semibold rounded-md">

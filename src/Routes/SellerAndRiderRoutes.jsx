@@ -11,7 +11,7 @@ const SellerAndRiderRoutes = ({ children }) => {
     return <Loader></Loader>;
   }
 
-  if (!user || role !== "seller" || role !== 'rider') {
+  if (!user || (role !== "seller" && role !== "rider")) {
     return <Navigate to="/forbidden"></Navigate>;
   }
 

@@ -459,7 +459,8 @@ const BecomeASeller = () => {
               Product Categories <span className="text-red-500">*</span>
             </label>
             <Select
-              options={categories.map((c) => ({ value: c, label: c }))}
+              closeMenuOnSelect={false}
+              options={categories.map((c) => ({ value: c.toLowerCase(), label: c }))}
               value={selectedCategories}
               onChange={handleCategoryChange}
               isMulti
