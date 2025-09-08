@@ -35,6 +35,7 @@ const BecomeASeller = () => {
     "Home & Kitchen",
     "Beauty",
     "Sports",
+    "Toys",
   ]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
@@ -459,7 +460,6 @@ const BecomeASeller = () => {
               Product Categories <span className="text-red-500">*</span>
             </label>
             <Select
-              closeMenuOnSelect={false}
               options={categories.map((c) => ({ value: c.toLowerCase(), label: c }))}
               value={selectedCategories}
               onChange={handleCategoryChange}

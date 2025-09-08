@@ -16,6 +16,7 @@ const AddProduct = () => {
     "Home & Kitchen",
     "Beauty",
     "Sports",
+    "Toys",
   ]);
   const axiosSecure = useAxiosSecure();
   const fileInputRef = useRef();
@@ -154,7 +155,7 @@ const AddProduct = () => {
         {/* Product Name */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Name
+            Product Name  <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -172,7 +173,7 @@ const AddProduct = () => {
         {/* Price */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Price (BDT)
+            Price (BDT)  <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -194,7 +195,7 @@ const AddProduct = () => {
         {/* Discount */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Discount (%)
+            Discount (%)  <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -212,7 +213,7 @@ const AddProduct = () => {
         {/* Stock */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Stock
+            Stock  <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -239,7 +240,6 @@ const AddProduct = () => {
             Product Categories <span className="text-red-500">*</span>
           </label>
           <Select
-            closeMenuOnSelect={false}
             options={categories.map((c) => ({
               value: c.toLowerCase(),
               label: c,
@@ -260,7 +260,7 @@ const AddProduct = () => {
         {/* Color */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional)
+            Color (Optional)  <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -273,7 +273,7 @@ const AddProduct = () => {
         {/* Size */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional)
+            Size (Optional)  <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -286,7 +286,7 @@ const AddProduct = () => {
         {/* Image Upload */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Upload Images
+            Upload Images  <span className="text-red-500">*</span>
           </label>
           <input
             ref={fileInputRef}
@@ -327,7 +327,7 @@ const AddProduct = () => {
         {/* Description */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Description
+            Description  <span className="text-red-500">*</span>
           </label>
           <textarea
             placeholder="Description"

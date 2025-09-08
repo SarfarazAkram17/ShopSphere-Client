@@ -238,7 +238,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "editProduct",
+        path: "editProduct/:id",
         element: (
           <SellerRoutes>
             <EditProduct></EditProduct>

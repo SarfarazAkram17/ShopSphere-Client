@@ -6,9 +6,8 @@
   name: "light";
 
   --color-primary: #019E97;
-  --color-secondary: #0EA5E9;
-  --color-warning: #F59E0B;
-  --color-info: #3abff8;
+  --color-secondary: #bf5b1f;
+  --color-error: #d62828;
 }
 
 .active {
