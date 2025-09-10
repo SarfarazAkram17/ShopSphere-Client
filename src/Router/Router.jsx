@@ -35,6 +35,7 @@ import UpdateOrderStatus from "../Pages/UpdateOrderStatus/UpdateOrderStatus";
 import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
 import ManageProducts from "../Pages/Dashboard/ManageProducts/ManageProducts";
 import EditProduct from "../Pages/Dashboard/EditProduct/EditProduct";
+import AllOrders from "../Pages/Dashboard/AllOrders/AllOrders";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -164,6 +165,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "allOrders",
+        element: (
+          <AdminRoutes>
+            <AllOrders></AllOrders>
+          </AdminRoutes>
+        ),
+      },
+      {
         path: "manageSellers",
         element: (
           <AdminRoutes>
@@ -238,7 +247,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "editProduct/:id",
+        path: "editProduct/:productId",
         element: (
           <SellerRoutes>
             <EditProduct></EditProduct>

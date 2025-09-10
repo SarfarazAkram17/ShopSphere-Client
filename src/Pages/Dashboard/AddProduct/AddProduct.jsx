@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
@@ -37,6 +37,10 @@ const AddProduct = () => {
 
   const cloudName = import.meta.env.VITE_cloudinary_cloud_name;
   const uploadPreset = import.meta.env.VITE_cloudinary_preset_name;
+
+  useEffect(() => {
+    register("categories", { required: "Choose at least one category." });
+  }, [register]);
 
   // ---------------- IMAGE UPLOAD ----------------
   const handleImageUpload = async (files) => {
@@ -155,7 +159,7 @@ const AddProduct = () => {
         {/* Product Name */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Name  <span className="text-red-500">*</span>
+            Product Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -173,7 +177,7 @@ const AddProduct = () => {
         {/* Price */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Price (BDT)  <span className="text-red-500">*</span>
+            Price (BDT) <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -195,7 +199,7 @@ const AddProduct = () => {
         {/* Discount */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Discount (%)  <span className="text-red-500">*</span>
+            Discount (%) <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -206,14 +210,14 @@ const AddProduct = () => {
             {...register("discount", { min: 0, max: 100 })}
           />
           <p className="text-xs text-gray-500 mt-1">
-            Default 0%. Can be updated up to 100% later by admin.
+            Default 0%. Can be updated up to 100%.
           </p>
         </div>
 
         {/* Stock */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Stock  <span className="text-red-500">*</span>
+            Stock <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -236,7 +240,7 @@ const AddProduct = () => {
 
         {/* Category */}
         <div>
-          <label className="text-xs font-semibold">
+          <label className="block font-semibold mb-1 text-sm text-gray-700">
             Product Categories <span className="text-red-500">*</span>
           </label>
           <Select
@@ -248,7 +252,7 @@ const AddProduct = () => {
             onChange={handleCategoryChange}
             isMulti
             placeholder="Select Product Categories"
-            className="text-xs xl:text-sm mt-1"
+            className="text-xs xl:text-sm mt-1 w-full"
           />
           {errors.categories && (
             <span className="text-red-500 text-xs mt-1 font-semibold">
@@ -260,11 +264,11 @@ const AddProduct = () => {
         {/* Color */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional)  <span className="text-red-500">*</span>
+            Color (Optional) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            placeholder="Color separated with comma"
+            placeholder="Color (separated with comma)"
             className="input input-bordered w-full"
             {...register("color")}
           />
@@ -273,11 +277,11 @@ const AddProduct = () => {
         {/* Size */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional)  <span className="text-red-500">*</span>
+            Size (Optional) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            placeholder="Size separated with comma"
+            placeholder="Size (separated with comma)"
             className="input input-bordered w-full"
             {...register("size")}
           />
@@ -286,7 +290,7 @@ const AddProduct = () => {
         {/* Image Upload */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Upload Images  <span className="text-red-500">*</span>
+            Upload Images <span className="text-red-500">*</span>
           </label>
           <input
             ref={fileInputRef}
@@ -298,23 +302,24 @@ const AddProduct = () => {
             disabled={uploading || imageURLs.length >= 4}
           />
 
-          <div className="flex space-x-2 mt-2">
-            {imageURLs.map((url, index) => (
-              <div key={index} className="relative w-28 h-28">
-                <img
-                  src={url}
-                  alt="Product"
-                  className="w-full h-full object-cover rounded"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleImageRemove(index)}
-                  className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded opacity-80 hover:opacity-100"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+            {imageURLs.length > 0 &&
+              imageURLs.map((url, index) => (
+                <div key={index} className="relative w-full h-28">
+                  <img
+                    src={url}
+                    alt="Product"
+                    className="w-full h-full object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleImageRemove(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded opacity-80 hover:opacity-100"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
           </div>
 
           <p className="text-xs text-gray-600 mt-1">
@@ -327,7 +332,7 @@ const AddProduct = () => {
         {/* Description */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Description  <span className="text-red-500">*</span>
+            Description <span className="text-red-500">*</span>
           </label>
           <textarea
             placeholder="Description"
@@ -353,7 +358,7 @@ const AddProduct = () => {
               <>
                 <span className="loading loading-spinner text-primary"></span>{" "}
                 {uploading ? (
-                  <span className="animate-pulse">Uploading image</span>
+                  <span className="animate-pulse">Uploading image(s)</span>
                 ) : (
                   <span className="animate-pulse">Adding Product</span>
                 )}

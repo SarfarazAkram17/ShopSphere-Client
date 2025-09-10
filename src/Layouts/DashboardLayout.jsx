@@ -19,6 +19,7 @@ import {
 import { LuCodesandbox } from "react-icons/lu";
 import { AiFillMessage } from "react-icons/ai";
 import { TiMessages } from "react-icons/ti";
+import { PiShoppingCartBold } from "react-icons/pi";
 
 const SidebarItem = ({ to, onClick, children }) => {
   if (to) {
@@ -170,6 +171,14 @@ const DashboardLayout = () => {
                     onClick={handleLinkClick}
                   >
                     <TbPackages size={20} /> All Products
+                  </SidebarItem>
+                </li>
+                <li className="my-1 font-semibold rounded-md">
+                  <SidebarItem
+                    to="/dashboard/allOrders"
+                    onClick={handleLinkClick}
+                  >
+                    <PiShoppingCartBold size={20} /> All Orders
                   </SidebarItem>
                 </li>
                 <li className="my-1 font-semibold rounded-md">
