@@ -52,7 +52,7 @@ const About = () => {
             <div className="flex items-center gap-4 mb-4">
               <img
                 src="https://i.ibb.co.com/RpJLT7dR/logo.png"
-                alt="TourNest"
+                alt="Sam's Kitchen"
                 className="h-12 w-auto"
               />
               <h4 className="text-2xl font-bold text-primary">Sam's Kitchen</h4>

@@ -4,7 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import Loader from "../../../Components/Loader/Loader";
-import { Pagination } from "antd";
+import TablePaginationActions from "../../../lib/pagination";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableFooter from "@mui/material/TableFooter";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -23,20 +32,27 @@ const AllUsers = () => {
   const axiosSecure = useAxiosSecure();
   const { userEmail } = useAuth();
 
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchType, setSearchType] = useState(searchOptions[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState(roleOptions[0]);
-
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["users", searchType.value, searchTerm, roleFilter.value, page],
+    queryKey: [
+      "users",
+      searchType.value,
+      searchTerm,
+      roleFilter.value,
+      page,
+      rowsPerPage,
+    ],
     queryFn: async () => {
       const res = await axiosSecure.get(`/users`, {
         params: {
           email: userEmail,
-          page,
-          limit: 10,
+          page: page + 1,
+          limit: rowsPerPage,
           searchType: searchType.value,
           search: searchTerm,
           role: roleFilter.value,
@@ -52,7 +68,7 @@ const AllUsers = () => {
 
   useEffect(() => {
     refetch();
-  }, [searchTerm, searchType, roleFilter, page]);
+  }, [searchTerm, searchType, roleFilter, rowsPerPage, page, refetch]);
 
   return (
     <div className="px-4">
@@ -104,52 +120,65 @@ const AllUsers = () => {
         </p>
       ) : (
         <>
-          <div className="overflow-x-auto border border-base-content/5 rounded-lg">
-            <table className="table table-sm text-center w-full">
-              <thead>
-                <tr className="bg-base-200">
-                  <th>#</th>
-                  <th>Photo</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Method</th>
-                  <th>Role</th>
-                </tr>
-              </thead>
-              <tbody>
+          <TableContainer component={Paper}>
+            <Table aria-label="all users table" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center" sx={{ py: 0.5 }}>#</TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>Photo</TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>Name</TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>Email</TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>Method</TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>Role</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
                 {users.map((user, i) => (
-                  <tr key={user._id}>
-                    <td>{(page - 1) * 10 + i + 1}</td>
-                    <td className="flex justify-center">
+                  <TableRow key={user._id}>
+                    <TableCell align="center" sx={{ py: 0.5 }}>
+                      {page * rowsPerPage + i + 1}
+                    </TableCell>
+                    <TableCell align="center" sx={{ py: 0.5 }}>
                       <img
-                        className="h-11 object-cover w-11 rounded-full"
+                        className="h-11 object-cover w-11 mx-auto rounded-full"
                         src={user.photo}
                         alt={user.name}
                       />
-                    </td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.providerId ? "Google" : "Email/Password"}</td>
-                    <td className="capitalize">{user.role}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell align="center" sx={{ py: 0.5 }}>{user.name}</TableCell>
+                    <TableCell align="center" sx={{ py: 0.5 }}>{user.email}</TableCell>
+                    <TableCell align="center" sx={{ py: 0.5 }}>
+                      {user.providerId ? "Google" : "Email/Password"}
+                    </TableCell>
+                    <TableCell align="center" className="capitalize" sx={{ py: 0.5 }}>{user.role}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
 
-          {/* Pagination */}
-          <div className="mt-6 w-full">
-            <Pagination
-              current={page}
-              align="center"
-              total={total}
-              pageSize={10}
-              showSizeChanger={false}
-              onChange={(newPage) => {
-                setPage(newPage);
-              }}
-            />
-          </div>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 20, 30]}
+                    colSpan={6}
+                    count={total}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      inputProps: { "aria-label": "rows per page" },
+                      native: false,
+                    }}
+                    onPageChange={(event, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(event) => {
+                      setRowsPerPage(parseInt(event.target.value, 10));
+                      setPage(0);
+                    }}
+                    ActionsComponent={TablePaginationActions}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
         </>
       )}
     </div>
