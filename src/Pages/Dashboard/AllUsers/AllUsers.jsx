@@ -41,7 +41,7 @@ const AllUsers = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: [
       "users",
-      searchType.value,
+      searchTerm && searchType.value,
       searchTerm,
       roleFilter.value,
       page,
@@ -51,7 +51,7 @@ const AllUsers = () => {
       const res = await axiosSecure.get(`/users`, {
         params: {
           email: userEmail,
-          page: page + 1,
+          page,
           limit: rowsPerPage,
           searchType: searchType.value,
           search: searchTerm,
@@ -69,7 +69,8 @@ const AllUsers = () => {
   useEffect(() => {
     refetch();
   }, [searchTerm, searchType, roleFilter, rowsPerPage, page, refetch]);
-
+  
+  console.log(users)
   return (
     <div className="px-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-primary">
@@ -77,17 +78,17 @@ const AllUsers = () => {
       </h2>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-2 items-center mb-6">
         <Select
           options={searchOptions}
           value={searchType}
           onChange={(selected) => {
             setSearchType(selected);
-            setPage(1);
+            setPage(0);
           }}
-          className="w-full md:w-1/3"
+          className="w-full"
         />
-        <label className="input input-bordered w-full md:w-1/3 flex items-center gap-2">
+        <label className="input input-bordered w-full h-9.5">
           <input
             type="search"
             required
@@ -95,9 +96,8 @@ const AllUsers = () => {
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              setPage(1);
+              setPage(0);
             }}
-            className="grow"
           />
         </label>
         <Select
@@ -107,7 +107,7 @@ const AllUsers = () => {
             setRoleFilter(selected);
             setPage(1);
           }}
-          className="w-full md:w-1/3"
+          className="w-full"
         />
       </div>
 
