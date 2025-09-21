@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRef, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
@@ -27,20 +27,14 @@ const AddProduct = () => {
     handleSubmit,
     reset,
     formState: { errors },
-    setValue,
-    trigger,
+    control,
   } = useForm();
 
   const [uploading, setUploading] = useState(false);
   const [imageURLs, setImageURLs] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const cloudName = import.meta.env.VITE_cloudinary_cloud_name;
   const uploadPreset = import.meta.env.VITE_cloudinary_preset_name;
-
-  useEffect(() => {
-    register("categories", { required: "Choose at least one category." });
-  }, [register]);
 
   // ---------------- IMAGE UPLOAD ----------------
   const handleImageUpload = async (files) => {
@@ -95,7 +89,6 @@ const AddProduct = () => {
       if (data.productId) {
         Swal.fire("Success", "🎉 Product added successfully!", "success");
         setImageURLs([]);
-        setSelectedCategories([]);
         reset();
       }
     },
@@ -103,12 +96,6 @@ const AddProduct = () => {
       toast.error(`Failed to add product: ${err.message}`);
     },
   });
-
-  const handleCategoryChange = (selected) => {
-    setSelectedCategories(selected || []);
-    setValue("categories", selected ? selected.map((c) => c.value) : []);
-    trigger("categories");
-  };
 
   const handleAddProduct = async (data) => {
     if (imageURLs.length < 4) {
@@ -128,15 +115,15 @@ const AddProduct = () => {
       description: data.description,
       images: imageURLs,
       stock,
-      category: data.categories,
+      category: data.categories, // from Controller
       color:
         data.color
-          .split(",")
+          ?.split(",")
           .map((c) => c.trim())
           .filter((c) => c.length > 0) || null,
       size:
         data.size
-          .split(",")
+          ?.split(",")
           .map((s) => s.trim())
           .filter((s) => s.length > 0) || null,
       addedAt: new Date().toISOString(),
@@ -238,21 +225,37 @@ const AddProduct = () => {
           )}
         </div>
 
-        {/* Category */}
+        {/* Categories */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
             Product Categories <span className="text-red-500">*</span>
           </label>
-          <Select
-            options={categories.map((c) => ({
-              value: c.toLowerCase(),
-              label: c,
-            }))}
-            value={selectedCategories}
-            onChange={handleCategoryChange}
-            isMulti
-            placeholder="Select Product Categories"
-            className="text-xs xl:text-sm mt-1 w-full"
+          <Controller
+            control={control}
+            name="categories"
+            rules={{ required: "Choose at least one category." }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                isMulti
+                options={categories.map((c) => ({
+                  value: c.toLowerCase(),
+                  label: c,
+                }))}
+                className="text-xs xl:text-sm mt-1 w-full"
+                placeholder="Select Product Categories"
+                value={
+                  field.value
+                    ? categories
+                        .filter((c) => field.value.includes(c.toLowerCase()))
+                        .map((c) => ({ value: c.toLowerCase(), label: c }))
+                    : []
+                }
+                onChange={(selected) =>
+                  field.onChange(selected.map((s) => s.value))
+                }
+              />
+            )}
           />
           {errors.categories && (
             <span className="text-red-500 text-xs mt-1 font-semibold">
@@ -264,7 +267,7 @@ const AddProduct = () => {
         {/* Color */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional) <span className="text-red-500">*</span>
+            Color (Optional)
           </label>
           <input
             type="text"
@@ -277,7 +280,7 @@ const AddProduct = () => {
         {/* Size */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional) <span className="text-red-500">*</span>
+            Size (Optional)
           </label>
           <input
             type="text"
@@ -302,14 +305,14 @@ const AddProduct = () => {
             disabled={uploading || imageURLs.length >= 4}
           />
 
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-2">
             {imageURLs.length > 0 &&
               imageURLs.map((url, index) => (
-                <div key={index} className="relative w-full h-28">
+                <div key={index} className="relative group">
                   <img
                     src={url}
                     alt="Product"
-                    className="w-full h-full object-cover rounded"
+                    className="w-full h-28 object-cover rounded border"
                   />
                   <button
                     type="button"

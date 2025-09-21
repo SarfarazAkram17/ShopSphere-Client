@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useParams, useNavigate } from "react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxios from "../../../Hooks/useAxios";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { toast } from "react-toastify";
@@ -10,7 +10,6 @@ import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 import Loader from "../../../Components/Loader/Loader";
 import Select from "react-select";
-import { useQueryClient } from "@tanstack/react-query";
 
 const EditProduct = () => {
   const { productId } = useParams();
@@ -24,7 +23,6 @@ const EditProduct = () => {
   const [existingImages, setExistingImages] = useState([]);
   const [newImageURLs, setNewImageURLs] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const cloudName = import.meta.env.VITE_cloudinary_cloud_name;
   const uploadPreset = import.meta.env.VITE_cloudinary_preset_name;
@@ -36,7 +34,7 @@ const EditProduct = () => {
     reset,
     formState: { errors },
     setValue,
-    trigger,
+    control,
   } = useForm();
 
   const [categories] = useState([
@@ -80,12 +78,12 @@ const EditProduct = () => {
             categories.find((cat) => cat.toLowerCase() === c.toLowerCase()) ||
             c,
         }));
-        setSelectedCategories(formatted);
-      }
 
-      register("categories", { required: "Choose at least one category." });
+        // ✅ set default value for Controller
+        setValue("categories", formatted);
+      }
     }
-  }, [productData, reset, categories, register]);
+  }, [productData, reset, categories, setValue]);
 
   // ---------------- IMAGE UPLOAD ----------------
   const handleImageUpload = async (files) => {
@@ -123,12 +121,6 @@ const EditProduct = () => {
 
   const handleRemoveNewImage = (index) => {
     setNewImageURLs((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleCategoryChange = (selected) => {
-    setSelectedCategories(selected || []);
-    setValue("categories", selected ? selected.map((c) => c.value) : []);
-    trigger("categories");
   };
 
   // ---------------- UPDATE Product MUTATION ----------------
@@ -169,7 +161,7 @@ const EditProduct = () => {
       discount,
       description: data.description,
       stock,
-      category: data.categories,
+      category: data.categories.map((c) => c.value), // ✅ extract values
       color:
         data.color
           .split(",")
@@ -283,16 +275,22 @@ const EditProduct = () => {
           <label className="block font-semibold mb-1 text-sm text-gray-700">
             Product Categories <span className="text-red-500">*</span>
           </label>
-          <Select
-            isMulti
-            placeholder="Select Product Categories"
-            value={selectedCategories}
-            onChange={handleCategoryChange}
-            options={categories.map((c) => ({
-              value: c.toLowerCase(),
-              label: c,
-            }))}
-            className="text-xs xl:text-sm mt-1 w-full"
+          <Controller
+            name="categories"
+            control={control}
+            rules={{ required: "Choose at least one category." }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                isMulti
+                placeholder="Select Product Categories"
+                options={categories.map((c) => ({
+                  value: c.toLowerCase(),
+                  label: c,
+                }))}
+                className="text-xs xl:text-sm mt-1 w-full"
+              />
+            )}
           />
           {errors.categories && (
             <span className="text-red-500 text-xs mt-1 font-semibold">
@@ -376,7 +374,7 @@ const EditProduct = () => {
               existingImages.length + newImageURLs.length >= 4
             }
           />
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-2">
             {newImageURLs.length > 0 &&
               newImageURLs.map((url, i) => (
                 <div key={i} className="relative group">
@@ -424,7 +422,37 @@ const EditProduct = () => {
           >
             {uploading || isPending ? (
               <>
-                                <svg className="w-5 h-5 text-primary animate-spin" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8"/><line x1="50" y1="50" x2="50" y2="25" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/><line x1="50" y1="50" x2="75" y2="50" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>{" "}
+                <svg
+                  className="w-5 h-5 text-primary animate-spin"
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                  />
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="50"
+                    y2="25"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="75"
+                    y2="50"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                </svg>{" "}
                 {uploading ? (
                   <span className="animate-pulse">Uploading image(s)</span>
                 ) : (

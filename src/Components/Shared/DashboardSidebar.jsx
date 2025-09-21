@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import useUserRole from "../../Hooks/useUserRole";
 import { FiPlusCircle, FiUser } from "react-icons/fi";
 import { TbLayoutDashboard, TbPackages } from "react-icons/tb";
@@ -25,7 +24,6 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
   const { roleLoading, role } = useUserRole();
   const sidebarRef = useRef(null);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
@@ -240,10 +238,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             ))}
 
             <div
-              onClick={() => {
-                logOutUser();
-                queryClient.clear();
-              }}
+              onClick={() => logOutUser()}
               className="px-4 py-2 rounded-md flex gap-2 mt-3 text-sm font-medium hover:bg-red-500 hover:text-white/85 items-center cursor-pointer"
             >
               <MdLogout size={20} /> Logout
