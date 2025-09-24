@@ -7,7 +7,7 @@ const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="flex h-screen overflow-hidden max-w-[1500px] mx-auto">
+    <div className="flex h-screen overflow-hidden max-w-[1700px] mx-auto">
       {/* Sidebar (fixed height) */}
       <DashboardSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
 
