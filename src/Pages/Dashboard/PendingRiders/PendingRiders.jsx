@@ -190,7 +190,7 @@ const PendingRiders = () => {
         </h1>
       ) : (
         <TableContainer component={Paper}>
-          <Table aria-label="pending sellers table" size="small">
+          <Table aria-label="pending riders table" size="small">
             <TableHead>
               <TableRow>
                 <TableCell align="center" sx={{ py: 0.5 }}>

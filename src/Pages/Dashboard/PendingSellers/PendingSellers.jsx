@@ -309,9 +309,9 @@ const PendingSellers = () => {
         </TableContainer>
       )}
 
-      {/* Modal for viewing rider details */}
+      {/* Modal for viewing seller details */}
       {selectedSeller && (
-        <dialog id="riderDetailsModal" className="modal modal-open">
+        <dialog id="sellerDetailsModal" className="modal modal-open">
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-2xl mb-5">
               Seller requester Details

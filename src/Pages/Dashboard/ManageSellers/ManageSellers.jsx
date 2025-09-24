@@ -1,4 +1,3 @@
-// import Swal from "sweetalert2";
 import useAuth from "../../../Hooks/useAuth";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
@@ -64,7 +63,7 @@ const ManageSellers = () => {
 
   const { isPending, data, refetch } = useQuery({
     queryKey: [
-      "pending-sellers",
+      "sellers",
       searchTerm,
       searchTerm && searchType.value,
       page,
@@ -116,6 +115,7 @@ const ManageSellers = () => {
       Swal.fire("Error", "Could not update seller status", err.message);
     }
   };
+
   return (
     <div className="px-4">
       <h1 className="text-3xl sm:text-4xl text-gray-600 font-extrabold mb-6 text-center">
@@ -170,7 +170,7 @@ const ManageSellers = () => {
         </h1>
       ) : (
         <TableContainer component={Paper}>
-          <Table aria-label="pending sellers table" size="small">
+          <Table aria-label="sellers table" size="small">
             <TableHead>
               <TableRow>
                 <TableCell align="center" sx={{ py: 0.5 }}>
@@ -284,9 +284,9 @@ const ManageSellers = () => {
         </TableContainer>
       )}
 
-      {/* Modal for viewing rider details */}
+      {/* Modal for viewing seller details */}
       {selectedSeller && (
-        <dialog id="riderDetailsModal" className="modal modal-open">
+        <dialog id="sellerDetailsModal" className="modal modal-open">
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-2xl mb-5">
               Seller requester Details
