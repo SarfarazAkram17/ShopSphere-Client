@@ -5,7 +5,6 @@ import Offers from "../Pages/Offers/Offers";
 import Loader from "../Components/Loader/Loader";
 import ProductDetails from "../Pages/ProductDetails/ProductDetails";
 import DashboardLayout from "../Layouts/DashboardLayout";
-import ManageProfile from "../Pages/Dashboard/ManageProfile/ManageProfile";
 import Dashboard from "../Pages/Dashboard/Dashboard/Dashboard";
 import PrivateRoutes from "../Routes/PrivateRoutes";
 import AllUsers from "../Pages/Dashboard/AllUsers/AllUsers";
@@ -28,8 +27,6 @@ import LiveChat from "../Pages/Dashboard/LiveChat/LiveChat";
 import RiderRoutes from "../Routes/RiderRoutes";
 import PendingDeliveries from "../Pages/Dashboard/PendingDeliveries/PendingDeliveries";
 import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
-import SellerAndRiderRoutes from "../Routes/SellerAndRiderRoutes";
-import ChatSupport from "../Pages/Dashboard/ChatSupport/ChatSupport";
 import UpdateOrderStatus from "../Pages/UpdateOrderStatus/UpdateOrderStatus";
 import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
 import ManageProducts from "../Pages/Dashboard/ManageProducts/ManageProducts";
@@ -37,6 +34,12 @@ import EditProduct from "../Pages/Dashboard/EditProduct/EditProduct";
 import AllOrders from "../Pages/Dashboard/AllOrders/AllOrders";
 import Products from "../Pages/Products/Products";
 import AllProducts from "../Pages/Dashboard/AllProducts/AllProducts";
+import Profile from "../Pages/Dashboard/Profile/Profile";
+import PayoutRequests from "../Pages/Dashboard/PayoutRequests/PayoutRequests";
+import RiderRequestPayout from "../Pages/Dashboard/RiderRequestPayout/RiderRequestPayout";
+import SellerRequestPayout from "../Pages/Dashboard/SellerRequestPayout/SellerRequestPayout";
+import RiderChatSupport from "../Pages/Dashboard/RiderChatSupport/RiderChatSupport";
+import SellerChatSupport from "../Pages/Dashboard/SellerChatSupport/SellerChatSupport";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -110,8 +113,8 @@ export const router = createBrowserRouter([
         Component: Dashboard,
       },
       {
-        path: "manageProfile",
-        Component: ManageProfile,
+        path: "profile",
+        Component: Profile,
       },
 
       // customer routes
@@ -154,6 +157,14 @@ export const router = createBrowserRouter([
         element: (
           <AdminRoutes>
             <AllUsers></AllUsers>
+          </AdminRoutes>
+        ),
+      },
+      {
+        path: "payoutRequests",
+        element: (
+          <AdminRoutes>
+            <PayoutRequests></PayoutRequests>
           </AdminRoutes>
         ),
       },
@@ -264,6 +275,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "seller/requestPayout",
+        element: (
+          <SellerRoutes>
+            <SellerRequestPayout></SellerRequestPayout>
+          </SellerRoutes>
+        ),
+      },
+      {
         path: "myStore",
         element: (
           <SellerRoutes>
@@ -276,6 +295,14 @@ export const router = createBrowserRouter([
         element: (
           <SellerRoutes>
             <ChatCustomer></ChatCustomer>
+          </SellerRoutes>
+        ),
+      },
+      {
+        path: "seller/chatSupport",
+        element: (
+          <SellerRoutes>
+            <SellerChatSupport></SellerChatSupport>
           </SellerRoutes>
         ),
       },
@@ -297,14 +324,20 @@ export const router = createBrowserRouter([
           </RiderRoutes>
         ),
       },
-
-      // seller and rider route
       {
-        path: "chatSupport",
+        path: "rider/requestPayout",
         element: (
-          <SellerAndRiderRoutes>
-            <ChatSupport></ChatSupport>
-          </SellerAndRiderRoutes>
+          <RiderRoutes>
+            <RiderRequestPayout></RiderRequestPayout>
+          </RiderRoutes>
+        ),
+      },
+      {
+        path: "rider/chatSupport",
+        element: (
+          <RiderRoutes>
+            <RiderChatSupport></RiderChatSupport>
+          </RiderRoutes>
         ),
       },
     ],

@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { Link } from "react-router";
 
 const DashboardNavbar = ({ setIsOpen }) => {
@@ -10,7 +10,7 @@ const DashboardNavbar = ({ setIsOpen }) => {
           className="btn rounded-sm flex items-center py-2 px-3 mr-3"
           onClick={() => setIsOpen(true)}
         >
-          <Menu size={20} />
+          <AiOutlineMenuUnfold size={20} />
         </button>
 
         {/* Logo */}

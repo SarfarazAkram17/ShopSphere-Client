@@ -90,7 +90,7 @@ const ManageRiders = () => {
   const riders = data?.riders || [];
   const total = data?.total || 0;
 
-  const handleSwitchChange = async (e, id, currentStatus, email) => {
+  const handleStatusSwitch = async (e, id, currentStatus, email) => {
     e.stopPropagation();
 
     const confirm = await Swal.fire({
@@ -237,7 +237,7 @@ const ManageRiders = () => {
                     <Switch
                       checked={r.status === "active"}
                       onChange={(checked, e) =>
-                        handleSwitchChange(e, r._id, r.status, r.email)
+                        handleStatusSwitch(e, r._id, r.status, r.email)
                       }
                       checkedChildren="Active"
                       unCheckedChildren="Deactive"
@@ -257,7 +257,7 @@ const ManageRiders = () => {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 20, 30]}
-                  colSpan={9}
+                  colSpan={8}
                   count={total}
                   rowsPerPage={rowsPerPage}
                   page={page}
@@ -282,9 +282,7 @@ const ManageRiders = () => {
       {selectedRider && (
         <dialog id="riderDetailsModal" className="modal modal-open">
           <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-2xl mb-5">
-              Seller requester Details
-            </h3>
+            <h3 className="font-bold text-2xl mb-5">Rider requester Details</h3>
             <div className="space-y-2">
               <p>
                 <strong>Name:</strong> {selectedRider.name}
@@ -300,30 +298,6 @@ const ManageRiders = () => {
               </p>
               <p>
                 <strong>Experience:</strong> {selectedRider.experience} years
-              </p>
-              <img
-                src={selectedRider.storeLogo}
-                alt={selectedRider.storeName}
-                className="h-12 w-auto"
-              />
-              <img
-                src={selectedRider.coverImage}
-                alt={selectedRider.storeName}
-                className="h-40 rounded-md w-full"
-              />
-              <p>
-                <strong>Store Name:</strong> {selectedRider.storeName}
-              </p>
-              <p>
-                <strong>Product Categories:</strong>{" "}
-                <span className="capitalize">
-                  {selectedRider.categories
-                    .map((category) => category)
-                    .join(", ")}
-                </span>
-              </p>
-              <p>
-                <strong>Store Address:</strong> {selectedRider.storeAddress}
               </p>
               <p>
                 <strong>Region:</strong> {selectedRider.region}
@@ -341,6 +315,21 @@ const ManageRiders = () => {
               <p>
                 <strong>Applied At:</strong>{" "}
                 {new Date(selectedRider.appliedAt).toLocaleString()}
+              </p>
+              {selectedRider.activeAt && (
+                <p>
+                  <strong>Active At:</strong>{" "}
+                  {new Date(selectedRider.activeAt).toLocaleString()}
+                </p>
+              )}
+              {selectedRider.deactiveAt && (
+                <p>
+                  <strong>Deactive At:</strong>{" "}
+                  {new Date(selectedRider.deactiveAt).toLocaleString()}
+                </p>
+              )}
+              <p className="capitalize">
+                <strong>Work Status:</strong> {selectedRider.work_status}
               </p>
             </div>
 

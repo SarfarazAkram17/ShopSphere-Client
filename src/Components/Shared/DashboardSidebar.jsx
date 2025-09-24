@@ -14,11 +14,12 @@ import {
   FaUserTie,
 } from "react-icons/fa";
 import { LuCodesandbox } from "react-icons/lu";
-import { TiMessages } from "react-icons/ti";
+// import { TiMessages } from "react-icons/ti";
 import { MdLogout, MdStorefront } from "react-icons/md";
-import { AiFillMessage } from "react-icons/ai";
+// import { AiFillMessage } from "react-icons/ai";
 import { Link, NavLink } from "react-router";
 import useAuth from "../../Hooks/useAuth";
+import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 
 export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
@@ -57,8 +58,8 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
       icon: <TbLayoutDashboard size={20} />,
     },
     {
-      name: "Manage Profile",
-      path: "/dashboard/manageProfile",
+      name: "Profile",
+      path: "/dashboard/profile",
       icon: <FiUser size={20} />,
     },
     ...(!roleLoading && role === "admin"
@@ -72,6 +73,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             name: "All Orders",
             path: "/dashboard/allOrders",
             icon: <PiShoppingCartBold size={20} />,
+          },
+          {
+            name: "Payout Requests",
+            path: "/dashboard/payoutRequests",
+            icon: <GiPayMoney size={20} />,
           },
           {
             name: "All Users",
@@ -108,11 +114,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             path: "/dashboard/updateOrderStatus",
             icon: <LuCodesandbox size={20} />,
           },
-          {
-            name: "Live Chat",
-            path: "/dashboard/liveChat",
-            icon: <TiMessages size={20} />,
-          },
+          // {
+          //   name: "Live Chat",
+          //   path: "/dashboard/liveChat",
+          //   icon: <TiMessages size={20} />,
+          // },
         ]
       : []),
     ...(!roleLoading && role === "customer"
@@ -132,11 +138,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             path: "/dashboard/becomeARider",
             icon: <FaMotorcycle size={20} />,
           },
-          {
-            name: "Chat",
-            path: "/dashboard/chat",
-            icon: <AiFillMessage size={20} />,
-          },
+          // {
+          //   name: "Chat",
+          //   path: "/dashboard/chat",
+          //   icon: <AiFillMessage size={20} />,
+          // },
         ]
       : []),
     ...(!roleLoading && role === "seller"
@@ -162,15 +168,20 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             icon: <LuCodesandbox size={20} />,
           },
           {
-            name: "Chat Customer",
-            path: "/dashboard/chatCustomer",
-            icon: <TiMessages size={20} />,
+            name: "Request Payout",
+            path: "/dashboard/seller/requestPayout",
+            icon: <GiReceiveMoney size={20} />,
           },
-          {
-            name: "Chat Support",
-            path: "/dashboard/chatSupport",
-            icon: <AiFillMessage size={20} />,
-          },
+          // {
+          //   name: "Chat Customer",
+          //   path: "/dashboard/chatCustomer",
+          //   icon: <TiMessages size={20} />,
+          // },
+          // {
+          //   name: "Chat Support",
+          //   path: "/dashboard/chatSupport",
+          //   icon: <AiFillMessage size={20} />,
+          // },
         ]
       : []),
     ...(!roleLoading && role === "rider"
@@ -186,10 +197,15 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             icon: <FaCheckCircle size={20} />,
           },
           {
-            name: "Chat Support",
-            path: "/dashboard/chatSupport",
-            icon: <AiFillMessage size={20} />,
+            name: "Request Payout",
+            path: "/dashboard/rider/requestPayout",
+            icon: <GiReceiveMoney size={20} />,
           },
+          // {
+          //   name: "Chat Support",
+          //   path: "/dashboard/chatSupport",
+          //   icon: <AiFillMessage size={20} />,
+          // },
         ]
       : []),
   ];

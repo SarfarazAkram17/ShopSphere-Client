@@ -4,10 +4,9 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 import useUserRole from "../../../Hooks/useUserRole";
-import { Link } from "react-router";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 
-const ManageProfile = () => {
+const Profile = () => {
   const axiosSecure = useAxiosSecure();
   const { user, userEmail, updateUserProfile } = useAuth();
   const { role, roleLoading } = useUserRole();
@@ -283,4 +282,4 @@ const ManageProfile = () => {
   );
 };
 
-export default ManageProfile;
+export default Profile;

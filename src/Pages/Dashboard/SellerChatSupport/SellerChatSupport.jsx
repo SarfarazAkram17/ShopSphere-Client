@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChatSupport = () => {
+const SellerChatSupport = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const ChatSupport = () => {
     );
 };
 
-export default ChatSupport;
+export default SellerChatSupport;

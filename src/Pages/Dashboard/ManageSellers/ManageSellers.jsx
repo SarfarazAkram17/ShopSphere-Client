@@ -90,7 +90,7 @@ const ManageSellers = () => {
   const sellers = data?.sellers || [];
   const total = data?.total || 0;
 
-  const handleSwitchChange = async (e, id, currentStatus, email) => {
+  const handleStatusSwitch = async (e, id, currentStatus, email) => {
     e.stopPropagation();
 
     const confirm = await Swal.fire({
@@ -243,7 +243,7 @@ const ManageSellers = () => {
                     <Switch
                       checked={s.status === "active"}
                       onChange={(checked, e) =>
-                        handleSwitchChange(e, s._id, s.status, s.email)
+                        handleStatusSwitch(e, s._id, s.status, s.email)
                       }
                       checkedChildren="Active"
                       unCheckedChildren="Deactive"
@@ -347,6 +347,21 @@ const ManageSellers = () => {
               <p>
                 <strong>Applied At:</strong>{" "}
                 {new Date(selectedSeller.appliedAt).toLocaleString()}
+              </p>
+              {selectedSeller.activeAt && (
+                <p>
+                  <strong>Active At:</strong>{" "}
+                  {new Date(selectedSeller.activeAt).toLocaleString()}
+                </p>
+              )}
+              {selectedSeller.deactiveAt && (
+                <p>
+                  <strong>Deactive At:</strong>{" "}
+                  {new Date(selectedSeller.deactiveAt).toLocaleString()}
+                </p>
+              )}
+              <p className="capitalize">
+                <strong>Work Status:</strong> {selectedSeller.work_status}
               </p>
             </div>
 
