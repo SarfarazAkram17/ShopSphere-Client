@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router";
 import { lazy, Suspense } from "react";
 import RootLayout from "../Layouts/RootLayout";
 import Offers from "../Pages/Offers/Offers";
-import AllProducts from "../Pages/AllProducts/AllProducts";
 import Loader from "../Components/Loader/Loader";
 import ProductDetails from "../Pages/ProductDetails/ProductDetails";
 import DashboardLayout from "../Layouts/DashboardLayout";
@@ -36,6 +35,8 @@ import AddProduct from "../Pages/Dashboard/AddProduct/AddProduct";
 import ManageProducts from "../Pages/Dashboard/ManageProducts/ManageProducts";
 import EditProduct from "../Pages/Dashboard/EditProduct/EditProduct";
 import AllOrders from "../Pages/Dashboard/AllOrders/AllOrders";
+import Products from "../Pages/Products/Products";
+import AllProducts from "../Pages/Dashboard/AllProducts/AllProducts";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -82,8 +83,8 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/allProducts",
-        Component: AllProducts,
+        path: "/products",
+        Component: Products,
       },
       {
         path: "/offers",

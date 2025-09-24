@@ -30,9 +30,9 @@ const Navbar = () => {
       <NavLink
         onClick={() => setIsOpen(false)}
         className="px-3 py-0.5 text-xs lg:text-sm rounded-full font-bold hover:text-primary hover:bg-primary/10"
-        to="/allProducts"
+        to="/products"
       >
-        All Products
+        Products
       </NavLink>
       <NavLink
         onClick={() => setIsOpen(false)}
