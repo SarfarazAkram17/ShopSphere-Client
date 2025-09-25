@@ -26,12 +26,6 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { roleLoading, role } = useUserRole();
   const sidebarRef = useRef(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setIsOpen(false);
-    }
-  }, [setIsOpen]);
-
   // ✅ Close sidebar if click outside
   useEffect(() => {
     function handleClickOutside(event) {
