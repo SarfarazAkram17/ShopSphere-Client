@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import useAxios from "../../Hooks/useAxios";
 import useAuth from "../../Hooks/useAuth";
-import SocialLogin from "../../Components/Shared/SocialLogin";
+import SocialLogin from "../../Components/Shared/Auth/SocialLogin";
 import Lottie from "lottie-react";
 import loginLottie from "../../assets/animations/login.json";
 

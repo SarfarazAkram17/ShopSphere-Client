@@ -281,7 +281,7 @@ const ManageRiders = () => {
       {/* Modal for viewing rider details */}
       {selectedRider && (
         <dialog id="riderDetailsModal" className="modal modal-open">
-          <div className="modal-box max-w-2xl">
+          <div className="modal-box max-w-2xl hide-scrollbar max-h-[95vh]">
             <h3 className="font-bold text-2xl mb-5">Rider requester Details</h3>
             <div className="space-y-2">
               <p>

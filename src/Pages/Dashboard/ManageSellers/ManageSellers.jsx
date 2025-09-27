@@ -287,7 +287,7 @@ const ManageSellers = () => {
       {/* Modal for viewing seller details */}
       {selectedSeller && (
         <dialog id="sellerDetailsModal" className="modal modal-open">
-          <div className="modal-box max-w-2xl">
+          <div className="modal-box max-w-2xl hide-scrollbar max-h-[95vh]">
             <h3 className="font-bold text-2xl mb-5">
               Seller requester Details
             </h3>

@@ -5,7 +5,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { uploadToCloudinary } from "../../../lib/imageUpload";
 
 const BecomeASeller = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -27,7 +27,6 @@ const BecomeASeller = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [thanas, setThanas] = useState([]);
   const [selectedThana, setSelectedThana] = useState(null);
-
   const [categories] = useState([
     "Electronics",
     "Clothing",
@@ -114,24 +113,6 @@ const BecomeASeller = () => {
     setSelectedCategories(selected || []);
     setValue("categories", selected ? selected.map((c) => c.value) : []);
     trigger("categories");
-  };
-
-  const uploadToCloudinary = async (file) => {
-    const imageData = new FormData();
-    imageData.append("file", file);
-    imageData.append(
-      "upload_preset",
-      import.meta.env.VITE_cloudinary_preset_name
-    );
-
-    const imageRes = await axios.post(
-      `https://api.cloudinary.com/v1_1/${
-        import.meta.env.VITE_cloudinary_cloud_name
-      }/image/upload`,
-      imageData
-    );
-
-    return imageRes.data.secure_url;
   };
 
   const handleSubmitSellerForm = async (data) => {

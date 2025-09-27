@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import userImage from "../../assets/images/image-upload-icon.png";
 import axios from "axios";
-import SocialLogin from "../../Components/Shared/SocialLogin";
+import SocialLogin from "../../Components/Shared/Auth/SocialLogin";
 import useAuth from "../../Hooks/useAuth";
 import Lottie from "lottie-react";
 import registerLottie from "../../assets/animations/register.json";

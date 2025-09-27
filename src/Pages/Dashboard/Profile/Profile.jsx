@@ -186,7 +186,7 @@ const Profile = () => {
                     onClick={() =>
                       document.getElementById("profileImage").click()
                     }
-                    className="btn bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white"
+                    className="btn btn-sm bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white"
                   >
                     Change Profile Photo
                   </button>
@@ -229,7 +229,7 @@ const Profile = () => {
                   </button>
                   <button
                     onClick={handleUpdate}
-                    className="btn btn-primary text-white"
+                    className="btn btn-primary text-white disabled:text-black/50"
                     disabled={
                       loading ||
                       !formData.name.trim() ||

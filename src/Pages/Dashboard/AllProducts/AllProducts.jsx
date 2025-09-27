@@ -197,7 +197,7 @@ const AllProducts = () => {
       {/* Modal for viewing rider details */}
       {selectedProduct && (
         <dialog id="riderDetailsModal" className="modal modal-open">
-          <div className="modal-box max-w-3xl">
+          <div className="modal-box max-w-2xl hide-scrollbar max-h-[95vh]">
             <h3 className="font-bold text-2xl mb-5">Product Details</h3>
             <div className="space-y-2">
               <p>
