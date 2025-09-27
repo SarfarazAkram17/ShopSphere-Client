@@ -460,7 +460,10 @@ const BecomeASeller = () => {
               Product Categories <span className="text-red-500">*</span>
             </label>
             <Select
-              options={categories.map((c) => ({ value: c.toLowerCase(), label: c }))}
+              options={categories.map((c) => ({
+                value: c.toLowerCase(),
+                label: c,
+              }))}
               value={selectedCategories}
               onChange={handleCategoryChange}
               isMulti
@@ -482,7 +485,37 @@ const BecomeASeller = () => {
         >
           {submitting ? (
             <>
-                              <svg className="w-5 h-5 text-primary animate-spin" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8"/><line x1="50" y1="50" x2="50" y2="25" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/><line x1="50" y1="50" x2="75" y2="50" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
+              <svg
+                className="w-5 h-5 text-primary animate-spin"
+                viewBox="0 0 100 100"
+              >
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                />
+                <line
+                  x1="50"
+                  y1="50"
+                  x2="50"
+                  y2="25"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="50"
+                  y1="50"
+                  x2="75"
+                  y2="50"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+              </svg>
               <span className="animate-pulse">Submitting Application</span>
             </>
           ) : (

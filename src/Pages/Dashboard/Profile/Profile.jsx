@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { FiEdit3, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
+import { FaRegEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
@@ -141,7 +142,7 @@ const Profile = () => {
               onClick={handleEditClick}
               className="btn btn-outline btn-primary hover:text-white mt-4 flex items-center gap-2"
             >
-              <FiEdit3 />
+              <FaRegEdit size={20} />
               Edit Profile
             </button>
           </div>
@@ -155,7 +156,7 @@ const Profile = () => {
             ></div>
 
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="bg-white border rounded-lg max-w-md w-full p-8 relative shadow-xl">
+              <div className="bg-white border rounded-lg max-h-[95vh] hide-scrollbar overflow-y-auto max-w-md w-full p-8 relative shadow-xl">
                 <button
                   onClick={() => !loading && setIsModalOpen(false)}
                   className="absolute top-4 right-4 hover:text-red-500 cursor-pointer text-gray-500 transition"
