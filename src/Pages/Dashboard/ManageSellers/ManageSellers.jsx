@@ -2,7 +2,6 @@ import useAuth from "../../../Hooks/useAuth";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
-import Select from "react-select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,10 +12,11 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import TablePaginationActions from "../../../lib/pagination";
-import Loader from "../../../Components/Loader/Loader";
 import { Switch } from "antd";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import ManageSellersTableSkeleton from "../../../Components/Shared/ManageSellers/ManageSellersTableSkeleton";
+import ManageSellersSearchAndFilter from "../../../Components/Shared/ManageSellers/ManageSellersSearchAndFilter";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -122,48 +122,23 @@ const ManageSellers = () => {
         Manage Sellers
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-2 items-center mb-6">
-        <Select
-          options={searchOptions}
-          value={searchType}
-          onChange={(selected) => {
-            setSearchType(selected);
-            setPage(0);
-          }}
-          className="w-full"
-        />
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder={`Search by ${searchType.value}`}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(0);
-            }}
-          />
-        </label>
-        <Select
-          options={regions.map((r) => ({ value: r, label: r }))}
-          value={selectedRegion}
-          onChange={setSelectedRegion}
-          placeholder="Filter by Region"
-          className="w-full"
-          isClearable
-        />
-        <Select
-          options={districts.map((d) => ({ value: d, label: d }))}
-          value={selectedDistrict}
-          onChange={setSelectedDistrict}
-          placeholder="Filter by District"
-          className="w-full"
-          isClearable
-        />
-      </div>
+      <ManageSellersSearchAndFilter
+        searchOptions={searchOptions}
+        searchType={searchType}
+        setSearchType={setSearchType}
+        setPage={setPage}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        regions={regions}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        districts={districts}
+        selectedDistrict={selectedDistrict}
+        setSelectedDistrict={setSelectedDistrict}
+      ></ManageSellersSearchAndFilter>
 
       {isPending ? (
-        <Loader></Loader>
+        <ManageSellersTableSkeleton></ManageSellersTableSkeleton>
       ) : sellers.length === 0 ? (
         <h1 className="text-gray-600 font-semibold text-center">
           There is no Seller

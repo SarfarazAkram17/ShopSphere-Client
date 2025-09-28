@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
-import Loader from "../../../Components/Loader/Loader";
 import { FaCheck, FaEye, FaTimes } from "react-icons/fa";
 import TablePaginationActions from "../../../lib/pagination";
 import Table from "@mui/material/Table";
@@ -15,7 +14,8 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Select from "react-select";
+import PendingRidersSearchAndFilter from "../../../Components/Shared/PendingRiders/PendingRidersSearchAndFilter";
+import PendingRidersTableSkeleton from "../../../Components/Shared/PendingRiders/PendingRidersTableSkeleton";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -142,48 +142,23 @@ const PendingRiders = () => {
         Pending Rider Applications
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-2 items-center mb-6">
-        <Select
-          options={searchOptions}
-          value={searchType}
-          onChange={(selected) => {
-            setSearchType(selected);
-            setPage(0);
-          }}
-          className="w-full"
-        />
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder={`Search by ${searchType.value}`}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(0);
-            }}
-          />
-        </label>
-        <Select
-          options={regions.map((r) => ({ value: r, label: r }))}
-          value={selectedRegion}
-          onChange={setSelectedRegion}
-          placeholder="Filter by Region"
-          className="w-full"
-          isClearable
-        />
-        <Select
-          options={districts.map((d) => ({ value: d, label: d }))}
-          value={selectedDistrict}
-          onChange={setSelectedDistrict}
-          placeholder="Filter by District"
-          className="w-full"
-          isClearable
-        />
-      </div>
+      <PendingRidersSearchAndFilter
+        searchOptions={searchOptions}
+        searchType={searchType}
+        setSearchType={setSearchType}
+        setPage={setPage}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        regions={regions}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        districts={districts}
+        selectedDistrict={selectedDistrict}
+        setSelectedDistrict={setSelectedDistrict}
+      ></PendingRidersSearchAndFilter>
 
       {isPending ? (
-        <Loader></Loader>
+        <PendingRidersTableSkeleton></PendingRidersTableSkeleton>
       ) : riders.length === 0 ? (
         <h1 className="text-gray-600 font-semibold text-center">
           There is no Pending Rider Applications

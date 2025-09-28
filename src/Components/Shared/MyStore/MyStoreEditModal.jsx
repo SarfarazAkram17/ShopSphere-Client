@@ -86,7 +86,7 @@ const MyStoreEditModal = ({
               <div className="flex justify-end gap-4 mt-8">
                 <button
                   onClick={() => !loading && setActiveModal(null)}
-                  className="btn btn-outline"
+                  className="btn btn-outline disabled:text-black/50"
                   disabled={loading}
                 >
                   Cancel

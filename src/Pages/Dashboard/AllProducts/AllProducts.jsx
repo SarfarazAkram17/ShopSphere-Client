@@ -9,10 +9,10 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useQuery } from "@tanstack/react-query";
-import Select from "react-select";
 import useAxios from "../../../Hooks/useAxios";
 import TablePaginationActions from "../../../lib/pagination";
-import Loader from "../../../Components/Loader/Loader";
+import AllProductsSearchAndFilter from "../../../Components/Shared/AllProducts/AllProductsSearchAndFilter";
+import AllProductsTableSkeleton from "../../../Components/Shared/AllProducts/AllProductsTableSkeleton";
 
 const searchOptions = [
   { value: "product name", label: "Search by Product Name" },
@@ -67,43 +67,20 @@ const AllProducts = () => {
         All Products live on ShopSphere
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-2 items-center mb-6">
-        <Select
-          options={searchOptions}
-          value={searchType}
-          onChange={(selected) => {
-            setSearchType(selected);
-            setPage(0);
-          }}
-          className="w-full"
-        />
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder={`Search by ${searchType.value}`}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(0);
-            }}
-          />
-        </label>
-        <Select
-          options={sortOptions}
-          value={sortOptions.find((o) => o.value === sort)}
-          onChange={(selected) => {
-            setSort(selected?.value || null);
-            setPage(0);
-          }}
-          placeholder="Sort by Price"
-          className="w-full"
-          isClearable
-        />
-      </div>
+      <AllProductsSearchAndFilter
+        searchOptions={searchOptions}
+        searchType={searchType}
+        setSearchType={setSearchType}
+        setPage={setPage}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        sortOptions={sortOptions}
+        sort={sort}
+        setSort={setSort}
+      ></AllProductsSearchAndFilter>
 
       {isPending ? (
-        <Loader></Loader>
+        <AllProductsTableSkeleton></AllProductsTableSkeleton>
       ) : products.length === 0 ? (
         <h1 className="text-gray-600 font-semibold text-center">
           There is no products on ShopSphere

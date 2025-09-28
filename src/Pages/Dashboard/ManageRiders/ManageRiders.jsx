@@ -1,9 +1,7 @@
 import TablePaginationActions from "../../../lib/pagination";
-import Loader from "../../../Components/Loader/Loader";
 import { Switch } from "antd";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import Select from "react-select";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -17,6 +15,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
+import ManageRidersSearchAndFilter from "../../../Components/Shared/ManageRiders/ManageRidersSearchAndFilter";
+import ManageRidersTableSkeleton from "../../../Components/Shared/ManageRiders/ManageRidersTableSkeleton";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -122,48 +122,23 @@ const ManageRiders = () => {
         Manage Riders
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-2 items-center mb-6">
-        <Select
-          options={searchOptions}
-          value={searchType}
-          onChange={(selected) => {
-            setSearchType(selected);
-            setPage(0);
-          }}
-          className="w-full"
-        />
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder={`Search by ${searchType.value}`}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setPage(0);
-            }}
-          />
-        </label>
-        <Select
-          options={regions.map((r) => ({ value: r, label: r }))}
-          value={selectedRegion}
-          onChange={setSelectedRegion}
-          placeholder="Filter by Region"
-          className="w-full"
-          isClearable
-        />
-        <Select
-          options={districts.map((d) => ({ value: d, label: d }))}
-          value={selectedDistrict}
-          onChange={setSelectedDistrict}
-          placeholder="Filter by District"
-          className="w-full"
-          isClearable
-        />
-      </div>
+      <ManageRidersSearchAndFilter
+        searchOptions={searchOptions}
+        searchType={searchType}
+        setSearchType={setSearchType}
+        setPage={setPage}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        regions={regions}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        districts={districts}
+        selectedDistrict={selectedDistrict}
+        setSelectedDistrict={setSelectedDistrict}
+      ></ManageRidersSearchAndFilter>
 
       {isPending ? (
-        <Loader></Loader>
+        <ManageRidersTableSkeleton></ManageRidersTableSkeleton>
       ) : riders.length === 0 ? (
         <h1 className="text-gray-600 font-semibold text-center">
           There is no Rider
