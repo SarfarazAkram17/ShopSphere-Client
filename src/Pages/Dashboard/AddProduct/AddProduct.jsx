@@ -117,20 +117,23 @@ const AddProduct = () => {
       stock,
       category: data.categories,
       rating: 0,
-      color: data.color.trim()
-        ? data.color
-            ?.split(",")
-            .map((c) => c.trim())
-            .filter((c) => c.length > 0)
-        : null,
-      size: data.size.trim()
-        ? data.size
-            ?.split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0)
-        : null,
       addedAt: new Date().toISOString(),
     };
+
+    if (data.color?.trim()) {
+      newProduct.color = data.color
+        .split(",")
+        .map((c) => c.trim())
+        .filter((c) => c.length > 0);
+    }
+
+    // Conditionally add size if not empty
+    if (data.size?.trim()) {
+      newProduct.size = data.size
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
 
     addProduct(newProduct);
   };
@@ -177,7 +180,10 @@ const AddProduct = () => {
             {...register("price", {
               required: "Price is required.",
               min: { value: 1, message: "Price must be greater than 0." },
-              max: { value: 100000, message: "Price must be less than 100000." },
+              max: {
+                value: 100000,
+                message: "Price must be less than 100000.",
+              },
             })}
           />
           {errors.price && (

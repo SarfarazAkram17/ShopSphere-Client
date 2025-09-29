@@ -223,7 +223,7 @@ const AllProducts = () => {
                 <p>
                   <strong>Size(s):</strong>{" "}
                   <span className="capitalize">
-                    {selectedProduct.size.join(", ")}
+                    {selectedProduct.size && selectedProduct.size.join(", ")}
                   </span>
                 </p>
               )}
@@ -231,7 +231,7 @@ const AllProducts = () => {
                 <p>
                   <strong>Color(s):</strong>{" "}
                   <span className="capitalize">
-                    {selectedProduct.color.join(", ")}
+                    {selectedProduct.color && selectedProduct.color.join(", ")}
                   </span>
                 </p>
               )}

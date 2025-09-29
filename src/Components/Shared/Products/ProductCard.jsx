@@ -7,7 +7,7 @@ const ProductCard = ({ product, discountedPrice, handleAddToCart }) => {
     <div className="border group h-full relative rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-500">
       {/* Discount Badge */}
       {product.discount > 0 && (
-        <span className="absolute top-1.5 right-1.5 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow z-10">
+        <span className="absolute top-1.5 right-1.5 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow z-3">
           {product.discount}% off
         </span>
       )}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pagination, Slider, Input, Rate, ConfigProvider, Drawer } from "antd";
-import Select from "react-select"; // ✅ react-select
+import { Pagination, Drawer } from "antd";
 import useAxios from "../../Hooks/useAxios";
 import useAuth from "../../Hooks/useAuth";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
@@ -10,8 +9,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { addToCart } from "../../lib/cartUtils";
 import { RiMenuSearchLine } from "react-icons/ri";
-
-const { Search } = Input;
+import RenderFilters from "../../lib/RenderFilters";
 
 const Products = () => {
   const { user } = useAuth();
@@ -20,8 +18,8 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState([]);
-  const [color, setColor] = useState(null);
-  const [size, setSize] = useState(null);
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [discount, setDiscount] = useState(null);
   const [rating, setRating] = useState(null);
@@ -46,7 +44,7 @@ const Products = () => {
           page,
           limit: 12,
           search,
-          category,
+          category: category.join(","),
           color,
           size,
           minPrice: priceRange[0],
@@ -74,6 +72,7 @@ const Products = () => {
   ];
 
   const discounts = [
+    { label: "5% or more", value: 5 },
     { label: "10% or more", value: 10 },
     { label: "20% or more", value: 20 },
     { label: "30% or more", value: 30 },
@@ -90,96 +89,6 @@ const Products = () => {
     addToCart(product._id);
   };
 
-  // Filters UI as a function so we can reuse in both desktop & mobile drawer
-  const renderFilters = () => (
-    <>
-      {/* First Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-center">
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </label>
-
-        <Select
-          isMulti
-          isClearable
-          placeholder="Select Product Category"
-          options={categories}
-          value={categories.filter((cat) => category.includes(cat.value))}
-          onChange={(selectedOptions) =>
-            setCategory(
-              selectedOptions ? selectedOptions.map((opt) => opt.value) : []
-            )
-          }
-          className="w-full"
-        />
-
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            required
-            placeholder="Search product by Color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-          />
-        </label>
-
-        <label className="input input-bordered w-full h-9.5">
-          <input
-            type="search"
-            placeholder="Search product by Size"
-            value={size}
-            onChange={(e) => setSize(e.target.value)}
-          />
-        </label>
-      </div>
-
-      {/* Second Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-center">
-        <div>
-          <p className="font-semibold text-sm">Price Range</p>
-          <Slider
-            range
-            min={0}
-            max={100000}
-            defaultValue={[0, 100000]}
-            onChangeComplete={(val) => setPriceRange(val)}
-          />
-        </div>
-
-        <Select
-          isClearable
-          placeholder="Min Discount"
-          options={discounts}
-          onChange={(option) => setDiscount(option ? option.value : null)}
-          className="w-full"
-        />
-
-        <div>
-          <p className="font-semibold text-sm mb-1">Min Rating</p>
-          <ConfigProvider
-            theme={{
-              components: {
-                Rate: {
-                  starBg: "#B5B7B770",
-                  starSize: 20,
-                  marginXS: 7,
-                },
-              },
-            }}
-          >
-            <Rate allowClear onChange={(val) => setRating(val)} />
-          </ConfigProvider>
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <div className="max-w-[1500px] mx-auto px-4">
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4 text-primary">
@@ -194,7 +103,23 @@ const Products = () => {
       </p>
 
       {/* Filters */}
-      <div className="hidden md:block">{renderFilters()}</div>
+      <div className="hidden md:block">
+        <RenderFilters
+          search={search}
+          setSearch={setSearch}
+          categories={categories}
+          category={category}
+          setCategory={setCategory}
+          color={color}
+          setColor={setColor}
+          size={size}
+          setSize={setSize}
+          setPriceRange={setPriceRange}
+          discounts={discounts}
+          setDiscount={setDiscount}
+          setRating={setRating}
+        ></RenderFilters>
+      </div>
 
       {/* Mobile Filters Toggle */}
       <div className="flex md:hidden items-center gap-2 mb-4">
@@ -207,10 +132,7 @@ const Products = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </label>
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="btn rounded-sm"
-        >
+        <button onClick={() => setDrawerOpen(true)} className="btn rounded-sm">
           <RiMenuSearchLine size={20} />
         </button>
       </div>
@@ -223,7 +145,21 @@ const Products = () => {
         open={drawerOpen}
         width={280}
       >
-        {renderFilters()}
+        <RenderFilters
+          search={search}
+          setSearch={setSearch}
+          categories={categories}
+          category={category}
+          setCategory={setCategory}
+          color={color}
+          setColor={setColor}
+          size={size}
+          setSize={setSize}
+          setPriceRange={setPriceRange}
+          discounts={discounts}
+          setDiscount={setDiscount}
+          setRating={setRating}
+        ></RenderFilters>
       </Drawer>
 
       {/* Products Grid */}

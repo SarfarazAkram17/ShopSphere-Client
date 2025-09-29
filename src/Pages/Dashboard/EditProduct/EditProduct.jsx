@@ -161,22 +161,25 @@ const EditProduct = () => {
       discount,
       description: data.description,
       stock,
-      category: data.categories.map((c) => c.value), // ✅ extract values
-      color:
-        data.color.trim() &&
-        data.color
-          .split(",")
-          .map((c) => c.trim())
-          .filter((c) => c.length > 0),
-      size:
-        data.size.trim() &&
-        data.size
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0),
+      category: data.categories.map((c) => c.value),
       imagesToAdd: newImageURLs,
       imagesToRemove,
     };
+
+    if (data.color?.trim()) {
+      updatedProduct.color = data.color
+        .split(",")
+        .map((c) => c.trim())
+        .filter((c) => c.length > 0);
+    }
+
+    // Conditionally add size if not empty
+    if (data.size?.trim()) {
+      updatedProduct.size = data.size
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
 
     updateProduct(updatedProduct);
   };
@@ -304,7 +307,7 @@ const EditProduct = () => {
         {/* Color */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional) <span className="text-red-500">*</span>
+            Color (Optional)
           </label>
           <input
             type="text"
@@ -317,7 +320,7 @@ const EditProduct = () => {
         {/* Size */}
         <div>
           <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional) <span className="text-red-500">*</span>
+            Size (Optional)
           </label>
           <input
             type="text"

@@ -31,6 +31,7 @@ const Navbar = () => {
         onClick={() => setIsOpen(false)}
         className="px-3 py-0.5 text-xs lg:text-sm rounded-full font-bold hover:text-primary hover:bg-primary/10"
         to="/products"
+        end
       >
         Products
       </NavLink>
