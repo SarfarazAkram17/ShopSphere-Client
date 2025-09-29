@@ -81,8 +81,12 @@ const MyStore = () => {
         store.thana ? { value: store.thana, label: store.thana } : null
       );
       setSelectedCategories(
-        store.categories?.map((c) => ({ value: c.toLowerCase(), label: c })) ||
-          []
+        store.categories?.map((c) => ({
+          value: c.toLowerCase(),
+          label:
+            categories.find((cat) => cat.toLowerCase() === c.toLowerCase()) ||
+            c,
+        })) || []
       );
 
       // Populate districts and thanas based on store data
@@ -100,7 +104,7 @@ const MyStore = () => {
         setThanas(covered);
       }
     }
-  }, [store, outlets]);
+  }, [store, outlets, categories]);
 
   if (isPending) return <Loader />;
 

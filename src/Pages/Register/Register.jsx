@@ -91,7 +91,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col max-w-7xl mx-auto px-4 sm:flex-row gap-6 justify-start items-center md:justify-center">
+    <div className="flex flex-col max-w-[1500px] mx-auto px-4 sm:flex-row gap-6 justify-start items-center md:justify-center">
       <Lottie
         className="flex-1"
         animationData={registerLottie}
@@ -109,7 +109,7 @@ const Register = () => {
               <img
                 src={preview || userImage}
                 alt="Upload"
-                className="w-13 h-13 object-cover rounded-full border-2 p-0.5 border-primary"
+                className="w-15 h-15 object-cover rounded-full border-2 p-0.5 border-primary"
               />
             </label>
             <input

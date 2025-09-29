@@ -33,13 +33,13 @@ const ProductCard = ({ product, handleDelete }) => {
           <strong>Discount:</strong> {product.discount}%
         </p>
 
-        {product.color.length > 0 && (
+        {product.color && product.color.length > 0 && (
           <p className="text-sm capitalize">
             <strong>Color(s):</strong> {product.color.join(", ")}
           </p>
         )}
 
-        {product.size.length > 0 && (
+        {product.size && product.size.length > 0 && (
           <p className="text-sm capitalize">
             <strong>Size:</strong> {product.size.join(", ")}
           </p>

@@ -65,7 +65,7 @@ const Navbar = () => {
 
   return (
     <div className="backdrop-blur-2xl p-0 shadow-sm">
-      <div ref={menuRef} className="navbar px-2 max-w-7xl mx-auto">
+      <div ref={menuRef} className="navbar px-2 max-w-[1500px] mx-auto">
         <div className="navbar-start">
           <div className="md:hidden mr-1">
             <button
@@ -122,7 +122,7 @@ const Navbar = () => {
 
         {/* Mobile Dropdown */}
         {isOpen && (
-          <div className="absolute top-32 w-32 left-4 z-10 md:hidden bg-base-100 rounded-box p-2 place-items-center shadow">
+          <div className="absolute top-full w-32 left-4 z-10 md:hidden bg-base-100 rounded-box p-2 place-items-center shadow">
             <ul className="menu space-y-2 text-center">
               {navLinks}
               {!user && (

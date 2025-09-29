@@ -9,10 +9,11 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useQuery } from "@tanstack/react-query";
-import useAxios from "../../../Hooks/useAxios";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import TablePaginationActions from "../../../lib/pagination";
 import AllProductsSearchAndFilter from "../../../Components/Shared/AllProducts/AllProductsSearchAndFilter";
 import AllProductsTableSkeleton from "../../../Components/Shared/AllProducts/AllProductsTableSkeleton";
+import useAuth from "../../../Hooks/useAuth";
 
 const searchOptions = [
   { value: "product name", label: "Search by Product Name" },
@@ -27,8 +28,9 @@ const sortOptions = [
 ];
 
 const AllProducts = () => {
+  const { userEmail } = useAuth();
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const axiosInstance = useAxios();
+  const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchType, setSearchType] = useState(searchOptions[0]);
@@ -45,8 +47,9 @@ const AllProducts = () => {
       rowsPerPage,
     ],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/products`, {
+      const res = await axiosSecure.get(`/products`, {
         params: {
+          email: userEmail,
           searchType: searchType.value,
           search: searchTerm,
           page,

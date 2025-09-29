@@ -65,8 +65,8 @@ const EditProduct = () => {
         price: productData.price,
         discount: productData.discount,
         stock: productData.stock,
-        color: productData.color.join(", "),
-        size: productData.size.join(", "),
+        color: productData.color && productData.color.join(", "),
+        size: productData.size && productData.size.join(", "),
         description: productData.description,
       });
       setExistingImages(productData.images || []);
@@ -163,15 +163,17 @@ const EditProduct = () => {
       stock,
       category: data.categories.map((c) => c.value), // ✅ extract values
       color:
+        data.color.trim() &&
         data.color
           .split(",")
           .map((c) => c.trim())
-          .filter((c) => c.length > 0) || null,
+          .filter((c) => c.length > 0),
       size:
+        data.size.trim() &&
         data.size
           .split(",")
           .map((s) => s.trim())
-          .filter((s) => s.length > 0) || null,
+          .filter((s) => s.length > 0),
       imagesToAdd: newImageURLs,
       imagesToRemove,
     };
