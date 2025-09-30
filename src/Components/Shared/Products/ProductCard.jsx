@@ -50,7 +50,7 @@ const ProductCard = ({ product, discountedPrice, handleAddToCart }) => {
           theme={{
             components: {
               Rate: {
-                starBg: "#B5B7B750",
+                starBg: "#B5B7B770",
                 starSize: 18,
                 marginXS: 2,
               },

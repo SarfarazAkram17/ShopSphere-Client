@@ -42,7 +42,7 @@ const Offers = () => {
       const res = await axiosInstance.get(`/products/offer`, {
         params: {
           page,
-          limit: 12,
+          limit: 24,
           search,
           category: category.join(","),
           color,
@@ -92,14 +92,14 @@ const Offers = () => {
   return (
     <div className="max-w-[1500px] mx-auto px-4">
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4 text-primary">
-        Products
+        Products on Sale
       </h2>
       <p className="text-center text-xs xl:text-sm text-gray-600 mb-8 xl:max-w-4xl max-w-3xl mx-auto">
-        Browse through our wide selection of products, from toys and electronics
-        to clothing and books. Easily filter by category, color, size, price,
-        discount, and rating to find exactly what you need. Enjoy a smooth
-        shopping experience and discover the perfect items for yourself or your
-        loved ones.
+        Discover our exclusive collection of discounted products across a
+        variety of categories. From electronics and clothing to books and more,
+        enjoy amazing deals with special offers tailored just for you. Use
+        filters like category, color, size, price, discount, and rating to
+        quickly find the best bargains and save more on your shopping.
       </p>
 
       {/* Filters */}
@@ -196,7 +196,7 @@ const Offers = () => {
             <Pagination
               current={page}
               total={total}
-              pageSize={12}
+              pageSize={24}
               showSizeChanger={false}
               onChange={(newPage) => setPage(newPage)}
             />

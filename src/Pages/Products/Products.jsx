@@ -42,7 +42,7 @@ const Products = () => {
       const res = await axiosInstance.get(`/products/all`, {
         params: {
           page,
-          limit: 12,
+          limit: 24,
           search,
           category: category.join(","),
           color,
@@ -196,7 +196,7 @@ const Products = () => {
             <Pagination
               current={page}
               total={total}
-              pageSize={12}
+              pageSize={24}
               showSizeChanger={false}
               onChange={(newPage) => setPage(newPage)}
             />
