@@ -224,6 +224,10 @@ const EditProduct = () => {
             {...register("price", {
               required: "Price is required.",
               min: { value: 1, message: "Price must be greater than 0." },
+              max: {
+                value: 1000000,
+                message: "Price must be less than 1000000.",
+              },
             })}
           />
           {errors.price && (

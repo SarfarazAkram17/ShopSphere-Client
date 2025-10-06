@@ -2,25 +2,19 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pagination, Drawer } from "antd";
 import useAxios from "../../Hooks/useAxios";
-import useAuth from "../../Hooks/useAuth";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
 import ProductCard from "../../Components/Shared/Products/ProductCard";
-import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
-import { addToCart } from "../../lib/cartUtils";
-import { RiMenuSearchLine } from "react-icons/ri";
 import RenderFilters from "../../lib/RenderFilters";
+import { FaFilter } from "react-icons/fa";
 
 const Products = () => {
-  const { user } = useAuth();
   const axiosInstance = useAxios();
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState([]);
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [discount, setDiscount] = useState(null);
   const [rating, setRating] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -28,7 +22,7 @@ const Products = () => {
   // Fetch Products
   const { isPending, data } = useQuery({
     queryKey: [
-      "products-all",
+      "all-products",
       page,
       search,
       category,
@@ -80,15 +74,6 @@ const Products = () => {
     { label: "50% or more", value: 50 },
   ];
 
-  const handleAddToCart = (product) => {
-    if (!user) {
-      navigate("/login", { state: location.pathname });
-      toast.info("Login first");
-      return;
-    }
-    addToCart(product._id);
-  };
-
   return (
     <div className="max-w-[1500px] mx-auto px-4">
       <h2 className="text-3xl md:text-4xl text-center font-bold mb-4 text-primary">
@@ -103,7 +88,7 @@ const Products = () => {
       </p>
 
       {/* Filters */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <RenderFilters
           search={search}
           setSearch={setSearch}
@@ -122,7 +107,7 @@ const Products = () => {
       </div>
 
       {/* Mobile Filters Toggle */}
-      <div className="flex md:hidden items-center gap-2 mb-4">
+      <div className="flex lg:hidden items-center gap-2 mb-4">
         <label className="input input-bordered w-full h-9.5">
           <input
             type="search"
@@ -133,12 +118,12 @@ const Products = () => {
           />
         </label>
         <button onClick={() => setDrawerOpen(true)} className="btn rounded-sm">
-          <RiMenuSearchLine size={20} />
+          <FaFilter size={20} />
         </button>
       </div>
 
       {/* Drawer for Mobile */}
-      <Drawer
+      <Drawer     
         title="Filters"
         placement="left"
         onClose={() => setDrawerOpen(false)}
@@ -185,7 +170,6 @@ const Products = () => {
                   key={product._id}
                   product={product}
                   discountedPrice={discountedPrice}
-                  handleAddToCart={handleAddToCart}
                 />
               );
             })}

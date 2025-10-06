@@ -94,7 +94,7 @@ export const router = createBrowserRouter([
         Component: Offers,
       },
       {
-        path: "/products/:id",
+        path: "/products/:productId",
         Component: ProductDetails,
       },
     ],

@@ -2,19 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pagination, Drawer } from "antd";
 import useAxios from "../../Hooks/useAxios";
-import useAuth from "../../Hooks/useAuth";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
 import ProductCard from "../../Components/Shared/Products/ProductCard";
-import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
-import { addToCart } from "../../lib/cartUtils";
 import { RiMenuSearchLine } from "react-icons/ri";
 import RenderFilters from "../../lib/RenderFilters";
 
 const Offers = () => {
-  const { user } = useAuth();
   const axiosInstance = useAxios();
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState([]);
@@ -79,15 +73,6 @@ const Offers = () => {
     { label: "40% or more", value: 40 },
     { label: "50% or more", value: 50 },
   ];
-
-  const handleAddToCart = (product) => {
-    if (!user) {
-      navigate("/login", { state: location.pathname });
-      toast.info("Login first");
-      return;
-    }
-    addToCart(product._id);
-  };
 
   return (
     <div className="max-w-[1500px] mx-auto px-4">
@@ -185,7 +170,6 @@ const Offers = () => {
                   key={product._id}
                   product={product}
                   discountedPrice={discountedPrice}
-                  handleAddToCart={handleAddToCart}
                 />
               );
             })}

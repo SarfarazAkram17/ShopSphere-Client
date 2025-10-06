@@ -181,8 +181,8 @@ const AddProduct = () => {
               required: "Price is required.",
               min: { value: 1, message: "Price must be greater than 0." },
               max: {
-                value: 100000,
-                message: "Price must be less than 100000.",
+                value: 1000000,
+                message: "Price must be less than 1000000.",
               },
             })}
           />

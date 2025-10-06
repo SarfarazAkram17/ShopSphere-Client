@@ -37,14 +37,6 @@ const ProductCardSkeleton = () => {
           />
         </div>
 
-        {/* stock */}
-        <div className="relative w-2/3 h-5 bg-base-300 rounded">
-          <div
-            className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
-            bg-gradient-to-r from-transparent via-gray-300 to-transparent"
-          />
-        </div>
-
         {/* Rating Skeleton */}
         <div className="flex gap-1 mt-2">
           {[...Array(5)].map((_, i) => (

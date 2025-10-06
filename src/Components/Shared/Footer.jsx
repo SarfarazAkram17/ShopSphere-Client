@@ -28,7 +28,7 @@ const Footer = () => {
         {/* Brand Section */}
         <div>
           <Link to="/" className="flex items-center gap-1">
-            <img src={logo} alt="ShopSphere Logo" className="h-12 w-auto" />
+            <img src={logo} alt="ShopSphere Logo" className="h-14 w-auto" />
             <span className="text-[#392B12] font-bold sm:text-xl">
               ShopSphere
             </span>

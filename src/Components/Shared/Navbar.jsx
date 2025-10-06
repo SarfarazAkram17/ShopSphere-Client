@@ -81,7 +81,7 @@ const Navbar = () => {
             <img
               src={logo}
               alt="ShopSphere Logo"
-              className="h-8 md:h-10 w-auto"
+              className="h-10 md:h-12 w-auto"
             />
             <span className="text-[#392B12] font-bold md:text-xl whitespace-nowrap">
               ShopSphere

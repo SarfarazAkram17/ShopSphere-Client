@@ -18,7 +18,7 @@ const DashboardNavbar = ({ setIsOpen }) => {
           <img
             src="/logo.png"
             alt="ShopSphere Logo"
-            className="h-8 lg:h-10 w-auto"
+            className="h-10 lg:h-12 w-auto"
           />
           <span className="text-[#392B12] font-bold text-lg">ShopSphere</span>
         </Link>
