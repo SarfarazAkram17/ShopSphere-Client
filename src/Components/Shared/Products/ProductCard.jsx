@@ -1,8 +1,25 @@
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { PiShoppingCartBold } from "react-icons/pi";
 import { ConfigProvider, Rate } from "antd";
+import useAuth from "../../../Hooks/useAuth";
+import { toast } from "react-toastify";
+import { addToCart } from "../../../lib/cartUtils";
 
-const ProductCard = ({ product, discountedPrice, handleAddToCart }) => {
+const ProductCard = ({ product, discountedPrice }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleAddToCart = (food) => {
+    if (!user) {
+      navigate("/login", { state: location.pathname });
+      toast.info("Login first");
+      return;
+    }
+
+    addToCart(food._id);
+  };
+
   return (
     <div className="border group rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-500 h-full flex flex-col">
       {/* Discount Badge */}
@@ -15,7 +32,7 @@ const ProductCard = ({ product, discountedPrice, handleAddToCart }) => {
       <img
         src={product.images[0]}
         alt={product.name}
-        className="w-full h-52 sm:h-60 group-hover:scale-108 overflow-hidden transition-all duration-300 object-cover"
+        className="w-full h-52 sm:h-60 group-hover:scale-108 overflow-hidden transition-all duration-300 object-contain"
       />
 
       {/* Card Content */}
@@ -55,11 +72,7 @@ const ProductCard = ({ product, discountedPrice, handleAddToCart }) => {
             },
           }}
         >
-          <Rate
-            allowHalf
-            disabled
-            defaultValue={product.rating}
-          />
+          <Rate allowHalf disabled defaultValue={product.rating} />
         </ConfigProvider>
 
         {/* Buttons at the bottom */}
