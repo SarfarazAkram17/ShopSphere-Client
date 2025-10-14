@@ -18,6 +18,7 @@ const AllProductsTableSkeleton = () => {
         <TableHead>
           <TableRow>
             <TableCell align="center" sx={{ py: 0.5 }}>#</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Product ID</TableCell>
             <TableCell align="center" sx={{ py: 0.5 }}>Store ID</TableCell>
             <TableCell align="center" sx={{ py: 0.5 }}>Store Name</TableCell>
             <TableCell align="center" sx={{ py: 0.5 }}>Name</TableCell>
@@ -30,7 +31,7 @@ const AllProductsTableSkeleton = () => {
         <TableBody>
           {rows.map((_, idx) => (
             <TableRow key={idx}>
-              {Array.from({ length: 7 }).map((__, cellIdx) => (
+              {Array.from({ length: 8 }).map((__, cellIdx) => (
                 <TableCell key={cellIdx} align="center" sx={{ py: 0.5 }}>
                   <div className="relative w-full h-4 bg-base-300 rounded overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
@@ -43,7 +44,7 @@ const AllProductsTableSkeleton = () => {
 
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={7} align="right">
+            <TableCell colSpan={8} align="right">
               <div className="flex items-center justify-end gap-3">
                 {/* Rows per page skeleton */}
                 <div className="relative w-24 h-6 bg-base-300 rounded overflow-hidden">

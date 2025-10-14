@@ -18,7 +18,8 @@ import useAuth from "../../../Hooks/useAuth";
 const searchOptions = [
   { value: "product name", label: "Search by Product Name" },
   { value: "seller email", label: "Search by Seller email" },
-  { value: "storeId", label: "Search by StoreId" },
+  { value: "productId", label: "Search by Product Id" },
+  { value: "storeId", label: "Search by Store Id" },
   { value: "storeName", label: "Search by Store name" },
 ];
 
@@ -97,6 +98,9 @@ const AllProducts = () => {
                   #
                 </TableCell>
                 <TableCell align="center" sx={{ py: 0.5 }}>
+                  Product ID
+                </TableCell>
+                <TableCell align="center" sx={{ py: 0.5 }}>
                   Store ID
                 </TableCell>
                 <TableCell align="center" sx={{ py: 0.5 }}>
@@ -126,6 +130,9 @@ const AllProducts = () => {
                 >
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {page * rowsPerPage + i + 1}
+                  </TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>
+                    {p._id}
                   </TableCell>
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {p.storeId}
@@ -180,6 +187,9 @@ const AllProducts = () => {
           <div className="modal-box max-w-2xl hide-scrollbar max-h-[95vh]">
             <h3 className="font-bold text-2xl mb-5">Product Details</h3>
             <div className="space-y-2">
+              <p>
+                <strong>Product ID:</strong> {selectedProduct._id}
+              </p>
               <p>
                 <strong>Store ID:</strong> {selectedProduct.storeId}
               </p>
