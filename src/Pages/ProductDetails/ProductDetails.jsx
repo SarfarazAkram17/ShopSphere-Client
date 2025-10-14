@@ -44,7 +44,7 @@ const ProductDetails = () => {
         <ReviewSectionSkeleton></ReviewSectionSkeleton>
 
         <section className="rounded-2xl shadow-xl px-4 py-6">
-          <div className="relative h-8 w-3/4 bg-base-300 rounded overflow-hidden">
+          <div className="relative h-8 w-48 mb-6 bg-base-300 rounded overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
           </div>
 
@@ -56,7 +56,7 @@ const ProductDetails = () => {
         </section>
 
         <section className="rounded-2xl shadow-xl px-4 py-6">
-          <div className="relative h-8 w-3/4 bg-base-300 rounded overflow-hidden">
+          <div className="relative h-8 w-48 mb-6 bg-base-300 rounded overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
           </div>
 

@@ -17,13 +17,13 @@ const AllProductsTableSkeleton = () => {
       <Table aria-label="all products skeleton table" size="small">
         <TableHead>
           <TableRow>
-            <TableCell align="center">#</TableCell>
-            <TableCell align="center">Store ID</TableCell>
-            <TableCell align="center">Store Name</TableCell>
-            <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Price</TableCell>
-            <TableCell align="center">Stock</TableCell>
-            <TableCell align="center">Added At</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>#</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Store ID</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Store Name</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Name</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Price</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Stock</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Added At</TableCell>
           </TableRow>
         </TableHead>
 
@@ -31,7 +31,7 @@ const AllProductsTableSkeleton = () => {
           {rows.map((_, idx) => (
             <TableRow key={idx}>
               {Array.from({ length: 7 }).map((__, cellIdx) => (
-                <TableCell key={cellIdx} align="center">
+                <TableCell key={cellIdx} align="center" sx={{ py: 0.5 }}>
                   <div className="relative w-full h-4 bg-base-300 rounded overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   </div>

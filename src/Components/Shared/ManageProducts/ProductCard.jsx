@@ -8,7 +8,7 @@ const ProductCard = ({ product, handleDelete }) => {
       <img
         src={product.images[0]}
         alt={product.name}
-        className="w-full h-52 sm:h-60 object-cover"
+        className="w-full h-52 sm:h-60 object-contain"
       />
       <div className="p-4 space-y-2">
         <h3 className="text-xl font-semibold text-primary">{product.name}</h3>

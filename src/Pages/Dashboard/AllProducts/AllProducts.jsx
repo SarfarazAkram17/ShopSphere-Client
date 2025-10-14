@@ -219,7 +219,7 @@ const AllProducts = () => {
                   {selectedProduct.category.join(", ")}
                 </span>
               </p>
-              {selectedProduct.size.length > 0 && (
+              {selectedProduct.size && selectedProduct.size.length > 0 && (
                 <p>
                   <strong>Size(s):</strong>{" "}
                   <span className="capitalize">
@@ -227,7 +227,7 @@ const AllProducts = () => {
                   </span>
                 </p>
               )}
-              {selectedProduct.color.length > 0 && (
+              {selectedProduct.color && selectedProduct.color.length > 0 && (
                 <p>
                   <strong>Color(s):</strong>{" "}
                   <span className="capitalize">

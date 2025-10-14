@@ -17,14 +17,14 @@ const ManageRidersTableSkeleton = () => {
       <Table aria-label="riders skeleton table" size="small">
         <TableHead>
           <TableRow>
-            <TableCell align="center">#</TableCell>
-            <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Region</TableCell>
-            <TableCell align="center">District</TableCell>
-            <TableCell align="center">Phone</TableCell>
-            <TableCell align="center">Stripe Account ID</TableCell>
-            <TableCell align="center">Applied At</TableCell>
-            <TableCell align="center">Status</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>#</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Name</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Region</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>District</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Phone</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Stripe Account ID</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Applied At</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Status</TableCell>
           </TableRow>
         </TableHead>
 
@@ -32,7 +32,7 @@ const ManageRidersTableSkeleton = () => {
           {rows.map((_, idx) => (
             <TableRow key={idx}>
               {Array.from({ length: 8 }).map((__, cellIdx) => (
-                <TableCell key={cellIdx} align="center">
+                <TableCell key={cellIdx} align="center" sx={{ py: 0.5 }}>
                   <div className="relative w-full h-4 bg-base-300 rounded overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   </div>

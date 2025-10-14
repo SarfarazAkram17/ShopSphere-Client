@@ -17,12 +17,12 @@ const AllUsersTableSkeleton = () => {
       <Table aria-label="all users skeleton table" size="small">
         <TableHead>
           <TableRow>
-            <TableCell align="center">#</TableCell>
-            <TableCell align="center">Photo</TableCell>
-            <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Email</TableCell>
-            <TableCell align="center">Method</TableCell>
-            <TableCell align="center">Role</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>#</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Photo</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Name</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Email</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Method</TableCell>
+            <TableCell align="center" sx={{ py: 0.5 }}>Role</TableCell>
           </TableRow>
         </TableHead>
 
@@ -30,21 +30,21 @@ const AllUsersTableSkeleton = () => {
           {rows.map((_, idx) => (
             <TableRow key={idx}>
               {/* # */}
-              <TableCell align="center">
+              <TableCell align="center" sx={{ py: 0.5 }}>
                 <div className="relative w-full h-4 bg-base-300 rounded overflow-hidden mx-auto">
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                 </div>
               </TableCell>
 
               {/* Photo */}
-              <TableCell align="center">
+              <TableCell align="center" sx={{ py: 0.5 }}>
                 <div className="relative w-11 h-11 bg-base-300 rounded-full overflow-hidden mx-auto">
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                 </div>
               </TableCell>
 
               {Array.from({ length: 4 }).map((__, cellIdx) => (
-                <TableCell key={cellIdx} align="center">
+                <TableCell key={cellIdx} align="center" sx={{ py: 0.5 }}>
                   <div className="relative w-full h-4 bg-base-300 rounded overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   </div>

@@ -52,7 +52,7 @@ const EditProduct = () => {
     queryKey: ["product", productId],
     queryFn: async () => {
       const res = await axiosInstance.get(`/products/${productId}`);
-      return res.data;
+      return res.data.product;
     },
     enabled: !!productId,
   });
@@ -142,6 +142,7 @@ const EditProduct = () => {
     },
   });
 
+  // todo: send color and size and from backend handle required things
   const handleProductUpdate = async (data) => {
     if (existingImages.length + newImageURLs.length < 4) {
       toast.error("Please upload total 4 images.");

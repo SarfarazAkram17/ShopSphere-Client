@@ -22,18 +22,19 @@ const ProductCard = ({ product, discountedPrice }) => {
 
   return (
     <div className="border group rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-500 h-full flex flex-col">
-      {/* Discount Badge */}
-      {product.discount > 0 && (
-        <span className="absolute top-1.5 right-1.5 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow z-3">
-          {product.discount}% off
-        </span>
-      )}
-
-      <img
-        src={product.images[0]}
-        alt={product.name}
-        className="w-full h-52 sm:h-60 group-hover:scale-108 overflow-hidden transition-all duration-300 object-contain"
-      />
+      <div className="relative">
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="w-full h-52 sm:h-60 group-hover:scale-108 overflow-hidden transition-all duration-300 object-contain"
+        />
+        {/* Discount Badge */}
+        {product.discount > 0 && (
+          <span className="absolute top-1.5 right-1.5 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow z-3">
+            {product.discount}% off
+          </span>
+        )}
+      </div>
 
       {/* Card Content */}
       <div className="p-4 flex flex-col flex-1">
