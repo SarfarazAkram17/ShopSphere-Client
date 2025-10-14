@@ -219,7 +219,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
         {/* Sidebar layout wrapper */}
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-4 pb-0 shrink-0">
+          <div className="p-4 pb-2 shrink-0 border-b border-gray-300">
             <Link to="/" className="flex items-center gap-2">
               <img
                 src="/logo.png"

@@ -66,7 +66,7 @@ const Navbar = () => {
 
   return (
     <div className="backdrop-blur-2xl p-0 shadow-sm">
-      <div ref={menuRef} className="navbar px-2 max-w-[1500px] mx-auto">
+      <div ref={menuRef} className="navbar px-4 max-w-[1500px] mx-auto">
         <div className="navbar-start">
           <div className="md:hidden mr-1">
             <button

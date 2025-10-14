@@ -44,7 +44,7 @@ const ProductSection = ({
             <div
               key={idx}
               onClick={() => setSelectedImage(img)}
-              className={`w-28 h-20 sm:w-36 sm:h-28 relative cursor-pointer rounded border-2 ${
+              className={`w-28 h-20 relative cursor-pointer rounded border-2 ${
                 selectedImage === img ? "border-primary" : "border-gray-300"
               }`}
             >
@@ -57,7 +57,7 @@ const ProductSection = ({
           ))}
         </div>
 
-        <div className="mt-5">
+        <div className="mt-10">
           <h2 className="font-bold text-xl mb-1">Like this product?</h2>
           <p className="text-sm text-gray-600 mb-3">
             Share it with your peers!
@@ -131,7 +131,7 @@ const ProductSection = ({
               {product.color.map((c, i) => (
                 <div
                   key={i}
-                  className={`py-1 px-4 rounded-md border-[2 capitalize cursor-pointer ${
+                  className={`py-1 px-4 rounded-md border-2 capitalize cursor-pointer ${
                     selectedColor === c ? "border-primary" : "border-gray-400"
                   }`}
                   onClick={() => setSelectedColor(c)}
@@ -152,7 +152,7 @@ const ProductSection = ({
               {product.size.map((s, i) => (
                 <div
                   key={i}
-                  className={`py-1 px-4 rounded-md border-[2 capitalize cursor-pointer ${
+                  className={`py-1 px-4 rounded-md border-2 capitalize cursor-pointer ${
                     selectedSize === s ? "border-primary" : "border-gray-400"
                   }`}
                   onClick={() => setSelectedSize(s)}

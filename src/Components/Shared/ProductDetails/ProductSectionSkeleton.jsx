@@ -100,6 +100,32 @@ const ProductSectionSkeleton = () => {
           <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
         </div>
 
+        {/* Color Skeleton */}
+        <div className="flex items-center gap-2 mt-3">
+          <div className="relative h-6 w-16 bg-base-300 rounded overflow-hidden" />
+          {[...Array(5)].map((_, idx) => (
+            <div
+              key={idx}
+              className="relative h-10 w-20 bg-base-300 rounded-md overflow-hidden"
+            >
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            </div>
+          ))}
+        </div>
+
+        {/* Size Skeleton */}
+        <div className="flex items-center gap-2 mt-3">
+          <div className="relative h-6 w-16 bg-base-300 rounded overflow-hidden" />
+          {[...Array(5)].map((_, idx) => (
+            <div
+              key={idx}
+              className="relative h-10 w-20 bg-base-300 rounded-md overflow-hidden"
+            >
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            </div>
+          ))}
+        </div>
+
         {/* Quantity */}
         <div className="flex items-center gap-4 mt-6">
           <div className="relative h-10 w-28 bg-base-300 rounded-lg overflow-hidden">

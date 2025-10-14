@@ -18,7 +18,7 @@ const ProductDetails = () => {
   const axiosInstance = useAxios();
   const { user } = useAuth();
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const navigate = useNavigate();
@@ -29,6 +29,9 @@ const ProductDetails = () => {
     queryKey: ["product-details"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/products/${productId}`);
+      setSelectedImage(res.data.product.images[0]);
+      setSelectedColor(res.data.product.color[0]);
+      setSelectedSize(res.data.product.size[0]);
       return res.data;
     },
   });
