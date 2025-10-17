@@ -4,6 +4,8 @@ import { RxCross2 } from "react-icons/rx";
 import { useState, useRef, useEffect } from "react";
 import { RiMenu2Line } from "react-icons/ri";
 import useAuth from "../../Hooks/useAuth";
+import { FaRegBell } from "react-icons/fa6";
+import { PiShoppingCartBold } from "react-icons/pi";
 
 const Navbar = () => {
   const { user } = useAuth();
@@ -94,6 +96,28 @@ const Navbar = () => {
         </div>
 
         <div className="flex navbar-end items-center gap-6 relative">
+          <div className="flex gap-6 items-center">
+            <Link
+              to="/cart"
+              className="indicator cursor-pointer hidden sm:block"
+            >
+              <PiShoppingCartBold size={23} />
+
+              <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
+                4
+              </span>
+            </Link>
+            {user && (
+              <div className="indicator cursor-pointer">
+                <FaRegBell size={23} />
+
+                <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
+                  3
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Auth Section */}
           {user ? (
             <div>
@@ -123,9 +147,10 @@ const Navbar = () => {
 
         {/* Mobile Dropdown */}
         {isOpen && (
-          <div className="absolute top-full w-32 left-4 z-10 md:hidden bg-base-100 rounded-box p-2 place-items-center shadow">
+          <div className="absolute top-full w-32 left-4 z-10 md:hidden bg-base-100 rounded-b-md p-2 place-items-center shadow">
             <ul className="menu space-y-2 text-center">
               {navLinks}
+
               {!user && (
                 <Link to="/register">
                   <button className="btn bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white">
@@ -133,6 +158,16 @@ const Navbar = () => {
                   </button>
                 </Link>
               )}
+
+              <div className="sm:hidden mt-4">
+                <Link to="/cart" className="indicator cursor-pointer">
+                  <PiShoppingCartBold size={20} />
+
+                  <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
+                    4
+                  </span>
+                </Link>
+              </div>
             </ul>
           </div>
         )}

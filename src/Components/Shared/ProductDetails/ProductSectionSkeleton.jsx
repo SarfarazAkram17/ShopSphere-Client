@@ -13,7 +13,7 @@ const ProductSectionSkeleton = () => {
           {[...Array(4)].map((_, idx) => (
             <div
               key={idx}
-              className="relative w-28 h-20 sm:w-36 sm:h-28 bg-base-300 rounded-md overflow-hidden"
+              className="relative w-28 h-20 bg-base-300 rounded-md overflow-hidden"
             >
               <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
             </div>
@@ -83,8 +83,8 @@ const ProductSectionSkeleton = () => {
         {/* Price */}
         <div className="flex items-center gap-3 mt-4">
           {[
-            { w: "w-24", h: "h-6" },
-            { w: "w-20", h: "h-5" },
+            { w: "w-24", h: "h-7" },
+            { w: "w-18", h: "h-5" },
           ].map((size, i) => (
             <div
               key={i}
@@ -102,7 +102,9 @@ const ProductSectionSkeleton = () => {
 
         {/* Color Skeleton */}
         <div className="flex items-center gap-2 mt-3">
-          <div className="relative h-6 w-16 bg-base-300 rounded overflow-hidden" />
+          <div className="relative h-6 w-16 bg-base-300 rounded-md overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          </div>
           {[...Array(5)].map((_, idx) => (
             <div
               key={idx}
@@ -115,7 +117,10 @@ const ProductSectionSkeleton = () => {
 
         {/* Size Skeleton */}
         <div className="flex items-center gap-2 mt-3">
-          <div className="relative h-6 w-16 bg-base-300 rounded overflow-hidden" />
+          <div className="relative h-6 w-16 bg-base-300 rounded-md overflow-hidden">
+            <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          </div>
+
           {[...Array(5)].map((_, idx) => (
             <div
               key={idx}

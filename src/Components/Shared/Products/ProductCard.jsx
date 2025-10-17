@@ -3,21 +3,21 @@ import { PiShoppingCartBold } from "react-icons/pi";
 import { ConfigProvider, Rate } from "antd";
 import useAuth from "../../../Hooks/useAuth";
 import { toast } from "react-toastify";
-import { addToCart } from "../../../lib/cartUtils";
+import { addToCart } from "../../../lib/localStorage";
 
 const ProductCard = ({ product, discountedPrice }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleAddToCart = (food) => {
+  const handleAddToCart = (product) => {
     if (!user) {
       navigate("/login", { state: location.pathname });
       toast.info("Login first");
       return;
     }
 
-    addToCart(food._id);
+    addToCart(product._id);
   };
 
   return (
@@ -67,7 +67,7 @@ const ProductCard = ({ product, discountedPrice }) => {
             components: {
               Rate: {
                 starBg: "#B5B7B770",
-                starSize: 18,
+                starSize: 17,
                 marginXS: 2,
               },
             },

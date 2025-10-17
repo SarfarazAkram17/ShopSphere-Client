@@ -3,7 +3,7 @@ import useAuth from "../../Hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import useAxios from "../../Hooks/useAxios";
 import { useState } from "react";
-import { addToCart } from "../../lib/cartUtils";
+import { addToCart } from "../../lib/localStorage";
 import ProductSection from "../../Components/Shared/ProductDetails/ProductSection";
 import ProductSectionSkeleton from "../../Components/Shared/ProductDetails/ProductSectionSkeleton";
 import ReviewSection from "../../Components/Shared/ProductDetails/ReviewSection";
@@ -18,7 +18,7 @@ const ProductDetails = () => {
   const axiosInstance = useAxios();
   const { user } = useAuth();
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const navigate = useNavigate();
@@ -26,14 +26,16 @@ const ProductDetails = () => {
 
   // Fetch Products
   const { isPending, data } = useQuery({
-    queryKey: ["product-details"],
+    queryKey: ["product-details", productId],
     queryFn: async () => {
       const res = await axiosInstance.get(`/products/${productId}`);
-      setSelectedImage(res.data.product.images[0]);
-      setSelectedColor(res.data.product.color[0]);
-      setSelectedSize(res.data.product.size[0]);
+      setSelectedImage(res.data.product?.images?.[0]);
+      setSelectedColor(res.data.product?.color?.[0]);
+      setSelectedSize(res.data.product?.size?.[0]);
       return res.data;
     },
+
+    enabled: !!productId,
   });
 
   const product = data?.product;

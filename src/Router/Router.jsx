@@ -40,6 +40,8 @@ import RiderRequestPayout from "../Pages/Dashboard/RiderRequestPayout/RiderReque
 import SellerRequestPayout from "../Pages/Dashboard/SellerRequestPayout/SellerRequestPayout";
 import RiderChatSupport from "../Pages/Dashboard/RiderChatSupport/RiderChatSupport";
 import SellerChatSupport from "../Pages/Dashboard/SellerChatSupport/SellerChatSupport";
+import Cart from "../Pages/Cart/Cart";
+import PlaceOrder from "../Pages/PlaceOrder/PlaceOrder";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -96,6 +98,18 @@ export const router = createBrowserRouter([
       {
         path: "/products/:productId",
         Component: ProductDetails,
+      },
+      {
+        path: "/cart",
+        Component: Cart,
+      },
+      {
+        path: "/placeOrder",
+        element: (
+          <PrivateRoutes>
+            <PlaceOrder></PlaceOrder>
+          </PrivateRoutes>
+        ),
       },
     ],
   },

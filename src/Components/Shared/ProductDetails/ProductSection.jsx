@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { ConfigProvider, Rate } from "antd";
 import { PiShoppingCartBold, PiBagBold } from "react-icons/pi";
 import ShareProduct from "./ShareProduct";
 import { toast } from "react-toastify";
 import useAuth from "../../../Hooks/useAuth";
+import { saveShopCart } from "../../../lib/localStorage";
 
 const ProductSection = ({
   selectedImage,
@@ -21,6 +22,36 @@ const ProductSection = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
+
+  // Buy Now handler
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.info("Please login first!");
+      return navigate("/login", { state: location.pathname });
+    }
+
+    const productInfo = {
+      productId: product._id,
+      quantity,
+    };
+
+    if (product.color) {
+      productInfo.color = selectedColor || product.color[0];
+    }
+
+    if (product.size) {
+      productInfo.size = selectedSize || product.size[0];
+    }
+
+    const payload = [productInfo];
+    
+    // Save the selected product to shop_cart (sessionStorage)
+    saveShopCart(payload);
+
+    // Redirect to place order page
+    navigate("/placeOrder");
+  };
 
   return (
     <section className="grid rounded-2xl shadow-xl px-4 py-6 grid-cols-1 md:grid-cols-2 gap-6">
@@ -44,14 +75,14 @@ const ProductSection = ({
             <div
               key={idx}
               onClick={() => setSelectedImage(img)}
-              className={`w-28 h-20 relative cursor-pointer rounded border-2 ${
+              className={`w-auto h-24 relative cursor-pointer rounded border-2 ${
                 selectedImage === img ? "border-primary" : "border-gray-300"
               }`}
             >
               <img
                 src={img}
                 alt="thumbnail"
-                className="h-full w-full object-contain rounded"
+                className="h-full object-contain rounded"
               />
             </div>
           ))}
@@ -62,7 +93,6 @@ const ProductSection = ({
           <p className="text-sm text-gray-600 mb-3">
             Share it with your peers!
           </p>
-
           <ShareProduct product={product}></ShareProduct>
         </div>
       </div>
@@ -71,40 +101,36 @@ const ProductSection = ({
       <div className="space-y-4">
         <h2 className="text-3xl font-bold text-primary">{product.name}</h2>
 
-        <div className="text-sm">
+        {/* rating */}
+        <div className="text-sm text-primary">
           <ConfigProvider
             theme={{
               components: {
-                Rate: {
-                  starBg: "#B5B7B750",
-                  starSize: 15,
-                  marginXS: 2,
-                },
+                Rate: { starBg: "#B5B7B750", starSize: 20, marginXS: 2 },
               },
             }}
           >
             <Rate disabled allowHalf value={displayRating} />
-          </ConfigProvider>{" "}
-          {/* ( {reviewData.total} {reviewData.total > 1 ? "reviews" : "review"} ) */}
+          </ConfigProvider>
         </div>
 
         <p className="text-gray-700 text-sm leading-relaxed">
           {product.description}
         </p>
 
-        {/* Price */}
-        <div className="text-xl">
+        {/* price */}
+        <div>
           {product.discount > 0 ? (
             <div className="space-x-2">
-              <span className="text-green-600 font-semibold">
+              <span className="text-green-600 text-xl font-semibold">
                 ৳ {discountedPrice.toFixed(2)}
               </span>
-              <span className="line-through text-lg text-gray-400">
+              <span className="line-through text-gray-400">
                 ৳ {product.price.toFixed(2)}
               </span>
             </div>
           ) : (
-            <span className="text-green-600 font-semibold">
+            <span className="text-green-600 text-xl font-semibold">
               ৳ {product.price.toFixed(2)}
             </span>
           )}
@@ -126,7 +152,6 @@ const ProductSection = ({
         {product?.color?.length > 0 && (
           <div className="text-md flex items-center">
             <strong>Colors:</strong>
-
             <div className="flex items-center gap-1.5 ml-2">
               {product.color.map((c, i) => (
                 <div
@@ -147,7 +172,6 @@ const ProductSection = ({
         {product?.size?.length > 0 && (
           <div className="text-md flex items-center">
             <strong>Sizes:</strong>
-
             <div className="flex items-center gap-1.5 ml-2">
               {product.size.map((s, i) => (
                 <div
@@ -164,7 +188,7 @@ const ProductSection = ({
           </div>
         )}
 
-        {/* Quantity + Add to Cart */}
+        {/* Quantity + Add to Cart / Buy Now */}
         {product.stock > 0 && (
           <>
             <div className="mt-6 flex items-center gap-4">
@@ -172,38 +196,31 @@ const ProductSection = ({
                 <button
                   onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                   disabled={quantity === 1}
-                  className="px-3 py-2 text-xl font-bold disabled:opacity-40 cursor-pointer"
+                  className="px-3 py-1 text-xl font-bold disabled:opacity-40 cursor-pointer"
                 >
                   -
                 </button>
-                <span className="px-4 text-lg font-semibold">{quantity}</span>
+                <span className="px-5 py-1 text-lg font-semibold border-x border-gray-500">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => setQuantity((prev) => prev + 1)}
                   disabled={quantity === product.stock}
-                  className="px-3 py-2 text-xl font-bold disabled:opacity-40 cursor-pointer"
+                  className="px-3 py-1 text-xl font-bold disabled:opacity-40 cursor-pointer"
                 >
                   +
                 </button>
               </div>
             </div>
+
             <div className="flex gap-2 items-center">
               <button
-                onClick={() => {
-                  if (!user) {
-                    toast.info("Login first");
-                    return navigate("/login", {
-                      state: `/products/${product._id}`,
-                    });
-                  }
-
-                  navigate("/placeOrder", {
-                    state: { productId: product._id, quantity },
-                  });
-                }}
+                onClick={handleBuyNow}
                 className="btn btn-primary text-white flex items-center"
               >
                 <PiBagBold size={20} className="mr-2" /> Buy Now
               </button>
+
               <button
                 onClick={handleAddToCart}
                 className="btn btn-secondary text-white flex items-center"

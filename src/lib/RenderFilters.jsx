@@ -69,6 +69,12 @@ const RenderFilters = ({
             )
           }
           className="w-full z-5"
+          styles={{
+            placeholder: (base) => ({
+              ...base,
+              fontSize: "13px",
+            }),
+          }}
         />
 
         <label className="input input-bordered w-full h-9.5">

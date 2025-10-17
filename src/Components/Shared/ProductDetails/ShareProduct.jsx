@@ -18,36 +18,36 @@ const ShareProduct = ({ product }) => {
     <div className="flex gap-2 items-center">
       <FacebookShareButton
         url={url}
-        quote={`Check out this amazing product: ${product.name}!`}
+        quote={`Check out this amazing product: ${product.name}! on ShopSphere`}
       >
-        <FacebookIcon size={30} round />
+        <FacebookIcon size={33} round />
       </FacebookShareButton>
       <TwitterShareButton
         url={url}
-        title={`Check out this amazing product: ${product.name}!`}
+        title={`Check out this amazing product: ${product.name}! on ShopSphere`}
       >
-        <TwitterIcon size={30} round />
+        <TwitterIcon size={33} round />
       </TwitterShareButton>
       <TelegramShareButton
         url={url}
-        title={`Check out this amazing product: ${product.name}!`}
+        title={`Check out this amazing product: ${product.name}! on ShopSphere`}
       >
-        <TelegramIcon size={30} round />
+        <TelegramIcon size={33} round />
       </TelegramShareButton>
       <WhatsappShareButton
         url={url}
-        title={`Check out this amazing product: ${product.name}!`}
+        title={`Check out this amazing product: ${product.name}! on ShopSphere`}
         separator=" - "
       >
-        <WhatsappIcon size={30} round />
+        <WhatsappIcon size={33} round />
       </WhatsappShareButton>
       <LinkedinShareButton
         url={url}
-        title={`Check out this amazing product: ${product.name}!`}
+        title={`Check out this amazing product: ${product.name}! on ShopSphere`}
         summary={product.description}
-        source="Sam's Kitchen"
+        source="ShopSphere"
       >
-        <LinkedinIcon size={30} round />
+        <LinkedinIcon size={33} round />
       </LinkedinShareButton>
     </div>
   );

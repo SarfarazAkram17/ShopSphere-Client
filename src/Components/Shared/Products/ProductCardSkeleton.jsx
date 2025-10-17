@@ -50,8 +50,14 @@ const ProductCardSkeleton = () => {
         </div>
 
         {/* Action buttons */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex justify-between gap-2 mt-4">
           <div className="relative w-20 h-8 bg-base-300 rounded">
+            <div
+              className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
+                bg-gradient-to-r from-transparent via-gray-300 to-transparent"
+            />
+          </div>
+          <div className="relative w-24 h-8 bg-base-300 rounded">
             <div
               className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
                 bg-gradient-to-r from-transparent via-gray-300 to-transparent"
