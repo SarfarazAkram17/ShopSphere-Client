@@ -1,5 +1,7 @@
 const CART_KEY = "shopsphere_cart";
 const SHOP_CART_KEY = "shopsphere_shop_cart";
+const SHOP_CART_TIMESTAMP_KEY = "shopsphere_shop_cart_timestamp";
+const SHOP_CART_EXPIRY_TIME = 10 * 60 * 1000;
 
 export function getCart() {
   if (typeof window === "undefined") return [];
@@ -43,48 +45,70 @@ export function clearCart() {
   localStorage.removeItem(CART_KEY);
 }
 
-// shop cart
-export function getShopCart() {
-  if (typeof window === "undefined") return [];
-  const data = sessionStorage.getItem(SHOP_CART_KEY);
-  return data ? JSON.parse(data) : [];
+// ============== SHOP CART (BUY NOW) FUNCTIONS ==============
+
+// Save shop cart with timestamp
+export function saveShopCart(items) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SHOP_CART_KEY, JSON.stringify(items));
+  localStorage.setItem(SHOP_CART_TIMESTAMP_KEY, Date.now().toString());
 }
 
-// save multiple products to shop cart
-export function saveShopCart(products = []) {
-  if (typeof window === "undefined") return;
-  if (!Array.isArray(products)) {
-    throw new Error("saveShopCart expects an array of products");
+// Get shop cart with expiry check
+export function getShopCart() {
+  if (typeof window === "undefined") return null;
+
+  const shopCart = localStorage.getItem(SHOP_CART_KEY);
+  const timestamp = localStorage.getItem(SHOP_CART_TIMESTAMP_KEY);
+
+  // If no shop cart exists
+  if (!shopCart || !timestamp) {
+    clearShopCart();
+    return null;
   }
 
-  // Add timestamp to each product
-  const cartWithTimestamps = products.map((product) => ({
-    ...product,
-    createdAt: Date.now(),
-  }));
+  // Check if expired (10 minutes)
+  const currentTime = Date.now();
+  const elapsedTime = currentTime - parseInt(timestamp);
 
-  sessionStorage.setItem(SHOP_CART_KEY, JSON.stringify(cartWithTimestamps));
+  if (elapsedTime > SHOP_CART_EXPIRY_TIME) {
+    clearShopCart();
+    return null;
+  }
+
+  return JSON.parse(shopCart);
 }
 
-// clear shop cart
+// Clear shop cart and timestamp
 export function clearShopCart() {
   if (typeof window === "undefined") return;
-  sessionStorage.removeItem(SHOP_CART_KEY);
+  localStorage.removeItem(SHOP_CART_KEY);
+  localStorage.removeItem(SHOP_CART_TIMESTAMP_KEY);
 }
 
-// check if shop cart has any valid items
-export function isShopCartValid(maxAgeMinutes = 10) {
-  const cart = getShopCart();
-  if (!cart.length) return false;
+// Check if shop cart is valid (not expired)
+export function isShopCartValid() {
+  if (typeof window === "undefined") return false;
 
-  const now = Date.now();
-  const maxAgeMs = maxAgeMinutes * 60 * 1000;
+  const timestamp = localStorage.getItem(SHOP_CART_TIMESTAMP_KEY);
+  if (!timestamp) return false;
 
-  const validCart = cart.filter((item) => now - item.createdAt <= maxAgeMs);
+  const currentTime = Date.now();
+  const elapsedTime = currentTime - parseInt(timestamp);
 
-  if (validCart.length !== cart.length) {
-    sessionStorage.setItem(SHOP_CART_KEY, JSON.stringify(validCart));
-  }
+  return elapsedTime <= SHOP_CART_EXPIRY_TIME;
+}
 
-  return validCart.length > 0;
+// Get remaining time for shop cart (in milliseconds)
+export function getShopCartRemainingTime() {
+  if (typeof window === "undefined") return 0;
+
+  const timestamp = localStorage.getItem(SHOP_CART_TIMESTAMP_KEY);
+  if (!timestamp) return 0;
+
+  const currentTime = Date.now();
+  const elapsedTime = currentTime - parseInt(timestamp);
+  const remainingTime = SHOP_CART_EXPIRY_TIME - elapsedTime;
+
+  return remainingTime > 0 ? remainingTime : 0;
 }

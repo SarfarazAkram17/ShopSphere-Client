@@ -57,7 +57,7 @@ const ProductSection = ({
     <section className="grid rounded-2xl shadow-xl px-4 py-6 grid-cols-1 md:grid-cols-2 gap-6">
       {/* product image */}
       <div>
-        <div className="w-full h-64 sm:h-80 border relative rounded-lg overflow-hidden">
+        <div className="w-full h-96 border relative rounded-lg overflow-hidden">
           <img
             src={selectedImage || product.images[0]}
             alt={product.name}
