@@ -4,9 +4,11 @@ import { ConfigProvider, Rate } from "antd";
 import useAuth from "../../../Hooks/useAuth";
 import { toast } from "react-toastify";
 import { addToCart } from "../../../lib/localStorage";
+import useUserRole from "../../../Hooks/useUserRole";
 
 const ProductCard = ({ product, discountedPrice }) => {
   const { user } = useAuth();
+  const { roleLoading, userId } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,7 +19,9 @@ const ProductCard = ({ product, discountedPrice }) => {
       return;
     }
 
-    addToCart(product._id);
+    if (roleLoading) return;
+
+    addToCart(product._id, 1, userId);
   };
 
   return (

@@ -12,11 +12,13 @@ import RelavantProductsSection from "../../Components/Shared/ProductDetails/Rela
 import ReviewSectionSkeleton from "../../Components/Shared/ProductDetails/ReviewSectionSkeleton";
 import { toast } from "react-toastify";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
+import useUserRole from "../../Hooks/useUserRole";
 
 const ProductDetails = () => {
   const { productId } = useParams();
   const axiosInstance = useAxios();
   const { user } = useAuth();
+  const { userId } = useUserRole();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -87,7 +89,7 @@ const ProductDetails = () => {
       return;
     }
 
-    addToCart(product._id, quantity);
+    addToCart(product._id, quantity, userId);
     setQuantity(1);
   };
 

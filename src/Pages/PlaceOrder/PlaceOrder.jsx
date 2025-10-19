@@ -7,8 +7,12 @@ import {
   getShopCartRemainingTime,
   isShopCartValid,
 } from "../../lib/localStorage";
+// import useAuth from "../../Hooks/useAuth";
+// import useUserRole from "../../Hooks/useUserRole";
 
 const PlaceOrder = () => {
+  // const {user} = useAuth()
+  // const {roleLoading, role} = useUserRole()
   const navigate = useNavigate();
   const [shopCartItems, setShopCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -76,6 +80,11 @@ const PlaceOrder = () => {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  // if (!roleLoading && role !== "customer") {
+  //   toast.info("You are not allowded to add product on cart");
+  //   return;
+  // }
+
   if (isLoading) {
     return (
       <div className="max-w-[1500px] mx-auto px-4 py-8">
@@ -94,7 +103,7 @@ const PlaceOrder = () => {
       {/* Session Timer Warning */}
       <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">⏱️</span>
+          <span className="text-4xl">⏱️</span>
           <div>
             <p className="text-yellow-800 font-semibold">
               Session expires in: {formatTime(remainingTime)}
