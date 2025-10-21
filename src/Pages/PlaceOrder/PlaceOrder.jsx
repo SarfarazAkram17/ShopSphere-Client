@@ -7,38 +7,42 @@ import {
   getShopCartRemainingTime,
   isShopCartValid,
 } from "../../lib/localStorage";
-// import useAuth from "../../Hooks/useAuth";
-// import useUserRole from "../../Hooks/useUserRole";
+import useAuth from "../../Hooks/useAuth";
+// import useAxios from "../../Hooks/useAxios";
 
 const PlaceOrder = () => {
-  // const {user} = useAuth()
-  // const {roleLoading, role} = useUserRole()
   const navigate = useNavigate();
+  const { user, userEmail } = useAuth();
+  // const axiosInstance = useAxios();
   const [shopCartItems, setShopCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if shop cart is valid
-    const items = getShopCart();
+    if (!user) {
+      toast.error("Please login first!");
+      navigate("/login");
+      return;
+    }
 
-    if (!items || items.length === 0 || !isShopCartValid()) {
+    const items = getShopCart(userEmail);
+
+    if (!items || items.length === 0 || !isShopCartValid(userEmail)) {
       toast.error("No items found or session expired!");
-      clearShopCart();
+      clearShopCart(userEmail);
       navigate(-1);
       return;
     }
 
     setShopCartItems(items);
-    setRemainingTime(getShopCartRemainingTime());
+    setRemainingTime(getShopCartRemainingTime(userEmail));
     setIsLoading(false);
 
-    // Set up timer to update remaining time every second
     const timer = setInterval(() => {
-      const remaining = getShopCartRemainingTime();
+      const remaining = getShopCartRemainingTime(userEmail);
 
       if (remaining <= 0) {
-        clearShopCart();
+        clearShopCart(userEmail);
         toast.error("Session expired! Please try again.");
         navigate(-1);
       } else {
@@ -46,48 +50,77 @@ const PlaceOrder = () => {
       }
     }, 1000);
 
-    // Cleanup timer on unmount
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [navigate, user, userEmail]);
 
-  // Handle back button / browser navigation
   useEffect(() => {
+    if (!user) return;
+
+    const userEmail = user.email;
     let shouldClearOnUnmount = true;
 
     const handlePopState = () => {
-      // User clicked back button
-      clearShopCart();
-      shouldClearOnUnmount = false; // Prevent double clearing
+      clearShopCart(userEmail);
+      shouldClearOnUnmount = false;
     };
 
     window.addEventListener("popstate", handlePopState);
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
-
-      // Only clear if user navigated away WITHOUT placing order or canceling
-      // Don't clear if they used cancel button or completed order (those handle clearing themselves)
+      
       if (shouldClearOnUnmount && shopCartItems.length > 0) {
-        clearShopCart();
+        clearShopCart(userEmail);
       }
     };
-  }, [shopCartItems]);
+  }, [shopCartItems, user]);
 
-  // Format remaining time (mm:ss)
+  // const handlePlaceOrder = async () => {
+  //   if (!user) return;
+
+  //   try {
+  //     setIsLoading(true);
+  //     const userEmail = user.email;
+
+  //     // Place order API call
+  //     const response = await axiosInstance.post("/orders", {
+  //       items: shopCartItems,
+  //       // other order details like address, payment method, etc.
+  //     });
+
+  //     if (response.data.success) {
+  //       // After successful order, remove items from cart (if they came from cart)
+  //       // Since this is "Buy Now", we just clear the shop cart
+  //       clearShopCart(userEmail);
+        
+  //       toast.success("Order placed successfully!");
+  //       navigate("/order-confirmation");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to place order. Please try again.");
+  //     console.error(error);
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const handleCancel = () => {
+  //   if (!user) return;
+    
+  //   const userEmail = user.email;
+  //   clearShopCart(userEmail);
+  //   toast.info("Order cancelled");
+  //   navigate(-1);
+  // };
+
   const formatTime = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // if (!roleLoading && role !== "customer") {
-  //   toast.info("You are not allowded to add product on cart");
-  //   return;
-  // }
-
   if (isLoading) {
     return (
-      <div className="max-w-[1500px] mx-auto px-4 py-8">
+      <div className="max-w-[1500px] mx-auto px-4">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="loading loading-spinner loading-lg text-primary"></div>
@@ -100,10 +133,10 @@ const PlaceOrder = () => {
 
   return (
     <div className="max-w-[1500px] mx-auto px-4 py-8">
-      {/* Session Timer Warning */}
+      {/* Session Timer */}
       <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-4xl">⏱️</span>
+          <span className="text-2xl">⏱️</span>
           <div>
             <p className="text-yellow-800 font-semibold">
               Session expires in: {formatTime(remainingTime)}

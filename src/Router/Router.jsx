@@ -101,13 +101,21 @@ export const router = createBrowserRouter([
       },
       {
         path: "/cart",
-        Component: Cart,
+        element: (
+          <PrivateRoutes>
+            <CustomerRoutes>
+              <Cart></Cart>
+            </CustomerRoutes>
+          </PrivateRoutes>
+        ),
       },
       {
         path: "/placeOrder",
         element: (
           <PrivateRoutes>
-            <PlaceOrder></PlaceOrder>
+            <CustomerRoutes>
+              <PlaceOrder></PlaceOrder>
+            </CustomerRoutes>
           </PrivateRoutes>
         ),
       },

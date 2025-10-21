@@ -5,6 +5,10 @@ import ShareProduct from "./ShareProduct";
 import { toast } from "react-toastify";
 import useAuth from "../../../Hooks/useAuth";
 import { saveShopCart } from "../../../lib/localStorage";
+import useUserRole from "../../../Hooks/useUserRole";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import { useState } from "react";
+import { useCartCount } from "../../../Hooks/useCartCount";
 
 const ProductSection = ({
   selectedImage,
@@ -12,17 +16,59 @@ const ProductSection = ({
   setSelectedImage,
   discountedPrice,
   displayRating,
-  setQuantity,
-  quantity,
-  handleAddToCart,
   selectedColor,
   setSelectedColor,
   selectedSize,
   setSelectedSize,
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, userEmail } = useAuth();
+  const { roleLoading, role } = useUserRole();
   const location = useLocation();
+  const axiosSecure = useAxiosSecure();
+  const [quantity, setQuantity] = useState(1);
+  const { refetch } = useCartCount();
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      navigate("/login", { state: location.pathname });
+      toast.info("Please login first");
+      return;
+    }
+
+    if (!roleLoading && role !== "customer") {
+      toast.info("You are not allowded to add products on cart");
+      return;
+    }
+
+    try {
+      // Prepare the request body
+      const requestBody = {
+        productId: product._id,
+        quantity,
+      };
+
+      // Only add color if product has color options (use first color as default)
+      if (product.color) {
+        requestBody.color = selectedColor || product.color[0];
+      }
+
+      // Only add size if product has size options (use first size as default)
+      if (product.size) {
+        requestBody.size = selectedSize || product.size[0];
+      }
+
+      // Call the API to add to cart
+      await axiosSecure.post(`/cart/add?email=${userEmail}`, requestBody);
+
+      toast.success("Product added to cart!");
+      refetch();
+      setQuantity(1)
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("Failed to add product to cart");
+    }
+  };
 
   // Buy Now handler
   const handleBuyNow = () => {
@@ -31,23 +77,31 @@ const ProductSection = ({
       return navigate("/login", { state: location.pathname });
     }
 
+    if (!roleLoading || role !== "customer") {
+      toast.info("You are not allowded to add products on cart");
+      return;
+    }
+
     const productInfo = {
       productId: product._id,
       quantity,
+      storeId: product.storeId,
     };
 
+    // Only add color if product has color options
     if (product.color) {
       productInfo.color = selectedColor || product.color[0];
     }
 
+    // Only add size if product has size options
     if (product.size) {
       productInfo.size = selectedSize || product.size[0];
     }
 
     const payload = [productInfo];
-    
-    // Save the selected product to shop_cart (sessionStorage)
-    saveShopCart(payload);
+
+    // Save to localStorage with user email
+    saveShopCart(payload, userEmail);
 
     // Redirect to place order page
     navigate("/placeOrder");

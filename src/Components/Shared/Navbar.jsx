@@ -5,10 +5,12 @@ import { useState, useRef, useEffect } from "react";
 import { RiMenu2Line } from "react-icons/ri";
 import useAuth from "../../Hooks/useAuth";
 import { FaRegBell } from "react-icons/fa6";
-import { PiShoppingCartBold } from "react-icons/pi";
+import CartIcon from "../Shared/CartIcon";
+import useUserRole from "../../Hooks/useUserRole";
 
 const Navbar = () => {
   const { user } = useAuth();
+  const { roleLoading, role } = useUserRole();
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -97,20 +99,15 @@ const Navbar = () => {
 
         <div className="flex navbar-end items-center gap-6 relative">
           <div className="flex gap-6 items-center">
-            <Link
-              to="/cart"
-              className="indicator cursor-pointer hidden sm:block"
-            >
-              <PiShoppingCartBold size={23} />
+            {/* Desktop Cart Icon */}
+            {(!user || (!roleLoading && role === "customer")) && (
+              <CartIcon className="hidden sm:block" />
+            )}
 
-              <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
-                4
-              </span>
-            </Link>
+            {/* Notification Bell */}
             {user && (
               <div className="indicator cursor-pointer">
                 <FaRegBell size={23} />
-
                 <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
                   3
                 </span>
@@ -159,15 +156,12 @@ const Navbar = () => {
                 </Link>
               )}
 
-              <div className="sm:hidden mt-4">
-                <Link to="/cart" className="indicator cursor-pointer">
-                  <PiShoppingCartBold size={20} />
-
-                  <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
-                    4
-                  </span>
-                </Link>
-              </div>
+              {/* Mobile Cart Icon */}
+              {(!user || (!roleLoading && role === "customer")) && (
+                <div className="sm:hidden mt-4">
+                  <CartIcon size={20} />
+                </div>
+              )}
             </ul>
           </div>
         )}

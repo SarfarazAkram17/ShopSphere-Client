@@ -1,30 +1,21 @@
-import { useLocation, useNavigate, useParams } from "react-router";
-import useAuth from "../../Hooks/useAuth";
+import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import useAxios from "../../Hooks/useAxios";
 import { useState } from "react";
-import { addToCart } from "../../lib/localStorage";
 import ProductSection from "../../Components/Shared/ProductDetails/ProductSection";
 import ProductSectionSkeleton from "../../Components/Shared/ProductDetails/ProductSectionSkeleton";
 import ReviewSection from "../../Components/Shared/ProductDetails/ReviewSection";
 import FromSameStoreProducts from "../../Components/Shared/ProductDetails/FromSameStoreProductsSection";
 import RelavantProductsSection from "../../Components/Shared/ProductDetails/RelavantProductsSection";
 import ReviewSectionSkeleton from "../../Components/Shared/ProductDetails/ReviewSectionSkeleton";
-import { toast } from "react-toastify";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
-import useUserRole from "../../Hooks/useUserRole";
 
 const ProductDetails = () => {
   const { productId } = useParams();
   const axiosInstance = useAxios();
-  const { user } = useAuth();
-  const { userId } = useUserRole();
-  const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
 
   // Fetch Products
   const { isPending, data } = useQuery({
@@ -82,17 +73,6 @@ const ProductDetails = () => {
       ? product.price - (product.price * product.discount) / 100
       : product.price;
 
-  const handleAddToCart = () => {
-    if (!user) {
-      navigate("/login", { state: location.pathname });
-      toast.info("Login first");
-      return;
-    }
-
-    addToCart(product._id, quantity, userId);
-    setQuantity(1);
-  };
-
   const roundToHalf = (num) => {
     const floor = Math.floor(num);
     const decimal = num - floor;
@@ -105,16 +85,13 @@ const ProductDetails = () => {
   const displayRating = roundToHalf(avgRating);
 
   return (
-    <section className="max-w-[1500px] mx-auto px-4 space-y-4">
+    <section className="max-w-[1500px] mx-auto px-4 space-y-4 py-8">
       <ProductSection
         selectedImage={selectedImage}
         product={product}
         setSelectedImage={setSelectedImage}
         discountedPrice={discountedPrice}
         displayRating={displayRating}
-        setQuantity={setQuantity}
-        quantity={quantity}
-        handleAddToCart={handleAddToCart}
         selectedColor={selectedColor}
         setSelectedColor={setSelectedColor}
         selectedSize={selectedSize}

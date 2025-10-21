@@ -8,9 +8,7 @@ const RootLayout = () => {
       <div className="sticky z-50 top-0">
         <Navbar></Navbar>
       </div>
-      <div className="my-8">
-        <Outlet></Outlet>
-      </div>
+      <Outlet></Outlet>
       <Footer></Footer>
     </div>
   );

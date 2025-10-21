@@ -3,25 +3,56 @@ import { PiShoppingCartBold } from "react-icons/pi";
 import { ConfigProvider, Rate } from "antd";
 import useAuth from "../../../Hooks/useAuth";
 import { toast } from "react-toastify";
-import { addToCart } from "../../../lib/localStorage";
 import useUserRole from "../../../Hooks/useUserRole";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import { useCartCount } from "../../../Hooks/useCartCount";
 
 const ProductCard = ({ product, discountedPrice }) => {
-  const { user } = useAuth();
-  const { roleLoading, userId } = useUserRole();
+  const { user, userEmail } = useAuth();
+  const { roleLoading, role } = useUserRole();
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const location = useLocation();
+  const { refetch } = useCartCount();
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = async () => {
     if (!user) {
       navigate("/login", { state: location.pathname });
-      toast.info("Login first");
+      toast.info("Please login first");
       return;
     }
 
-    if (roleLoading) return;
+    if (!roleLoading && role !== "customer") {
+      toast.info("You are not allowded to add products on cart");
+      return;
+    }
 
-    addToCart(product._id, 1, userId);
+    try {
+      // Prepare the request body
+      const requestBody = {
+        productId: product._id,
+        quantity: 1,
+      };
+
+      // Only add color if product has color options (use first color as default)
+      if (product.color) {
+        requestBody.color = product.color[0];
+      }
+
+      // Only add size if product has size options (use first size as default)
+      if (product.size) {
+        requestBody.size = product.size[0];
+      }
+
+      // Call the API to add to cart
+      await axiosSecure.post(`/cart/add?email=${userEmail}`, requestBody);
+
+      toast.success("Product added to cart!");
+      refetch();
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("Failed to add product to cart");
+    }
   };
 
   return (
@@ -89,7 +120,7 @@ const ProductCard = ({ product, discountedPrice }) => {
           </Link>
 
           <button
-            onClick={() => handleAddToCart(product)}
+            onClick={() => handleAddToCart()}
             disabled={product.stock <= 0}
             className="btn btn-sm btn-outline btn-secondary hover:text-white"
           >
