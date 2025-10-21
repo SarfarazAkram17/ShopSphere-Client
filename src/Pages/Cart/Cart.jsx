@@ -179,7 +179,7 @@ const Cart = () => {
         <p className="text-gray-600 mb-6">Add some products to get started!</p>
         <button
           onClick={() => navigate("/products")}
-          className="btn btn-primary text-white"
+          className="btn btn-error text-white"
         >
           Continue Shopping
         </button>
@@ -192,7 +192,7 @@ const Cart = () => {
       <div className="max-w-[1500px] mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cart Items Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-2 lg:order-1">
             {/* Header */}
             <div className="bg-white rounded-lg p-4 mb-4 flex items-center justify-between shadow-xl">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -390,8 +390,8 @@ const Cart = () => {
           </div>
 
           {/* Order Summary Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg p-6 shadow-xl sticky top-4">
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="bg-white rounded-lg p-6 shadow-xl sticky top-18">
               <h2 className="text-lg font-bold mb-4">Order Summary</h2>
 
               {/* Subtotal */}

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 const axiosSecure = axios.create({
-  baseURL: "https://shopsphere-server-wzml.onrender.com",
+  baseURL: "http://localhost:5001",
   withCredentials: true,
 });
 
