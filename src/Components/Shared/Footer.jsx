@@ -2,100 +2,172 @@ import { Link, NavLink } from "react-router";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import logo from "/logo.png";
 import { FaGithub, FaXTwitter } from "react-icons/fa6";
+import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { IoMdHeart } from "react-icons/io";
+
 const Footer = () => {
-  const normalClass =
-    "px-3 py-0.5 block w-fit text-sm rounded-full font-bold hover:text-primary hover:bg-primary/10";
+  const quickLinks = [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About Us" },
+    { to: "/products", label: "Products", end: true },
+    { to: "/offers", label: "Offers" },
+  ];
 
-  const navLinks = (
-    <>
-      <NavLink to="/" className={`${normalClass}`}>
-        Home
-      </NavLink>
-      <NavLink to="/about" className={`${normalClass}`}>
-        About
-      </NavLink>
-      <NavLink to="/products" end className={`${normalClass}`}>
-        Products
-      </NavLink>
-      <NavLink to="/offers" className={`${normalClass}`}>
-        Offers
-      </NavLink>
-    </>
-  );
   return (
-    <footer className="bg-base-200 text-base-content border-t border-gray-200">
-      <div className="max-w-[1500px] px-4 mx-auto py-10 grid md:grid-cols-3 gap-6">
-        {/* Brand Section */}
-        <div>
-          <Link to="/" className="flex items-center gap-1">
-            <img src={logo} alt="ShopSphere Logo" className="h-14 w-auto" />
-            <span className="text-[#392B12] font-bold sm:text-xl">
-              ShopSphere
-            </span>
-          </Link>
-          <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-            ShopSphere is your trusted online marketplace, connecting customers
-            with verified sellers and fast, reliable riders.
-          </p>
-        </div>
+    <footer className="bg-base-300">
+      {/* Main Footer Content */}
+      <div className="max-w-[1500px] px-4 mx-auto py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Brand Column */}
+          <div className="lg:col-span-2">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <img src={logo} alt="ShopSphere Logo" className="h-12 w-auto" />
+              <span className="text-[#392B12] font-bold text-2xl">
+                ShopSphere
+              </span>
+            </Link>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6 max-w-sm">
+              Bangladesh's premier multi-vendor e-commerce platform connecting
+              customers, sellers, and riders in one seamless ecosystem. Shop
+              smart, sell better, deliver faster.
+            </p>
 
-        {/* Quick Links */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-sm">{navLinks}</ul>
-        </div>
+            {/* Social Links */}
+            <div>
+              <h4 className="text-gray-900 font-semibold mb-3 text-sm">
+                Follow Us
+              </h4>
+              <div className="flex space-x-3">
+                <a
+                  href="https://www.facebook.com/sarfarazakram17"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Facebook"
+                >
+                  <FaFacebookF size={20} />
+                </a>
+                <a
+                  href="https://www.instagram.com/sarfarazakram17"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Instagram"
+                >
+                  <FaInstagram size={20} />
+                </a>
+                <a
+                  href="https://x.com/SarfarazAkram17"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Twitter"
+                >
+                  <FaXTwitter size={20} />
+                </a>
+                <a
+                  href="https://www.github.com/SarfarazAkram17"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="GitHub"
+                >
+                  <FaGithub size={20} />
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/sarfarazakram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="LinkedIn"
+                >
+                  <FaLinkedinIn size={20} />
+                </a>
+              </div>
+            </div>
+          </div>
 
-        {/* Contact & Social */}
-        <div>
-          <h3 className="text-lg font-bold mb-3">Get In Touch</h3>
-          <p className="text-sm mb-2">📍 Dhaka, Bangladesh</p>
-          <p className="text-sm mb-2">📧 support@shopsphere.com</p>
-          <p className="text-sm mb-2">📞 +880 1234 567 890</p>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4 text-base">
+              Quick Links
+            </h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    end={link.end}
+                    className="px-3 py-0.5 text-xs lg:text-sm rounded-full font-bold hover:text-primary hover:bg-primary/10"
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-          {/* Social Icons */}
-          <div className="flex space-x-3 mt-4">
-            <a
-              href="https://www.facebook.com/sarfarazakram17"
-              target="_blank"
-              className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
-            >
-              <FaFacebookF />
-            </a>
-            <a
-              href="https://www.instagram.com/sarfarazakram17"
-              target="_blank"
-              className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
-            >
-              <FaInstagram />
-            </a>
-            <a
-              href="https://x.com/SarfarazAkram17"
-              target="_blank"
-              className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
-            >
-              <FaXTwitter />
-            </a>
-            <a
-              href="https://www.github.com/SarfarazAkram17"
-              target="_blank"
-              className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
-            >
-              <FaGithub />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/sarfarazakram"
-              target="_blank"
-              className="p-2 bg-primary text-white rounded-full hover:bg-primary/80 transition"
-            >
-              <FaLinkedinIn />
-            </a>
+          {/* Get In Touch */}
+          <div>
+            <h3 className="text-gray-900 font-bold mb-4 text-base">
+              Get In Touch
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 text-gray-600">
+                <MdLocationOn className="text-xl mt-0.5 flex-shrink-0 text-primary" />
+                <span className="text-sm">
+                  House #123, Road #456
+                  <br />
+                  Dhaka 1212, Bangladesh
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 hover:text-primary transition-colors">
+                <MdEmail className="text-xl flex-shrink-0 text-primary" />
+                <a href="mailto:support@shopsphere.com" className="text-sm">
+                  support@shopsphere.com
+                </a>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 hover:text-primary transition-colors">
+                <MdPhone className="text-xl flex-shrink-0 text-primary" />
+                <a href="tel:+8801234567890" className="text-sm">
+                  +880 1234 567 890
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-300 text-center py-4 text-sm text-gray-600">
-        © {new Date().getFullYear()} ShopSphere. All rights reserved.
+      <div className="bg-base-300">
+        <div className="max-w-[1500px] px-4 mx-auto py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
+            <p className="flex items-center gap-1">
+              © {new Date().getFullYear()} ShopSphere. All rights reserved. Made
+              with <IoMdHeart className="text-error mx-1" /> in Bangladesh
+            </p>
+            <div className="flex flex-wrap justify-center gap-6">
+              <Link
+                to="/privacy-policy"
+                className="hover:text-primary transition-colors font-medium"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/terms-conditions"
+                className="hover:text-primary transition-colors font-medium"
+              >
+                Terms & Conditions
+              </Link>
+              <Link
+                to="/cookie-policy"
+                className="hover:text-primary transition-colors font-medium"
+              >
+                Cookie Policy
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );
