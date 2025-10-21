@@ -43,7 +43,7 @@ const Navbar = () => {
   }, [isOpen, isProfileOpen]);
 
   return (
-    <div className="backdrop-blur-2xl p-0 shadow-sm">
+    <div className="bg-base-200 p-0 shadow-sm">
       <div ref={menuRef} className="navbar px-4 max-w-[1500px] mx-auto">
         {/* Logo Section */}
         <div className="navbar-start">

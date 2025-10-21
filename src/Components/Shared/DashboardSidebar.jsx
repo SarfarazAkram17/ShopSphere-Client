@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import useUserRole from "../../Hooks/useUserRole";
-import { FiPlusCircle, FiUser } from "react-icons/fi";
+import { FiLock, FiPlusCircle, FiUser } from "react-icons/fi";
 import { TbLayoutDashboard, TbPackages } from "react-icons/tb";
 import { PiShoppingCartBold } from "react-icons/pi";
 import {
@@ -202,6 +202,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
           // },
         ]
       : []),
+    {
+      name: "Change Password",
+      path: "/dashboard/changePassword",
+      icon: <FiLock size={20} />,
+    },
   ];
 
   return (

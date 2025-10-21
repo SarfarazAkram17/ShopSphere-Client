@@ -42,6 +42,7 @@ import RiderChatSupport from "../Pages/Dashboard/RiderChatSupport/RiderChatSuppo
 import SellerChatSupport from "../Pages/Dashboard/SellerChatSupport/SellerChatSupport";
 import Cart from "../Pages/Cart/Cart";
 import PlaceOrder from "../Pages/PlaceOrder/PlaceOrder";
+import ChangePassword from "../Pages/Dashboard/ChangePassword/ChangePassword";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -137,6 +138,10 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         Component: Profile,
+      },
+      {
+        path: "changePassword",
+        Component: ChangePassword,
       },
 
       // customer routes

@@ -1,4 +1,4 @@
-import { FiUser, FiPlusCircle } from "react-icons/fi";
+import { FiUser, FiPlusCircle, FiLock } from "react-icons/fi";
 import { TbLayoutDashboard, TbPackages } from "react-icons/tb";
 import { PiShoppingCartBold } from "react-icons/pi";
 import {
@@ -42,6 +42,11 @@ export const getMenuItemsByRole = (role) => {
         icon: <FaMotorcycle size={18} />,
         label: "Become a Rider",
         path: "/dashboard/becomeARider",
+      },
+      {
+        icon: <FiLock size={20} />,
+        label: "Change Password",
+        path: "/dashboard/changePassword",
       },
     ],
     admin: [
@@ -105,6 +110,11 @@ export const getMenuItemsByRole = (role) => {
         label: "Update Order Status",
         path: "/dashboard/updateOrderStatus",
       },
+      {
+        icon: <FiLock size={20} />,
+        label: "Change Password",
+        path: "/dashboard/changePassword",
+      },
     ],
     seller: [
       {
@@ -142,6 +152,11 @@ export const getMenuItemsByRole = (role) => {
         label: "Request Payout",
         path: "/dashboard/seller/requestPayout",
       },
+      {
+        icon: <FiLock size={20} />,
+        label: "Change Password",
+        path: "/dashboard/changePassword",
+      },
     ],
     rider: [
       {
@@ -168,6 +183,11 @@ export const getMenuItemsByRole = (role) => {
         icon: <GiReceiveMoney size={18} />,
         label: "Request Payout",
         path: "/dashboard/rider/requestPayout",
+      },
+      {
+        icon: <FiLock size={20} />,
+        label: "Change Password",
+        path: "/dashboard/changePassword",
       },
     ],
   };
