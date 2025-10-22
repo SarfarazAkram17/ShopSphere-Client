@@ -34,7 +34,7 @@ const SocialLogin = ({ state, message }) => {
   return (
     <>
       {/* Google */}
-      <button onClick={handleGoogleLogin} className="btn">
+      <button onClick={handleGoogleLogin} className="btn w-full">
         <svg
           aria-label="Google logo"
           width="25"

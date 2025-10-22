@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaEnvelope,
+  FaLock,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import useAxios from "../../Hooks/useAxios";
@@ -14,6 +21,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { loginUser, forgotPassword, logOutUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,104 +76,210 @@ const Login = () => {
       return toast.warn("Please enter your email first.");
     }
 
+    setForgotPasswordLoading(true);
+
     forgotPassword(email)
       .then(() => {
-        toast.success("Password reset email send.");
-        toast.warn("Also check email in the spam section");
+        toast.success("Password reset email sent.");
+        toast.info("Also check email in the spam section");
       })
       .catch((err) => {
         toast.error(`Error in password change: ${err.message}`);
+      })
+      .finally(() => {
+        setForgotPasswordLoading(false);
       });
   };
 
   return (
-    <div className="flex flex-col max-w-[1500px] mx-auto px-4 sm:flex-row gap-6 justify-start items-center md:justify-center">
-      <Lottie
-        className="flex-1"
-        animationData={loginLottie}
-        loop={true}
-      ></Lottie>
-      <div className="card w-full flex-1 shadow-xl">
-        <div className="card-body">
-          <h1 className="text-3xl font-extrabold">Welcome Back</h1>
-          <p className="mb-4 text-sm font-semibold">Login with ShopSphere</p>
-          <form onSubmit={handleSubmit(handleLogin)} className="fieldset">
-            <label className="label font-semibold">Email</label>
-            <input
-              type="email"
-              {...register("email", { required: true })}
-              className="input placeholder:text-[13px] placeholder:font-bold w-full"
-              placeholder="Enter your email"
-            />
-            {errors.email?.type === "required" && (
-              <p className="text-red-500 font-bold">Email is required.</p>
-            )}
+    <div className="min-h-screen flex items-center justify-center py-8 px-4 bg-gradient-to-br from-primary/5 via-transparent to-primary/10">
+      <div className="flex flex-col lg:flex-row max-w-[1500px] w-full gap-8 items-center justify-center">
+        {/* Lottie Animation Section */}
+        <div className="flex-1 w-full max-w-xl">
+          <Lottie
+            className="w-full h-auto"
+            animationData={loginLottie}
+            loop={true}
+          />
+        </div>
 
-            <label className="label font-semibold mt-4">Password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="input placeholder:text-[13px] placeholder:font-bold w-full"
-                {...register("password", {
-                  required: true,
-                })}
-                placeholder="Enter your password"
-              />
-              {errors.password?.type === "required" && (
-                <p className="text-red-500 font-bold">Password is required.</p>
-              )}
-              {showPassword ? (
-                <FaEyeSlash
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-3 right-3 cursor-pointer z-10"
-                  size={17}
-                />
-              ) : (
-                <FaEye
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-3 right-3 cursor-pointer z-10"
-                  size={17}
-                />
-              )}
+        {/* Login Form Section */}
+        <div className="flex-1 w-full max-w-2xl">
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                <FaLock className="w-8 h-8 text-primary" />
+              </div>
+              <h1 className="text-3xl font-extrabold text-gray-800 mb-2">
+                Welcome Back
+              </h1>
+              <p className="text-gray-600 font-medium">
+                Login to your ShopSphere account
+              </p>
             </div>
-            <div>
-              <a
-                onClick={handleForgotPassword}
-                className="link link-hover text-gray-600 font-semibold"
+
+            {/* Login Form */}
+            <form onSubmit={handleSubmit(handleLogin)} className="space-y-5">
+              {/* Email Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <FaEnvelope className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="email"
+                    {...register("email", { required: true })}
+                    className={`w-full pl-11 pr-4 py-3 border ${
+                      errors.email ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-primary/60 focus:border-transparent outline-none transition`}
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email?.type === "required" && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <FaExclamationTriangle className="w-4 h-4" />
+                    Email is required
+                  </p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <FaLock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`w-full pl-11 pr-12 py-3 border ${
+                      errors.password ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-primary/60 focus:border-transparent outline-none transition`}
+                    {...register("password", {
+                      required: true,
+                    })}
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="w-5 h-5 cursor-pointer" />
+                    ) : (
+                      <FaEye className="w-5 h-5 cursor-pointer" />
+                    )}
+                  </button>
+                </div>
+                {errors.password?.type === "required" && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <FaExclamationTriangle className="w-4 h-4" />
+                    Password is required
+                  </p>
+                )}
+              </div>
+
+              {/* Forgot Password Link */}
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={forgotPasswordLoading}
+                  className="text-sm text-primary cursor-pointer disabled:cursor-not-allowed hover:text-primary/80 font-semibold transition disabled:opacity-50"
+                >
+                  {forgotPasswordLoading ? "Sending..." : "Forgot password?"}
+                </button>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Forgot password?
-              </a>
+                {loading ? (
+                  <>
+                    <svg
+                      className="w-5 h-5 text-white animate-spin"
+                      viewBox="0 0 100 100"
+                    >
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                      />
+                      <line
+                        x1="50"
+                        y1="50"
+                        x2="50"
+                        y2="25"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+                      <line
+                        x1="50"
+                        y1="50"
+                        x2="75"
+                        y2="50"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <span>Logging in...</span>
+                  </>
+                ) : (
+                  <>
+                    <FaCheckCircle className="w-5 h-5" />
+                    <span>Login</span>
+                  </>
+                )}
+              </button>
+
+              {/* Register Link */}
+              <p className="text-center text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Link
+                  state={location.state}
+                  to="/register"
+                  className="text-primary hover:text-primary/80 font-semibold transition"
+                >
+                  Register now
+                </Link>
+              </p>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500 font-medium">
+                  Or continue with
+                </span>
+              </div>
             </div>
-            <button
-              disabled={loading}
-              className="btn btn-primary text-white mt-6"
-            >
-              {" "}
-              {loading ? (
-                <svg className="w-5 h-5 text-primary animate-spin" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8"/><line x1="50" y1="50" x2="50" y2="25" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/><line x1="50" y1="50" x2="75" y2="50" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
-              ) : (
-                "Login"
-              )}
-            </button>
-            <p className="text-xs my-2">
-              Don't have any account ?{" "}
-              <Link
-                state={location.state}
-                to="/register"
-                className="hover:underline text-primary font-semibold"
-              >
-                Register
-              </Link>
-            </p>
-          </form>
-          <div className="divider my-4">Or continue with</div>
-          <SocialLogin
-            state={location.state}
-            message={"You login successfully"}
-          ></SocialLogin>
+
+            {/* Social Login */}
+            <SocialLogin
+              state={location.state}
+              message={"You login successfully"}
+            />
+          </div>
         </div>
       </div>
-      
     </div>
   );
 };

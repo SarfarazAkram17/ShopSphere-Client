@@ -8,7 +8,7 @@ const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const { user, userEmail, logOutUser } = useAuth();
   const { role } = useUserRole();
 
-  const menuItems = getMenuItemsByRole(role);
+  const menuItems = getMenuItemsByRole(role, user.providerData[0].providerId);
 
   const handleLogout = () => {
     logOutUser();

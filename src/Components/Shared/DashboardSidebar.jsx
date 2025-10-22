@@ -25,7 +25,8 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
   const { roleLoading, role } = useUserRole();
   const sidebarRef = useRef(null);
-
+  const provider = user.providerData[0].providerId;
+console.log(provider)
   // ✅ Close sidebar if click outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -202,11 +203,15 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
           // },
         ]
       : []),
-    {
-      name: "Change Password",
-      path: "/dashboard/changePassword",
-      icon: <FiLock size={20} />,
-    },
+    ...(provider === "password"
+      ? [
+          {
+            name: "Change Password",
+            path: "/dashboard/changePassword",
+            icon: <FiLock size={20} />,
+          },
+        ]
+      : []),
   ];
 
   return (

@@ -15,7 +15,7 @@ import { LuCodesandbox } from "react-icons/lu";
 import { MdStorefront } from "react-icons/md";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 
-export const getMenuItemsByRole = (role) => {
+export const getMenuItemsByRole = (role, provider) => {
   const roleMenuItems = {
     customer: [
       {
@@ -43,7 +43,7 @@ export const getMenuItemsByRole = (role) => {
         label: "Become a Rider",
         path: "/dashboard/becomeARider",
       },
-      {
+      provider === "password" && {
         icon: <FiLock size={20} />,
         label: "Change Password",
         path: "/dashboard/changePassword",
@@ -110,7 +110,7 @@ export const getMenuItemsByRole = (role) => {
         label: "Update Order Status",
         path: "/dashboard/updateOrderStatus",
       },
-      {
+      provider === "password" && {
         icon: <FiLock size={20} />,
         label: "Change Password",
         path: "/dashboard/changePassword",
@@ -152,7 +152,7 @@ export const getMenuItemsByRole = (role) => {
         label: "Request Payout",
         path: "/dashboard/seller/requestPayout",
       },
-      {
+      provider === "password" && {
         icon: <FiLock size={20} />,
         label: "Change Password",
         path: "/dashboard/changePassword",
@@ -184,7 +184,7 @@ export const getMenuItemsByRole = (role) => {
         label: "Request Payout",
         path: "/dashboard/rider/requestPayout",
       },
-      {
+      provider === "password" && {
         icon: <FiLock size={20} />,
         label: "Change Password",
         path: "/dashboard/changePassword",
@@ -192,5 +192,5 @@ export const getMenuItemsByRole = (role) => {
     ],
   };
 
-  return roleMenuItems[role] || [];
+  return (roleMenuItems[role] || []).filter(Boolean);
 };

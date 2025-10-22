@@ -10,6 +10,9 @@ import {
   signOut,
   sendPasswordResetEmail,
   sendEmailVerification,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword,
 } from "firebase/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { auth } from "../../Firebase/firebase.config";
@@ -53,6 +56,42 @@ const AuthProvider = ({ children }) => {
     return sendPasswordResetEmail(auth, email);
   };
 
+  const changePassword = async (currentPassword, newPassword) => {
+    const user = auth.currentUser;
+
+    if (!user || !user.email) {
+      throw new Error("No user is currently logged in");
+    }
+
+    // Create credential with current password
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      currentPassword
+    );
+
+    try {
+      // Reauthenticate user with current password
+      await reauthenticateWithCredential(user, credential);
+
+      // If reauthentication succeeds, update password
+      await updatePassword(user, newPassword);
+
+      return { success: true };
+    } catch (error) {
+      // Handle specific errors
+      if (error.code === "auth/invalid-credential") {
+        throw new Error("Current password is incorrect");
+      } else if (error.code === "auth/weak-password") {
+        throw new Error("New password is too weak");
+      } else if (error.code === "auth/requires-recent-login") {
+        throw new Error(
+          "Please log out and log in again before changing your password"
+        );
+      }
+      throw error;
+    }
+  };
+
   const logOutUser = async () => {
     setLoading(true);
     queryClient.clear();
@@ -87,6 +126,7 @@ const AuthProvider = ({ children }) => {
     sendVerificationEmail,
     continueWithGoogle,
     forgotPassword,
+    changePassword,
     logOutUser,
   };
 
