@@ -42,46 +42,46 @@ const Footer = () => {
                   href="https://www.facebook.com/sarfarazakram17"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="Facebook"
                 >
-                  <FaFacebookF size={20} />
+                  <FaFacebookF size={23} />
                 </a>
                 <a
                   href="https://www.instagram.com/sarfarazakram17"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="Instagram"
                 >
-                  <FaInstagram size={20} />
+                  <FaInstagram size={23} />
                 </a>
                 <a
                   href="https://x.com/SarfarazAkram17"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="Twitter"
                 >
-                  <FaXTwitter size={20} />
+                  <FaXTwitter size={23} />
                 </a>
                 <a
                   href="https://www.github.com/SarfarazAkram17"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="GitHub"
                 >
-                  <FaGithub size={20} />
+                  <FaGithub size={23} />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/sarfarazakram"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                  className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="LinkedIn"
                 >
-                  <FaLinkedinIn size={20} />
+                  <FaLinkedinIn size={23} />
                 </a>
               </div>
             </div>
