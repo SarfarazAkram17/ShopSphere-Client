@@ -58,16 +58,14 @@ const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     const user = auth.currentUser;
+    const userEmail = user.email || user.providerData[0].email;
 
-    if (!user || !user.email) {
+    if (!user || !userEmail) {
       throw new Error("No user is currently logged in");
     }
 
     // Create credential with current password
-    const credential = EmailAuthProvider.credential(
-      user.email,
-      currentPassword
-    );
+    const credential = EmailAuthProvider.credential(userEmail, currentPassword);
 
     try {
       // Reauthenticate user with current password
@@ -81,8 +79,6 @@ const AuthProvider = ({ children }) => {
       // Handle specific errors
       if (error.code === "auth/invalid-credential") {
         throw new Error("Current password is incorrect");
-      } else if (error.code === "auth/weak-password") {
-        throw new Error("New password is too weak");
       } else if (error.code === "auth/requires-recent-login") {
         throw new Error(
           "Please log out and log in again before changing your password"

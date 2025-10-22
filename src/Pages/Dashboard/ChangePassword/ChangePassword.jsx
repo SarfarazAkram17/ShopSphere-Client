@@ -135,8 +135,8 @@ const ChangePassword = () => {
         </div>
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <FaCheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+            <FaCheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-green-800 font-medium">
                 Password changed successfully!
@@ -149,7 +149,7 @@ const ChangePassword = () => {
         )}
 
         {errors.general && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
             <FaExclamationCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <p className="text-red-800 text-sm">{errors.general}</p>
           </div>
@@ -327,7 +327,7 @@ const ChangePassword = () => {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>

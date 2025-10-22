@@ -202,12 +202,12 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
                     <svg
-                      className="w-5 h-5 text-white animate-spin"
+                      className="w-5 h-5 text-primary animate-spin"
                       viewBox="0 0 100 100"
                     >
                       <circle
@@ -261,16 +261,7 @@ const Login = () => {
             </form>
 
             {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">
-                  Or continue with
-                </span>
-              </div>
-            </div>
+            <div className="divider my-6">Or continue with</div>
 
             {/* Social Login */}
             <SocialLogin
