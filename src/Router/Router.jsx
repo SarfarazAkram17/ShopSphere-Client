@@ -45,6 +45,7 @@ import PlaceOrder from "../Pages/PlaceOrder/PlaceOrder";
 import ChangePassword from "../Pages/Dashboard/ChangePassword/ChangePassword";
 import PrivacyPolicy from "../Pages/PrivacyPolicy/PrivacyPolicy";
 import TermsConditions from "../Pages/TermsConditions/TermsConditions";
+import CookiePolicy from "../Pages/CookiePolicy/CookiePolicy";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -103,6 +104,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loader></Loader>}>
             <TermsConditions></TermsConditions>
+          </Suspense>
+        ),
+      },
+      {
+        path: "/cookie-policy",
+        element: (
+          <Suspense fallback={<Loader></Loader>}>
+            <CookiePolicy></CookiePolicy>
           </Suspense>
         ),
       },
