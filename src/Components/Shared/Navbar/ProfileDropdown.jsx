@@ -3,6 +3,7 @@ import { MdLogout } from "react-icons/md";
 import useAuth from "../../../Hooks/useAuth";
 import useUserRole from "../../../Hooks/useUserRole";
 import { getMenuItemsByRole } from "../../../lib/roleMenuItems";
+import { toast } from "react-toastify";
 
 const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const { user, userEmail, logOutUser } = useAuth();
@@ -11,7 +12,9 @@ const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const menuItems = getMenuItemsByRole(role, user.providerData[0].providerId);
 
   const handleLogout = () => {
-    logOutUser();
+    logOutUser().then(() => {
+      toast.warn("You logged out from ShopSphere");
+    });
     setIsProfileOpen(false);
   };
 

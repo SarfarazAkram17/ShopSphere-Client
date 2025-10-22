@@ -20,7 +20,7 @@ export const useCartCount = () => {
       return cart.reduce((total, item) => total + (item.quantity || 0), 0);
     },
     
-    enabled: !!user && !!userEmail && !roleLoading && role === "customer",
+    enabled: !roleLoading && role === "customer" && !!user && !!userEmail,
     refetchInterval: 10000, // Auto-refetch every 10 seconds
     staleTime: 5000,
   });

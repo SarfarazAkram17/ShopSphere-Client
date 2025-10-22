@@ -20,6 +20,7 @@ import { MdLogout, MdStorefront } from "react-icons/md";
 import { Link, NavLink } from "react-router";
 import useAuth from "../../Hooks/useAuth";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
+import { toast } from "react-toastify";
 
 export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
@@ -258,7 +259,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             ))}
 
             <div
-              onClick={() => logOutUser()}
+              onClick={() =>
+                logOutUser().then(() => {
+                  toast.warn("You logged out from ShopSphere");
+                })
+              }
               className="px-4 py-2 rounded-md flex gap-2 mt-3 text-sm font-medium hover:bg-red-500 hover:text-white/85 items-center cursor-pointer"
             >
               <MdLogout size={20} /> Logout
