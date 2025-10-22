@@ -159,12 +159,6 @@ const Footer = () => {
               >
                 Terms & Conditions
               </Link>
-              <Link
-                to="/cookie-policy"
-                className="hover:text-primary transition-colors font-medium"
-              >
-                Cookie Policy
-              </Link>
             </div>
           </div>
         </div>

@@ -43,6 +43,8 @@ import SellerChatSupport from "../Pages/Dashboard/SellerChatSupport/SellerChatSu
 import Cart from "../Pages/Cart/Cart";
 import PlaceOrder from "../Pages/PlaceOrder/PlaceOrder";
 import ChangePassword from "../Pages/Dashboard/ChangePassword/ChangePassword";
+import PrivacyPolicy from "../Pages/PrivacyPolicy/PrivacyPolicy";
+import TermsConditions from "../Pages/TermsConditions/TermsConditions";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -85,6 +87,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loader></Loader>}>
             <About></About>
+          </Suspense>
+        ),
+      },
+      {
+        path: "/privacy-policy",
+        element: (
+          <Suspense fallback={<Loader></Loader>}>
+            <PrivacyPolicy></PrivacyPolicy>
+          </Suspense>
+        ),
+      },
+      {
+        path: "/terms-conditions",
+        element: (
+          <Suspense fallback={<Loader></Loader>}>
+            <TermsConditions></TermsConditions>
           </Suspense>
         ),
       },
