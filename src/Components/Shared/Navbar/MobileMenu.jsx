@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import NavLinks from "./NavLinks";
-import CartIcon from "../CartIcon";
+import CartIcon from "../Cart/CartIcon";
 
 const MobileMenu = ({ user, role, roleLoading, onLinkClick }) => {
   return (

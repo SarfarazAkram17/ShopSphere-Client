@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { RiMenu2Line } from "react-icons/ri";
 import useAuth from "../../../Hooks/useAuth";
 import { FaRegBell } from "react-icons/fa6";
-import CartIcon from "../CartIcon";
+import CartIcon from "../Cart/CartIcon";
 import NavLinks from "./NavLinks";
 import ProfileDropdown from "./ProfileDropdown";
 import MobileMenu from "./MobileMenu";

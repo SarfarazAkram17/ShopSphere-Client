@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PiShoppingCartBold } from "react-icons/pi";
-import useAuth from "../../Hooks/useAuth";
-import { useCartCount } from "../../Hooks/useCartCount";
+import useAuth from "../../../Hooks/useAuth";
+import { useCartCount } from "../../../Hooks/useCartCount";
 
 const CartIcon = ({ size = 23, className = "" }) => {
   const { user } = useAuth();

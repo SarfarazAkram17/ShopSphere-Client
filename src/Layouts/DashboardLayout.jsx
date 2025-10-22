@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
-import DashboardSidebar from "../Components/Shared/DashboardSidebar";
-import DashboardNavbar from "../Components/Shared/DashboardNavbar";
+import DashboardSidebar from "../Components/Shared/Dashboard/DashboardSidebar";
+import DashboardNavbar from "../Components/Shared/Dashboard/DashboardNavbar";
 import { useEffect, useState } from "react";
 
 const DashboardLayout = () => {
