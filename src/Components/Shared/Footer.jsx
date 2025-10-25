@@ -14,7 +14,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-base-300">
+    <footer className="bg-gray-300/70">
       {/* Main Footer Content */}
       <div className="max-w-[1500px] px-4 mx-auto py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -139,7 +139,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="bg-base-300">
+      <div className="bg-gray-300/70">
         <div className="max-w-[1500px] px-4 mx-auto py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
             <p className="flex items-center gap-1">
@@ -164,6 +164,12 @@ const Footer = () => {
                 className="hover:text-primary transition-colors font-medium"
               >
                 Cookie Policy
+              </Link>
+              <Link
+                to="/support"
+                className="hover:text-primary transition-colors font-medium"
+              >
+                Support
               </Link>
             </div>
           </div>

@@ -107,7 +107,7 @@ const CartItem = ({
             >
               <FiTrash2 size={16} />
             </button>
-            <button className="text-gray-400 hover:text-pink-500 cursor-pointer">
+            <button title='This is static for now' className="text-gray-400 hover:text-pink-500 cursor-pointer">
               <FiHeart size={17} />
             </button>
           </div>

@@ -1,6 +1,6 @@
 const SHOP_CART_KEY = "shopsphere_shop_cart";
 const SHOP_CART_TIMESTAMP_KEY = "shopsphere_shop_cart_timestamp";
-const SHOP_CART_EXPIRY_TIME = 10 * 60 * 1000; // 10 minutes
+const SHOP_CART_EXPIRY_TIME = 10 * 60 * 1000 + 1000; // 10 minutes
 
 // ============== SHOP CART (BUY NOW) FUNCTIONS ==============
 
@@ -44,6 +44,7 @@ export function getShopCart(userEmail = null) {
 
 export function clearShopCart(userEmail = null) {
   if (typeof window === "undefined") return;
+
   const cartKey = userEmail ? `${SHOP_CART_KEY}_${userEmail}` : SHOP_CART_KEY;
   const timestampKey = userEmail
     ? `${SHOP_CART_TIMESTAMP_KEY}_${userEmail}`

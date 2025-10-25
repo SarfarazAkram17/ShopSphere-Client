@@ -63,7 +63,7 @@ const ProductSection = ({
 
       toast.success("Product added to cart!");
       refetch();
-      setQuantity(1)
+      setQuantity(1);
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error("Failed to add product to cart");
@@ -77,8 +77,8 @@ const ProductSection = ({
       return navigate("/login", { state: location.pathname });
     }
 
-    if (!roleLoading || role !== "customer") {
-      toast.info("You are not allowded to add products on cart");
+    if (!roleLoading && role !== "customer") {
+      toast.info("You are not allowded to buy product");
       return;
     }
 
@@ -111,11 +111,11 @@ const ProductSection = ({
     <section className="grid rounded-2xl shadow-xl px-4 py-6 grid-cols-1 md:grid-cols-2 gap-6">
       {/* product image */}
       <div>
-        <div className="w-full h-96 border relative rounded-lg overflow-hidden">
+        <div className="border relative rounded-lg overflow-hidden">
           <img
             src={selectedImage || product.images[0]}
             alt={product.name}
-            className="w-full h-full object-contain"
+            className="w-full h-auto object-contain"
           />
           {product.discount > 0 && (
             <span className="absolute top-2 right-2 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
@@ -140,14 +140,6 @@ const ProductSection = ({
               />
             </div>
           ))}
-        </div>
-
-        <div className="mt-10">
-          <h2 className="font-bold text-xl mb-1">Like this product?</h2>
-          <p className="text-sm text-gray-600 mb-3">
-            Share it with your peers!
-          </p>
-          <ShareProduct product={product}></ShareProduct>
         </div>
       </div>
 
@@ -284,6 +276,14 @@ const ProductSection = ({
             </div>
           </>
         )}
+
+        <div className="mt-15">
+          <h2 className="font-bold text-xl mb-1">Like this product?</h2>
+          <p className="text-sm text-gray-600 mb-3">
+            Share it with your peers!
+          </p>
+          <ShareProduct product={product}></ShareProduct>
+        </div>
       </div>
     </section>
   );

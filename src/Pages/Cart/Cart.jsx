@@ -11,9 +11,12 @@ import CartHeader from "../../Components/Shared/Cart/CartHeader";
 import StoreGroup from "../../Components/Shared/Cart/StoreGroup";
 import OrderSummary from "../../Components/Shared/Cart/OrderSummary";
 import EmptyCart from "../../Components/Shared/Cart/EmptyCart";
+import { saveShopCart } from "../../lib/localStorage";
+import useUserRole from "../../Hooks/useUserRole";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { roleLoading, role } = useUserRole();
   const { user, userEmail } = useAuth();
   const axiosSecure = useAxiosSecure();
   const { refetch: cartCountRefetch } = useCartCount();
@@ -197,6 +200,52 @@ const Cart = () => {
       toast.info("Please select items to checkout");
       return;
     }
+
+    if (!roleLoading && role !== "customer") {
+      toast.info("You are not allowded to buy product(s)");
+      return;
+    }
+
+    // Get selected cart items
+    const selectedCartItems = selectedItems.map((idx) => cart[idx]);
+
+    // Group selected items by storeId
+    const groupedByStoreId = selectedCartItems.reduce((acc, item) => {
+      const storeId = item.product?.storeId || "unknown";
+      if (!acc[storeId]) {
+        acc[storeId] = [];
+      }
+      acc[storeId].push(item);
+      return acc;
+    }, {});
+
+    // Transform grouped items into the payload format
+    const payload = Object.values(groupedByStoreId).flatMap((storeItems) =>
+      storeItems.map((item) => {
+        const productInfo = {
+          productId: item.productId,
+          quantity: item.quantity,
+          storeId: item.product?.storeId,
+        };
+
+        // Only add color if it exists
+        if (item.color) {
+          productInfo.color = item.color;
+        }
+
+        // Only add size if it exists
+        if (item.size) {
+          productInfo.size = item.size;
+        }
+
+        return productInfo;
+      })
+    );
+
+    // Save to localStorage with user email
+    saveShopCart(payload, userEmail);
+
+    // Redirect to place order page
     navigate("/placeOrder");
   };
 

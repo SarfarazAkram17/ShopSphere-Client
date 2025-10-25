@@ -41,9 +41,7 @@ const OrderSummary = ({
         disabled={selectedCount === 0}
         className="btn btn-primary w-full text-white font-bold disabled:opacity-50 disabled:text-black/60 text-xs sm:text-sm md:text-base h-10 sm:h-12 min-h-[2.5rem] sm:min-h-[3rem]"
       >
-        <span className="truncate">
-          PROCEED TO CHECKOUT ({totalQuantity})
-        </span>
+        PROCEED TO CHECKOUT ({totalQuantity})
       </button>
     </div>
   );

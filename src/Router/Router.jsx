@@ -46,6 +46,7 @@ import ChangePassword from "../Pages/Dashboard/ChangePassword/ChangePassword";
 import PrivacyPolicy from "../Pages/PrivacyPolicy/PrivacyPolicy";
 import TermsConditions from "../Pages/TermsConditions/TermsConditions";
 import CookiePolicy from "../Pages/CookiePolicy/CookiePolicy";
+import Support from "../Pages/Support/Support";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -112,6 +113,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loader></Loader>}>
             <CookiePolicy></CookiePolicy>
+          </Suspense>
+        ),
+      },
+      {
+        path: "/support",
+        element: (
+          <Suspense fallback={<Loader></Loader>}>
+            <Support></Support>
           </Suspense>
         ),
       },

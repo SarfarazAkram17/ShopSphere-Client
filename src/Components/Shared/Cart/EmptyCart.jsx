@@ -9,7 +9,7 @@ const EmptyCart = ({ onContinueShopping }) => {
       </p>
       <button
         onClick={onContinueShopping}
-        className="btn btn-error text-white text-sm sm:text-base"
+        className="btn btn-error hover:text-white btn-outline"
       >
         Continue Shopping
       </button>
