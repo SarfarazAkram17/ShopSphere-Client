@@ -21,6 +21,7 @@ import { Link, NavLink } from "react-router";
 import useAuth from "../../../Hooks/useAuth";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import { toast } from "react-toastify";
+import { FaAddressBook } from "react-icons/fa6";
 
 export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
@@ -119,6 +120,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
       : []),
     ...(!roleLoading && role === "customer"
       ? [
+          {
+            name: "Address Book",
+            path: "/dashboard/addressBook",
+            icon: <FaAddressBook size={20} />,
+          },
           {
             name: "My Orders",
             path: "/dashboard/myOrders",

@@ -15,8 +15,8 @@ const OrderSummary = ({
       {/* Subtotal */}
       <div className="flex justify-between mb-2 text-xs sm:text-sm">
         <span className="text-gray-600">
-          Subtotal ({selectedCount}{" "}
-          {selectedCount === 0 || selectedCount === 1 ? "Item" : "Items"})
+          Subtotal ({totalQuantity}{" "}
+          {totalQuantity === 0 || totalQuantity === 1 ? "Item" : "Items"})
         </span>
         <span className="font-semibold">৳ {subtotal.toFixed(2)}</span>
       </div>

@@ -14,6 +14,7 @@ import {
 import { LuCodesandbox } from "react-icons/lu";
 import { MdStorefront } from "react-icons/md";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
+import { FaAddressBook } from "react-icons/fa6";
 
 export const getMenuItemsByRole = (role, provider) => {
   const roleMenuItems = {
@@ -22,6 +23,11 @@ export const getMenuItemsByRole = (role, provider) => {
         icon: <TbLayoutDashboard size={18} />,
         label: "Dashboard",
         path: "/dashboard",
+      },
+      {
+        icon: <FaAddressBook size={18} />,
+        label: "Address Book",
+        path: "/dashboard/addressBook",
       },
       {
         icon: <FiUser size={16} />,

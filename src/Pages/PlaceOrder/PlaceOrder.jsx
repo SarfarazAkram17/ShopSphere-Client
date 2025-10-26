@@ -1,179 +1,197 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+// import { useNavigate } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaXmark } from "react-icons/fa6";
-import { FaRegTrashAlt } from "react-icons/fa";
-
-// Mock authentication hook
-const useAuth = () => ({
-  user: { email: "sarfarazakram16@gmail.com", name: "Sarfaraz Akram" },
-  userEmail: "sarfarazakram16@gmail.com"
-});
-
-// Mock localStorage functions
-const getShopCart = (email) => {
-  const cart = localStorage.getItem(`shopCart_${email}`);
-  return cart ? JSON.parse(cart) : [];
-};
-
-const clearShopCart = (email) => {
-  localStorage.removeItem(`shopCart_${email}`);
-  localStorage.removeItem(`shopCartExpiry_${email}`);
-};
-
-const getShopCartRemainingTime = (email) => {
-  const expiry = localStorage.getItem(`shopCartExpiry_${email}`);
-  if (!expiry) return 0;
-  return Math.max(0, parseInt(expiry) - Date.now());
-};
-
-const isShopCartValid = (email) => {
-  return getShopCartRemainingTime(email) > 0;
-};
-
-// Initialize demo data
-const initDemoData = (email) => {
-  if (!localStorage.getItem(`shopCart_${email}`)) {
-    const demoItems = [
-      {
-        id: 1,
-        packageId: "pkg1",
-        name: "Kitchen Faucet Anti-splash Aerator 360 Rotating Bubbler Bathroom Faucet Sprayer Saving Water Tap Sink Nozzle",
-        brand: "No Brand",
-        color: "Silver",
-        price: 177,
-        originalPrice: 250,
-        discount: 29,
-        quantity: 1,
-        seller: "AK Mart",
-        deliveryFee: 150,
-        deliveryDate: "28 Oct-1 Nov",
-        image: "faucet.jpg"
-      },
-      {
-        id: 2,
-        packageId: "pkg2",
-        name: "Water Faucet Filter Household Kitchen Home Faucet Mini Tap Water Clean Purifier Filter Filtration Cartridge Carbon",
-        brand: "No Brand",
-        color: "Green",
-        price: 195,
-        originalPrice: 500,
-        discount: 61,
-        quantity: 1,
-        seller: "Tanha shop 42",
-        deliveryFee: 150,
-        deliveryDate: "30 Oct-3 Nov",
-        image: "filter.jpg"
-      }
-    ];
-    localStorage.setItem(`shopCart_${email}`, JSON.stringify(demoItems));
-    localStorage.setItem(`shopCartExpiry_${email}`, (Date.now() + 600000).toString()); // 10 minutes
-  }
-};
-
-// Mock addresses
-const mockAddresses = [
-  {
-    id: "addr1",
-    name: "Sarfaraz Akram",
-    phone: "01973254091",
-    region: "Dhaka",
-    city: "Gopalganj",
-    area: "Koya Bansbari",
-    address: "Koya Bansbari, Gopalganj Sadar Ulipur, Gopalganj, Dhaka",
-    label: "HOME",
-    isDefaultShipping: true,
-    isDefaultBilling: true
-  },
-  {
-    id: "addr2",
-    name: "Sam",
-    phone: "01973254091",
-    region: "Chattogram",
-    city: "Bandarban",
-    area: "Koya Bansbari",
-    address: "Koya Bansbari, Thanchi Lama, Bandarban, Chattogram",
-    label: "OFFICE",
-    isDefaultShipping: false,
-    isDefaultBilling: false
-  }
-];
+// import { FaRegTrashAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+// import Swal from "sweetalert2";
+import useAuth from "../../Hooks/useAuth";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+import // clearShopCart,
+// getShopCart,
+// getShopCartRemainingTime,
+// isShopCartValid,
+"../../lib/localStorage";
+import Loader from "../../Components/Loader/Loader";
+import useUserRole from "../../Hooks/useUserRole";
 
 const PlaceOrder = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { user, userEmail } = useAuth();
-  const [shopCartItems, setShopCartItems] = useState([]);
+  const { roleLoading, role } = useUserRole();
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
+
+  const [cartItems, setCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  // const [isLoading, setIsLoading] = useState(true);
+
   // Address management
-  const [addresses, setAddresses] = useState(mockAddresses);
   const [selectedShippingAddress, setSelectedShippingAddress] = useState(null);
   const [selectedBillingAddress, setSelectedBillingAddress] = useState(null);
-  const [email, setEmail] = useState("");
-  
-  // Modal states
-  const [showShippingModal, setShowShippingModal] = useState(false);
-  const [showBillingModal, setShowBillingModal] = useState(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+  // Drawer states
+  const [showShippingDrawer, setShowShippingDrawer] = useState(false);
+  const [showBillingDrawer, setShowBillingDrawer] = useState(false);
+  const [showInvoiceDrawer, setShowInvoiceDrawer] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [addingForBilling, setAddingForBilling] = useState(false);
-  
+
   // Form states
   const [newAddress, setNewAddress] = useState({
     name: "",
     phone: "",
     region: "",
-    city: "",
-    area: "",
+    district: "",
+    thana: "",
     building: "",
-    colony: "",
     address: "",
-    label: "HOME"
+    label: "HOME",
   });
 
-  useEffect(() => {
-    if (!user) {
-      alert("Please login first!");
-      navigate("/login");
-      return;
-    }
+  // Fetch addresses from API
+  const { data: addresses, isLoading: addressesLoading } = useQuery({
+    queryKey: ["addresses", userEmail],
+    queryFn: async () => {
+      const response = await axiosSecure.get(
+        `/users/address?email=${userEmail}`
+      );
 
-    initDemoData(userEmail);
-    const items = getShopCart(userEmail);
+      const defaultBillingAddress = response.data.find(
+        (add) => add.isDefaultShipping && add.isDefaultBilling
+      );
+      setSelectedShippingAddress(defaultBillingAddress);
+      return response.data || [];
+    },
 
-    if (!items || items.length === 0 || !isShopCartValid(userEmail)) {
-      alert("No items found or session expired!");
-      clearShopCart(userEmail);
-      navigate(-1);
-      return;
-    }
+    enabled: !!user && !!userEmail && !roleLoading && role === "customer",
+  });
 
-    setShopCartItems(items);
-    setRemainingTime(getShopCartRemainingTime(userEmail));
-    setEmail(userEmail);
-    
-    // Set default addresses
-    const defaultShipping = addresses.find(a => a.isDefaultShipping);
-    const defaultBilling = addresses.find(a => a.isDefaultBilling);
-    setSelectedShippingAddress(defaultShipping || addresses[0]);
-    setSelectedBillingAddress(defaultBilling || addresses[0]);
-    
-    setIsLoading(false);
+  // Add address mutation
+  const addAddressMutation = useMutation({
+    mutationFn: async (addressData) => {
+      const response = await axiosSecure.post(
+        `/users/address?email=${userEmail}`,
+        addressData
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["addresses", userEmail]);
+      toast.success("Address added successfully");
+      setShowAddAddressModal(false);
+      setNewAddress({
+        name: "",
+        phone: "",
+        region: "",
+        district: "",
+        thana: "",
+        building: "",
+        address: "",
+        label: "HOME",
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to add address");
+    },
+  });
 
-    const timer = setInterval(() => {
-      const remaining = getShopCartRemainingTime(userEmail);
+  // Update default address mutation
+  // const updateDefaultAddressMutation = useMutation({
+  //   mutationFn: async ({ addressId, type }) => {
+  //     const response = await axiosSecure.put(
+  //       `/users/address/${addressId}/default`,
+  //       { type }
+  //     );
+  //     return response.data;
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries(["addresses", userEmail]);
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "Failed to update default address");
+  //   },
+  // });
 
-      if (remaining <= 0) {
-        clearShopCart(userEmail);
-        alert("Session expired! Please try again.");
-        navigate(-1);
-      } else {
-        setRemainingTime(remaining);
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const loadOrderData = async () => {
+  //     if (!user) {
+  //       toast.error("Please login first!");
+  //       navigate("/login");
+  //       return;
+  //     }
 
-    return () => clearInterval(timer);
-  }, [navigate, user, userEmail, addresses]);
+  //     const shopCartData = await getShopCart(userEmail);
+
+  //     if (
+  //       !shopCartData ||
+  //       shopCartData.length === 0 ||
+  //       !isShopCartValid(userEmail)
+  //     ) {
+  //       toast.error("No items found or session expired!");
+  //       clearShopCart(userEmail);
+  //       navigate("/cart");
+  //       return;
+  //     }
+
+  //     try {
+  //       const response = await axiosSecure.get(
+  //         `/cart/details?email=${userEmail}`
+  //       );
+  //       const fullCart = response.data.cart || [];
+
+  //       const shopCartProductIds = shopCartData.map((item) => ({
+  //         productId: item.productId,
+  //         color: item.color,
+  //         size: item.size,
+  //       }));
+
+  //       const filteredCart = fullCart.filter((item) =>
+  //         shopCartProductIds.some(
+  //           (shopItem) =>
+  //             shopItem.productId === item.productId &&
+  //             shopItem.color === item.color &&
+  //             shopItem.size === item.size
+  //         )
+  //       );
+
+  //       setCartItems(filteredCart);
+  //       setRemainingTime(getShopCartRemainingTime(userEmail));
+  //       setEmail(userEmail);
+  //       setIsLoading(false);
+  //     } catch (error) {
+  //       toast.error(error.message || "Failed to load order data");
+  //       navigate("/cart");
+  //     }
+  //   };
+
+  //   loadOrderData();
+
+  //   const timer = setInterval(() => {
+  //     const remaining = getShopCartRemainingTime(userEmail);
+
+  //     if (remaining <= 0) {
+  //       clearShopCart(userEmail);
+  //       toast.error("Session expired! Please try again.");
+  //       navigate("/cart");
+  //     } else {
+  //       setRemainingTime(remaining);
+  //     }
+  //   }, 1000);
+
+  //   return () => clearInterval(timer);
+  // }, [navigate, user, userEmail, axiosSecure]);
+
+  // useEffect(() => {
+  //   if (addresses.length > 0 && !selectedShippingAddress) {
+  //     const defaultShipping = addresses.find((a) => a.isDefaultShipping);
+  //     const defaultBilling = addresses.find((a) => a.isDefaultBilling);
+  //     setSelectedShippingAddress(defaultShipping || addresses[0]);
+  //     setSelectedBillingAddress(defaultBilling || addresses[0]);
+  //   }
+  // }, [addresses, selectedShippingAddress]);
+
+  if (addressesLoading) return <Loader />;
 
   const formatTime = (ms) => {
     const minutes = Math.floor(ms / 60000);
@@ -181,88 +199,137 @@ const PlaceOrder = () => {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const calculateTotal = () => {
-    const itemsTotal = shopCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryTotal = shopCartItems.reduce((sum, item) => sum + item.deliveryFee, 0);
-    return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
-  };
+  // const calculateItemPrice = (item) => {
+  //   if (!item?.product) return 0;
+  //   const price =
+  //     item.product.discount > 0
+  //       ? item.product.price -
+  //         (item.product.price * item.product.discount) / 100
+  //       : item.product.price;
+  //   return price;
+  // };
+
+  // const calculateTotal = () => {
+  //   const itemsTotal = cartItems.reduce((sum, item) => {
+  //     const price = calculateItemPrice(item);
+  //     return sum + price * item.quantity;
+  //   }, 0);
+
+  //   const deliveryTotal = 150 * cartItems.length;
+  //   return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
+  // };
+
+  // const handleDeleteItem = async (item) => {
+  //   Swal.fire({
+  //     title: "Are you sure?",
+  //     text: "This product will be removed from your order.",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Yes, remove it!",
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const params = new URLSearchParams();
+  //         if (item.color) params.append("color", item.color);
+  //         if (item.size) params.append("size", item.size);
+  //         params.append("email", userEmail);
+
+  //         await axiosSecure.delete(
+  //           `/cart/remove/${item.productId}${
+  //             params.toString() ? "?" + params.toString() : ""
+  //           }`
+  //         );
+
+  //         const updatedItems = cartItems.filter(
+  //           (cartItem) =>
+  //             !(
+  //               cartItem.productId === item.productId &&
+  //               cartItem.color === item.color &&
+  //               cartItem.size === item.size
+  //             )
+  //         );
+
+  //         setCartItems(updatedItems);
+
+  //         const shopCartData = getShopCart(userEmail);
+  //         const updatedShopCart = shopCartData.filter(
+  //           (shopItem) =>
+  //             !(
+  //               shopItem.productId === item.productId &&
+  //               shopItem.color === item.color &&
+  //               shopItem.size === item.size
+  //             )
+  //         );
+  //         localStorage.setItem(
+  //           `shopCart_${userEmail}`,
+  //           JSON.stringify(updatedShopCart)
+  //         );
+
+  //         toast.success("Item removed from order");
+
+  //         if (updatedItems.length === 0) {
+  //           clearShopCart(userEmail);
+  //           navigate("/cart");
+  //         }
+  //       } catch (error) {
+  //         toast.error(error.message || "Failed to remove item");
+  //       }
+  //     }
+  //   });
+  // };
 
   const handleAddAddress = () => {
-    if (!newAddress.name || !newAddress.phone || !newAddress.region || !newAddress.city || !newAddress.area || !newAddress.address) {
-      alert("Please fill all required fields");
+    if (
+      !newAddress.name ||
+      !newAddress.phone ||
+      !newAddress.region ||
+      !newAddress.district ||
+      !newAddress.thana ||
+      !newAddress.address
+    ) {
+      toast.error("Please fill all required fields");
       return;
     }
 
-    const addressObj = {
-      id: `addr${Date.now()}`,
-      ...newAddress,
-      isDefaultShipping: false,
-      isDefaultBilling: false
-    };
-
-    setAddresses([...addresses, addressObj]);
-    
-    if (addingForBilling) {
-      setSelectedBillingAddress(addressObj);
-    }
-    
-    setShowAddAddressModal(false);
-    setNewAddress({
-      name: "",
-      phone: "",
-      region: "",
-      city: "",
-      area: "",
-      building: "",
-      colony: "",
-      address: "",
-      label: "HOME"
-    });
+    addAddressMutation.mutate(newAddress);
   };
 
   const handleSelectShipping = (address) => {
     setSelectedShippingAddress(address);
-    setShowShippingModal(false);
+    setShowShippingDrawer(false);
   };
 
   const handleSelectBilling = (address) => {
     setSelectedBillingAddress(address);
-    setShowBillingModal(false);
-    if (showInvoiceModal) {
-      // Keep invoice modal open after selecting from billing
-    }
+    setShowBillingDrawer(false);
   };
 
-  const handleSaveInvoice = () => {
-    setShowInvoiceModal(false);
-  };
+  // const handlePlaceOrder = async () => {
+  //   if (!selectedShippingAddress || !selectedBillingAddress) {
+  //     toast.error("Please select shipping and billing addresses");
+  //     return;
+  //   }
 
-  const handleDeleteItem = (itemId) => {
-    const updatedItems = shopCartItems.filter(item => item.id !== itemId);
-    setShopCartItems(updatedItems);
-    localStorage.setItem(`shopCart_${userEmail}`, JSON.stringify(updatedItems));
-  };
+  //   toast.success("Order placed successfully!");
+  //   clearShopCart(userEmail);
+  //   navigate("/");
+  // };
 
-  const handlePlaceOrder = () => {
-    alert("Order placed successfully!");
-    clearShopCart(userEmail);
-    navigate("/");
-  };
+  // const groupedByStore = cartItems.reduce((acc, item) => {
+  //   const storeName = item.product?.storeName || "Unknown Store";
+  //   if (!acc[storeName]) {
+  //     acc[storeName] = [];
+  //   }
+  //   acc[storeName].push(item);
+  //   return acc;
+  // }, {});
 
-  const totals = calculateTotal();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
+  // const totals = calculateTotal();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1500px] mx-auto px-4 py-6">
-        {/* Session Timer - Full Width at Top */}
+        {/* Session Timer */}
         <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
           <div className="flex items-center gap-3">
             <span className="text-2xl">⏱️</span>
@@ -285,109 +352,150 @@ const PlaceOrder = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Shipping & Billing</h2>
                 <button
-                  onClick={() => setShowShippingModal(true)}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  onClick={() => setShowShippingDrawer(true)}
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm cursor-pointer"
                 >
                   EDIT
                 </button>
               </div>
-              
+
               {selectedShippingAddress && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{selectedShippingAddress.name}</p>
-                    <span className="text-sm">{selectedShippingAddress.phone}</span>
+                    <p className="font-medium">
+                      {selectedShippingAddress.name}
+                    </p>
+                    <span className="text-sm">
+                      {selectedShippingAddress.phone}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">
+                    <span
+                      className={`${
+                        selectedShippingAddress.label === "HOME"
+                          ? "bg-orange-500"
+                          : "bg-primary"
+                      } text-white text-xs px-2 py-0.5 rounded-full`}
+                    >
                       {selectedShippingAddress.label}
                     </span>
-                    <p className="text-sm text-gray-600">{selectedShippingAddress.address}</p>
+                    <p className="text-sm text-gray-600">
+                      {selectedShippingAddress.address}
+                    </p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Package Items */}
-            <div className="space-y-4">
-              {shopCartItems.map((item, index) => (
-                <div key={item.id} className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Package {index + 1} of {shopCartItems.length}</p>
-                    </div>
-                    <p className="text-sm text-gray-600">Shipped by {item.seller}</p>
-                  </div>
-
-                  <div className="border border-teal-500 rounded-lg p-4 mb-4">
-                    <div className="flex items-start gap-2 mb-2">
-                      <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
+            {/* Package Items by Store */}
+            {/* <div className="space-y-4">
+              {Object.entries(groupedByStore).map(
+                ([storeName, items], storeIndex) => (
+                  <div
+                    key={storeIndex}
+                    className="bg-white rounded-lg shadow-sm p-6"
+                  >
+                    <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="font-medium">৳ {item.deliveryFee}</p>
-                        <p className="text-sm text-gray-600">Standard Delivery</p>
-                        <p className="text-sm text-gray-600">Guaranteed by {item.deliveryDate}</p>
+                        <p className="text-sm text-gray-600">
+                          Package {storeIndex + 1} of{" "}
+                          {Object.keys(groupedByStore).length}
+                        </p>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <img
-                      src={`https://via.placeholder.com/80?text=${item.name.slice(0, 2)}`}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded"
-                    />
-                    <div className="flex-1">
-                      <h3 className="text-sm font-medium mb-1">{item.name}</h3>
-                      <p className="text-xs text-gray-500 mb-2">
-                        {item.brand}, Color family:{item.color}
+                      <p className="text-sm text-gray-600">
+                        Shipped by {storeName}
                       </p>
-                      <div className="flex items-center gap-3">
-                        <p className="text-orange-500 font-semibold">৳ {item.price}</p>
-                        <p className="text-gray-400 line-through text-sm">৳ {item.originalPrice}</p>
-                        <p className="text-sm text-gray-600">-{item.discount}%</p>
+                    </div>
+
+                    <div className="border border-teal-500 rounded-lg p-4 mb-4">
+                      <div className="flex items-start gap-2 mb-2">
+                        <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <div>
+                          <p className="font-medium">৳ 150</p>
+                          <p className="text-sm text-gray-600">
+                            Standard Delivery
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Guaranteed by 28 Oct-1 Nov
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end justify-between">
-                      <button
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="text-gray-400 hover:text-red-500"
-                      >
-                        <FaRegTrashAlt size={18} />
-                      </button>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+
+                    <div className="space-y-4">
+                      {items.map((item, itemIndex) => {
+                        const price = calculateItemPrice(item);
+                        const originalPrice = item.product?.price || 0;
+
+                        return (
+                          <div
+                            key={itemIndex}
+                            className="flex gap-4 border-t pt-4 first:border-t-0 first:pt-0"
+                          >
+                            <img
+                              src={
+                                item.product?.imageURLs?.[0] ||
+                                "https://via.placeholder.com/80"
+                              }
+                              alt={item.product?.name || "Product"}
+                              className="w-20 h-20 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <h3 className="text-sm font-medium mb-1">
+                                {item.product?.name}
+                              </h3>
+                              <p className="text-xs text-gray-500 mb-2">
+                                {item.product?.brand}
+                                {item.color && `, Color: ${item.color}`}
+                                {item.size && `, Size: ${item.size}`}
+                              </p>
+                              <div className="flex items-center gap-3">
+                                <p className="text-orange-500 font-semibold">
+                                  ৳ {price.toFixed(2)}
+                                </p>
+                                {item.product?.discount > 0 && (
+                                  <>
+                                    <p className="text-gray-400 line-through text-sm">
+                                      ৳ {originalPrice}
+                                    </p>
+                                    <p className="text-sm text-gray-600">
+                                      -{item.product.discount}%
+                                    </p>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end justify-between">
+                              <button
+                                onClick={() => handleDeleteItem(item)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <FaRegTrashAlt size={18} />
+                              </button>
+                              <p className="text-sm text-gray-600">
+                                Qty: {item.quantity}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )
+              )}
+            </div> */}
           </div>
 
           {/* Right Section - Summary */}
-          <div className="lg:col-span-1">
+          {/* <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6 space-y-6">
-              {/* Promotion */}
-              <div>
-                <h3 className="font-semibold mb-3">Promotion</h3>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter Store/Daraz Code"
-                    className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                  />
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded text-sm hover:bg-blue-600">
-                    APPLY
-                  </button>
-                </div>
-              </div>
-
-              {/* Invoice and Contact Info */}
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-semibold">Invoice and Contact Info</h3>
                   <button
-                    onClick={() => setShowInvoiceModal(true)}
+                    onClick={() => setShowInvoiceDrawer(true)}
                     className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                   >
                     Edit
@@ -395,13 +503,14 @@ const PlaceOrder = () => {
                 </div>
               </div>
 
-              {/* Order Summary */}
               <div>
                 <h3 className="font-semibold mb-4">Order Summary</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Items Total ({shopCartItems.length} Items)</span>
-                    <span>৳ {totals.itemsTotal}</span>
+                    <span className="text-gray-600">
+                      Items Total ({cartItems.length} Items)
+                    </span>
+                    <span>৳ {totals.itemsTotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery Fee</span>
@@ -409,9 +518,13 @@ const PlaceOrder = () => {
                   </div>
                   <div className="border-t pt-3 flex justify-between items-center">
                     <span className="font-semibold">Total:</span>
-                    <span className="text-orange-500 font-bold text-xl">৳ {totals.total}</span>
+                    <span className="text-orange-500 font-bold text-xl">
+                      ৳ {totals.total.toFixed(2)}
+                    </span>
                   </div>
-                  <p className="text-xs text-gray-500">VAT included, where applicable</p>
+                  <p className="text-xs text-gray-500">
+                    VAT included, where applicable
+                  </p>
                 </div>
               </div>
 
@@ -422,34 +535,46 @@ const PlaceOrder = () => {
                 Proceed to Pay
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      {/* Shipping Address Modal */}
-      {showShippingModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      {/* Shipping Address Drawer */}
+      {showShippingDrawer && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
+            onClick={() => setShowShippingDrawer(false)}
+          />
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Shipping Address</h2>
                 <button
-                  onClick={() => {
-                    setShowAddAddressModal(true);
-                    setAddingForBilling(false);
-                  }}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  onClick={() => setShowShippingDrawer(false)}
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
                 >
-                  Add new address
+                  <FaXmark size={24} />
                 </button>
               </div>
+
+              <button
+                onClick={() => {
+                  setShowAddAddressModal(true);
+                  setAddingForBilling(false);
+                }}
+                className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2"
+              >
+                Add new address
+              </button>
 
               <div className="space-y-4">
                 {addresses.map((addr) => (
                   <div
-                    key={addr.id}
+                    key={addr._id || addr.id}
                     className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      selectedShippingAddress?.id === addr.id
+                      selectedShippingAddress?.id === addr.id ||
+                      selectedShippingAddress?._id === addr._id
                         ? "border-teal-500 bg-teal-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -458,19 +583,29 @@ const PlaceOrder = () => {
                     <div className="flex items-start gap-3">
                       <input
                         type="radio"
-                        checked={selectedShippingAddress?.id === addr.id}
+                        checked={selectedShippingAddress?._id === addr._id}
                         onChange={() => handleSelectShipping(addr)}
-                        className="mt-1"
+                        className="mt-1 h-5 w-5"
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-medium">{addr.name}</p>
-                          <span className="text-sm text-gray-600">{addr.phone}</span>
+                          <span className="text-sm text-gray-600">
+                            {addr.phone}
+                          </span>
                         </div>
-                        <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded">
+                        <span
+                          className={`${
+                            addr.label === "HOME"
+                              ? "bg-orange-500"
+                              : "bg-primary"
+                          } text-white text-xs px-2 py-0.5 rounded-full`}
+                        >
                           {addr.label}
                         </span>
-                        <p className="text-sm text-gray-600 mt-1">{addr.address}</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {addr.address}
+                        </p>
                         {addr.isDefaultShipping && (
                           <span className="text-xs text-blue-600 mt-1 inline-block">
                             Default Shipping Address
@@ -484,13 +619,13 @@ const PlaceOrder = () => {
 
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => setShowShippingModal(false)}
+                  onClick={() => setShowShippingDrawer(false)}
                   className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
                 >
                   CANCEL
                 </button>
                 <button
-                  onClick={() => setShowShippingModal(false)}
+                  onClick={() => setShowShippingDrawer(false)}
                   className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
                 >
                   SAVE
@@ -498,15 +633,29 @@ const PlaceOrder = () => {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Invoice and Contact Info Modal */}
-      {showInvoiceModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      {/* Invoice and Contact Info Drawer */}
+      {showInvoiceDrawer && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
+            onClick={() => setShowInvoiceDrawer(false)}
+          />
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Invoice and Contact Info</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">
+                  Invoice and Contact Info
+                </h2>
+                <button
+                  onClick={() => setShowInvoiceDrawer(false)}
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
+                >
+                  <FaXmark size={24} />
+                </button>
+              </div>
 
               <div className="space-y-4">
                 <div>
@@ -515,11 +664,10 @@ const PlaceOrder = () => {
                   </label>
                   <input
                     type="email"
-                    value={email}
+                    value={userEmail}
                     disabled
                     className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-600"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Enter your email to get delivery status updates</p>
                 </div>
 
                 <div>
@@ -528,9 +676,7 @@ const PlaceOrder = () => {
                       <span className="text-red-500">*</span> Billing Address
                     </label>
                     <button
-                      onClick={() => {
-                        setShowBillingModal(true);
-                      }}
+                      onClick={() => setShowBillingDrawer(true)}
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                     >
                       EDIT
@@ -538,23 +684,27 @@ const PlaceOrder = () => {
                   </div>
                   {selectedBillingAddress && (
                     <div className="border border-gray-300 rounded p-3 bg-gray-50">
-                      <p className="font-medium">{selectedBillingAddress.name} {selectedBillingAddress.phone}</p>
-                      <p className="text-sm text-gray-600">{selectedBillingAddress.address}</p>
+                      <p className="font-medium">
+                        {selectedBillingAddress.name}{" "}
+                        {selectedBillingAddress.phone}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedBillingAddress.address}
+                      </p>
                     </div>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">Please edit your billing address</p>
                 </div>
               </div>
 
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => setShowInvoiceModal(false)}
+                  onClick={() => setShowInvoiceDrawer(false)}
                   className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
                 >
                   CANCEL
                 </button>
                 <button
-                  onClick={handleSaveInvoice}
+                  onClick={() => setShowInvoiceDrawer(false)}
                   className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
                 >
                   SAVE
@@ -562,33 +712,45 @@ const PlaceOrder = () => {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Billing Address Selection Modal */}
-      {showBillingModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      {/* Billing Address Drawer */}
+      {showBillingDrawer && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/10 bg-opacity-50 z-[60]"
+            onClick={() => setShowBillingDrawer(false)}
+          />
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[70] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Shipping Address</h2>
+                <h2 className="text-xl font-semibold">Billing Address</h2>
                 <button
-                  onClick={() => {
-                    setShowAddAddressModal(true);
-                    setAddingForBilling(true);
-                  }}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  onClick={() => setShowBillingDrawer(false)}
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
                 >
-                  Add new address
+                  <FaXmark size={24} />
                 </button>
               </div>
+
+              <button
+                onClick={() => {
+                  setShowAddAddressModal(true);
+                  setAddingForBilling(true);
+                }}
+                className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2"
+              >
+                Add new address
+              </button>
 
               <div className="space-y-4">
                 {addresses.map((addr) => (
                   <div
-                    key={addr.id}
+                    key={addr._id || addr.id}
                     className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      selectedBillingAddress?.id === addr.id
+                      selectedBillingAddress?.id === addr.id ||
+                      selectedBillingAddress?._id === addr._id
                         ? "border-teal-500 bg-teal-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -597,20 +759,25 @@ const PlaceOrder = () => {
                     <div className="flex items-start gap-3">
                       <input
                         type="radio"
-                        checked={selectedBillingAddress?.id === addr.id}
+                        checked={
+                          selectedBillingAddress?.id === addr.id ||
+                          selectedBillingAddress?._id === addr._id
+                        }
                         onChange={() => handleSelectBilling(addr)}
                         className="mt-1"
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-medium">{addr.name}</p>
-                          <span className="text-sm text-gray-600">{addr.phone}</span>
+                          <span className="text-sm text-gray-600">
+                            {addr.phone}
+                          </span>
                         </div>
                         <span className="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">
                           {addr.label}
                         </span>
                         <p className="text-sm text-gray-600 mt-1">
-                          Region: {addr.region} - {addr.city} - {addr.area}
+                          {addr.region} - {addr.district} - {addr.thana}
                         </p>
                         {addr.isDefaultBilling && (
                           <span className="text-xs text-blue-600 mt-1 inline-block">
@@ -625,13 +792,13 @@ const PlaceOrder = () => {
 
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => setShowBillingModal(false)}
+                  onClick={() => setShowBillingDrawer(false)}
                   className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
                 >
                   CANCEL
                 </button>
                 <button
-                  onClick={() => setShowBillingModal(false)}
+                  onClick={() => setShowBillingDrawer(false)}
                   className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
                 >
                   SAVE
@@ -639,40 +806,50 @@ const PlaceOrder = () => {
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Add Address Modal */}
       {showAddAddressModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
+        <div className="fixed inset-0 bg-black/15 bg-opacity-50 flex items-center justify-center z-[80] p-4">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Add new shipping Address</h2>
+                <h2 className="text-xl font-semibold">
+                  Add New Shipping Address
+                </h2>
                 <button
                   onClick={() => setShowAddAddressModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
                 >
                   <FaXmark size={24} />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Full name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Full name
+                  </label>
                   <input
                     type="text"
                     placeholder="Enter your first and last name"
                     value={newAddress.name}
-                    onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, name: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Region</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Region
+                  </label>
                   <select
                     value={newAddress.region}
-                    onChange={(e) => setNewAddress({ ...newAddress, region: e.target.value })}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, region: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   >
                     <option value="">Please choose your region</option>
@@ -680,79 +857,93 @@ const PlaceOrder = () => {
                     <option value="Chattogram">Chattogram</option>
                     <option value="Rajshahi">Rajshahi</option>
                     <option value="Khulna">Khulna</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Phone Number</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Phone Number
+                  </label>
                   <input
                     type="tel"
                     placeholder="Please enter your phone number"
                     value={newAddress.phone}
-                    onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, phone: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">City</label>
-                  <select
-                    value={newAddress.city}
-                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                  <label className="block text-sm font-medium mb-2">
+                    District
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter your district"
+                    value={newAddress.district}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, district: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
-                  >
-                    <option value="">Please choose your city</option>
-                    <option value="Gopalganj">Gopalganj</option>
-                    <option value="Bandarban">Bandarban</option>
-                  </select>
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Building / House No / Floor / Street</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Building / House No / Floor / Street
+                  </label>
                   <input
                     type="text"
                     placeholder="Please enter"
                     value={newAddress.building}
-                    onChange={(e) => setNewAddress({ ...newAddress, building: e.target.value })}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, building: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Area</label>
-                  <select
-                    value={newAddress.area}
-                    onChange={(e) => setNewAddress({ ...newAddress, area: e.target.value })}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  >
-                    <option value="">Please choose your area</option>
-                    <option value="Koya Bansbari">Koya Bansbari</option>
-                    <option value="Thanchi Lama">Thanchi Lama</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Colony / Suburb / Locality / Landmark</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Thana
+                  </label>
                   <input
                     type="text"
-                    placeholder="Please enter"
-                    value={newAddress.colony}
-                    onChange={(e) => setNewAddress({ ...newAddress, colony: e.target.value })}
+                    placeholder="Enter your thana"
+                    value={newAddress.thana}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, thana: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-2">Address</label>
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-sm font-medium mb-2">
+                    Address
+                  </label>
                   <input
                     type="text"
                     placeholder="For Example: House# 123, Street# 123, ABC Road"
                     value={newAddress.address}
-                    onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                    onChange={(e) =>
+                      setNewAddress({ ...newAddress, address: e.target.value })
+                    }
                     className="w-full border border-gray-300 rounded px-3 py-2"
                   />
                 </div>
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium mb-3">Select a label for effective delivery:</label>
+                <label className="block text-sm font-medium mb-3">
+                  Select a label for effective delivery:
+                </label>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setNewAddress({ ...newAddress, label: "OFFICE" })}
+                    onClick={() =>
+                      setNewAddress({ ...newAddress, label: "OFFICE" })
+                    }
                     className={`flex items-center gap-2 px-6 py-3 rounded border-2 transition-colors ${
                       newAddress.label === "OFFICE"
                         ? "border-teal-500 bg-teal-50 text-teal-700"
@@ -763,7 +954,9 @@ const PlaceOrder = () => {
                     <span>OFFICE</span>
                   </button>
                   <button
-                    onClick={() => setNewAddress({ ...newAddress, label: "HOME" })}
+                    onClick={() =>
+                      setNewAddress({ ...newAddress, label: "HOME" })
+                    }
                     className={`flex items-center gap-2 px-6 py-3 rounded border-2 transition-colors ${
                       newAddress.label === "HOME"
                         ? "border-orange-500 bg-orange-50 text-orange-700"
@@ -785,9 +978,10 @@ const PlaceOrder = () => {
                 </button>
                 <button
                   onClick={handleAddAddress}
-                  className="flex-1 bg-teal-500 text-white py-3 rounded hover:bg-teal-600 font-medium"
+                  disabled={addAddressMutation.isPending}
+                  className="flex-1 bg-teal-500 text-white py-3 rounded hover:bg-teal-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  SAVE
+                  {addAddressMutation.isPending ? "SAVING..." : "SAVE"}
                 </button>
               </div>
             </div>
