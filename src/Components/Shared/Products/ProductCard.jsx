@@ -61,7 +61,7 @@ const ProductCard = ({ product, discountedPrice }) => {
         <img
           src={product.images[0]}
           alt={product.name}
-          className="w-full h-56 sm:h-64 group-hover:scale-108 overflow-hidden transition-all duration-300 object-fit"
+          className="w-full h-56 sm:h-64 group-hover:scale-108 overflow-hidden transition-all duration-300 object-contain"
         />
         {/* Discount Badge */}
         {product.discount > 0 && (
