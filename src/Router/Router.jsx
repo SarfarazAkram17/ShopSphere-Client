@@ -47,6 +47,7 @@ import PrivacyPolicy from "../Pages/PrivacyPolicy/PrivacyPolicy";
 import TermsConditions from "../Pages/TermsConditions/TermsConditions";
 import CookiePolicy from "../Pages/CookiePolicy/CookiePolicy";
 import Support from "../Pages/Support/Support";
+import AddressBook from "../Pages/Dashboard/AddressBook/AddressBook";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -181,6 +182,14 @@ export const router = createBrowserRouter([
       },
 
       // customer routes
+      {
+        path: "addressBook",
+        element: (
+          <CustomerRoutes>
+            <AddressBook></AddressBook>
+          </CustomerRoutes>
+        ),
+      },
       {
         path: "myOrders",
         element: (
