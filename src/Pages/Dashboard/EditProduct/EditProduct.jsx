@@ -17,6 +17,7 @@ import {
   MdDescription,
   MdPalette,
   MdStraighten,
+  MdCloudUpload,
 } from "react-icons/md";
 import { FiPackage, FiEdit3 } from "react-icons/fi";
 import { AiOutlineStock } from "react-icons/ai";
@@ -33,6 +34,7 @@ const EditProduct = () => {
   const [existingImages, setExistingImages] = useState([]);
   const [newImageURLs, setNewImageURLs] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const cloudName = import.meta.env.VITE_cloudinary_cloud_name;
   const uploadPreset = import.meta.env.VITE_cloudinary_preset_name;
@@ -94,15 +96,36 @@ const EditProduct = () => {
 
   // ---------------- IMAGE UPLOAD ----------------
   const handleImageUpload = async (files) => {
-    if (!files.length) return;
+    if (!files || files.length === 0) return;
+
+    const totalImages = existingImages.length + newImageURLs.length;
+    const remainingSlots = 4 - totalImages;
+
+    if (remainingSlots <= 0) {
+      toast.error(
+        "Maximum 4 images already uploaded! Remove some images first."
+      );
+      return;
+    }
+
+    // Check if user is trying to upload more images than available slots
+    if (files.length > remainingSlots) {
+      toast.error(
+        `You can only upload ${remainingSlots} more image(s). You selected ${files.length} images. Please select fewer images.`
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    const filesToUpload = Array.from(files);
     setUploading(true);
 
     try {
       const uploaded = [];
 
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < filesToUpload.length; i++) {
         const formData = new FormData();
-        formData.append("file", files[i]);
+        formData.append("file", filesToUpload[i]);
         formData.append("upload_preset", uploadPreset);
 
         const res = await axios.post(
@@ -115,10 +138,47 @@ const EditProduct = () => {
 
       setNewImageURLs((prev) => [...prev, ...uploaded]);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.success(`${uploaded.length} image(s) uploaded successfully!`);
     } catch (error) {
       toast.error(`Image upload failed: ${error.message}`);
     } finally {
       setUploading(false);
+    }
+  };
+
+  // Drag & Drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleImageUpload(files);
+    }
+  };
+
+  const handleDropZoneClick = () => {
+    const totalImages = existingImages.length + newImageURLs.length;
+    if (totalImages < 4 && !uploading) {
+      fileInputRef.current?.click();
     }
   };
 
@@ -150,10 +210,12 @@ const EditProduct = () => {
   });
 
   const handleProductUpdate = async (data) => {
-    if (existingImages.length + newImageURLs.length < 4) {
+    const totalImages = existingImages.length + newImageURLs.length;
+    if (totalImages < 4) {
       toast.error("Please upload total 4 images.");
       return;
     }
+
     const price = Math.round(parseFloat(data.price) * 100) / 100;
     const discount = Math.round(parseFloat(data.discount) * 100) / 100;
     const stock = parseInt(data.stock);
@@ -434,112 +496,164 @@ const EditProduct = () => {
               </h2>
             </div>
 
-            {/* Image Status Badge */}
-            <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                  <MdImage className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Image Status</p>
-                  <p className="text-sm text-gray-600">
-                    {totalImages === 4
-                      ? "✓ All 4 images uploaded"
-                      : `${totalImages} / 4 images (${
-                          4 - totalImages
-                        } more needed)`}
-                  </p>
-                </div>
-              </div>
-              <div
-                className={`px-4 py-2 rounded-lg font-semibold ${
-                  totalImages === 4
-                    ? "bg-green-100 text-green-700"
-                    : "bg-orange-100 text-orange-700"
-                }`}
-              >
-                {totalImages === 4 ? "Complete" : "Incomplete"}
-              </div>
-            </div>
-
-            {/* Existing Images */}
-            {existingImages.length > 0 && (
-              <div>
-                <label className="flex items-center gap-2 font-semibold mb-3 text-gray-700">
-                  <MdImage className="w-4 h-4" />
-                  Current Images ({existingImages.length})
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {existingImages.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`Current ${index + 1}`}
-                        className="w-full h-40 sm:h-48 object-cover rounded-xl border-2 border-gray-200 shadow-md transition-transform group-hover:scale-105"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveExistingImage(url)}
-                        className="absolute top-2 right-2 bg-red-500 text-white text-sm w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 flex items-center justify-center shadow-lg cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                      <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
-                        Current {index + 1}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* New Images Upload */}
+            {/* Drag & Drop Upload Zone */}
             <div>
               <label className="flex items-center gap-2 font-semibold mb-3 text-gray-700">
                 <MdImage className="w-4 h-4" />
-                Add New Images
+                Upload Images <span className="text-red-500">*</span>
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-400 transition-all bg-gray-50">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => handleImageUpload(e.target.files)}
-                  className="file-input file-input-bordered w-full max-w-md mx-auto"
-                  disabled={uploading || totalImages >= 4}
-                />
-                <p className="text-sm text-gray-600 mt-3">
-                  {totalImages >= 4
-                    ? "Maximum 4 images reached"
-                    : `You can add ${4 - totalImages} more image(s)`}
-                </p>
-              </div>
 
-              {newImageURLs.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  {newImageURLs.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`New ${index + 1}`}
-                        className="w-full h-40 sm:h-48 object-cover rounded-xl border-2 border-green-200 shadow-md transition-transform group-hover:scale-105"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveNewImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white text-sm w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 flex items-center justify-center shadow-lg cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                      <div className="absolute bottom-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
-                        New {index + 1}
-                      </div>
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => handleImageUpload(e.target.files)}
+                className="hidden"
+                disabled={uploading || totalImages >= 4}
+              />
+
+              {/* Drag & Drop Zone */}
+              <div
+                onClick={handleDropZoneClick}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`
+                  border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer
+                  ${
+                    isDragging
+                      ? "border-blue-500 bg-blue-50 scale-[1.02]"
+                      : totalImages >= 4
+                      ? "border-green-400 bg-green-50 cursor-not-allowed"
+                      : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50/50"
+                  }
+                `}
+              >
+                <div className="flex flex-col items-center justify-center gap-3">
+                  <div
+                    className={`
+                    w-16 h-16 rounded-full flex items-center justify-center transition-all
+                    ${
+                      isDragging
+                        ? "bg-blue-500 scale-110"
+                        : totalImages >= 4
+                        ? "bg-green-500"
+                        : "bg-gray-400"
+                    }
+                  `}
+                  >
+                    {totalImages >= 4 ? (
+                      <span className="text-3xl text-white">✓</span>
+                    ) : (
+                      <MdCloudUpload className="w-8 h-8 text-white" />
+                    )}
+                  </div>
+
+                  {uploading ? (
+                    <div>
+                      <p className="text-lg font-semibold text-gray-700">
+                        Uploading...
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">Please wait</p>
                     </div>
-                  ))}
+                  ) : totalImages >= 4 ? (
+                    <div>
+                      <p className="text-lg font-semibold text-green-600">
+                        All {4} images uploaded!
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Remove an image to upload more
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-lg font-semibold text-gray-700">
+                        {isDragging
+                          ? "Drop images here"
+                          : "Drag & drop images here"}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        or{" "}
+                        <span className="text-blue-500 font-medium">
+                          click to browse
+                        </span>
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {totalImages} / 4 images • {4 - totalImages} remaining
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
+
+            {/* Image Previews */}
+            {(existingImages.length > 0 || newImageURLs.length > 0) && (
+              <div className="space-y-4">
+                {/* Existing Images */}
+                {existingImages.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 mb-3">
+                      Current Images ({existingImages.length})
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {existingImages.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Current ${index + 1}`}
+                            className="w-full h-40 sm:h-48 object-cover rounded-xl border-2 border-gray-200 shadow-md transition-transform group-hover:scale-105"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExistingImage(url)}
+                            className="absolute top-2 right-2 bg-red-500 text-white text-sm w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 flex items-center justify-center shadow-lg cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                          <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+                            Current {index + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New Images */}
+                {newImageURLs.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-green-600 mb-3">
+                      New Images ({newImageURLs.length})
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {newImageURLs.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`New ${index + 1}`}
+                            className="w-full h-40 sm:h-48 object-cover rounded-xl border-2 border-green-200 shadow-md transition-transform group-hover:scale-105"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveNewImage(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white text-sm w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 flex items-center justify-center shadow-lg cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                          <div className="absolute bottom-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
+                            New {index + 1}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Description Section */}
