@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
 import {
   FaEye,
   FaEyeSlash,
@@ -22,7 +22,6 @@ const Login = () => {
   const { loginUser, forgotPassword, logOutUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const {
@@ -60,8 +59,6 @@ const Login = () => {
           createdAt: res.user.metadata.createdAt,
           last_log_in: Date.now().toString(),
         });
-
-        navigate(location.state || "/");
       })
       .catch((error) => {
         toast.error(error.message);
@@ -265,7 +262,6 @@ const Login = () => {
 
             {/* Social Login */}
             <SocialLogin
-              state={location.state}
               message={"You login successfully"}
             />
           </div>

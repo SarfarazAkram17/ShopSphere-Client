@@ -7,6 +7,16 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 import Select from "react-select";
+import {
+  MdAttachMoney,
+  MdLocalOffer,
+  MdImage,
+  MdDescription,
+  MdPalette,
+  MdStraighten,
+} from "react-icons/md";
+import { FiPackage } from "react-icons/fi";
+import { AiOutlineStock } from "react-icons/ai";
 
 const AddProduct = () => {
   const [categories] = useState([
@@ -127,7 +137,6 @@ const AddProduct = () => {
         .filter((c) => c.length > 0);
     }
 
-    // Conditionally add size if not empty
     if (data.size?.trim()) {
       newProduct.size = data.size
         .split(",")
@@ -140,278 +149,366 @@ const AddProduct = () => {
 
   return (
     <div className="px-4">
-      <h2 className="text-3xl md:text-4xl text-center font-bold mb-4 text-primary">
-        Add New Product
-      </h2>
-      <p className="text-center text-sm text-gray-600 mb-8 max-w-2xl mx-auto">
-        Add a new product item to the menu. Upload 4 image, set price and
-        details. Discount defaults to 0% but can be updated.
-      </p>
-
-      <form onSubmit={handleSubmit(handleAddProduct)} className="space-y-4">
-        {/* Product Name */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Product Name"
-            className="input input-bordered w-full"
-            {...register("name", { required: true })}
-          />
-          {errors.name && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              Product name is required.
-            </p>
-          )}
+      {/* Header Section */}
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/80 rounded-2xl mb-4 shadow-lg">
+          <FiPackage className="w-8 h-8 text-white" />
         </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">
+          Add New Product
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto text-base">
+          List your product on ShopSphere. Upload high-quality images, set
+          competitive pricing, and provide detailed information to attract
+          customers.
+        </p>
+      </div>
 
-        {/* Price */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Price (BDT) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Price (BDT)"
-            className="input input-bordered w-full"
-            {...register("price", {
-              required: "Price is required.",
-              min: { value: 1, message: "Price must be greater than 0." },
-              max: {
-                value: 1000000,
-                message: "Price must be less than 1000000.",
-              },
-            })}
-          />
-          {errors.price && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              {errors.price.message}
-            </p>
-          )}
-        </div>
+      {/* Form Container */}
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10">
+        <form onSubmit={handleSubmit(handleAddProduct)} className="space-y-8">
+          {/* Basic Information Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <FiPackage className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Basic Information
+              </h2>
+            </div>
 
-        {/* Discount */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Discount (%) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Discount (%)"
-            className="input input-bordered w-full"
-            defaultValue={0}
-            {...register("discount", { min: 0, max: 100 })}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Default 0%. Can be updated up to 100%.
-          </p>
-        </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Product Name */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdDescription className="w-4 h-4" />
+                  Product Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter product name"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  {...register("name", { required: true })}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> Product name is required
+                  </p>
+                )}
+              </div>
 
-        {/* Stock */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Stock <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            placeholder="Stock Quantity"
-            className="input input-bordered w-full"
-            {...register("stock", {
-              required: "Stock quantity is required.",
-              min: {
-                value: 0,
-                message: "Stock must be greater than or equal to 0.",
-              },
-            })}
-          />
-          {errors.stock && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              {errors.stock.message}
-            </p>
-          )}
-        </div>
-
-        {/* Categories */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Categories <span className="text-red-500">*</span>
-          </label>
-          <Controller
-            control={control}
-            name="categories"
-            rules={{ required: "Choose at least one category." }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                isMulti
-                options={categories.map((c) => ({
-                  value: c.toLowerCase(),
-                  label: c,
-                }))}
-                className="text-xs xl:text-sm mt-1 w-full"
-                placeholder="Select Product Categories"
-                value={
-                  field.value
-                    ? categories
-                        .filter((c) => field.value.includes(c.toLowerCase()))
-                        .map((c) => ({ value: c.toLowerCase(), label: c }))
-                    : []
-                }
-                onChange={(selected) =>
-                  field.onChange(selected.map((s) => s.value))
-                }
-              />
-            )}
-          />
-          {errors.categories && (
-            <span className="text-red-500 text-xs mt-1 font-semibold">
-              {errors.categories.message}
-            </span>
-          )}
-        </div>
-
-        {/* Color */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional)
-          </label>
-          <input
-            type="text"
-            placeholder="Color (separated with comma)"
-            className="input input-bordered w-full"
-            {...register("color")}
-          />
-        </div>
-
-        {/* Size */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional)
-          </label>
-          <input
-            type="text"
-            placeholder="Size (separated with comma)"
-            className="input input-bordered w-full"
-            {...register("size")}
-          />
-        </div>
-
-        {/* Image Upload */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Upload Images <span className="text-red-500">*</span>
-          </label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleImageUpload(e.target.files)}
-            className="file-input file-input-bordered w-full"
-            disabled={uploading || imageURLs.length >= 4}
-          />
-
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-2">
-            {imageURLs.length > 0 &&
-              imageURLs.map((url, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={url}
-                    alt="Product"
-                    className="w-full h-28 object-cover rounded border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleImageRemove(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded opacity-80 hover:opacity-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+              {/* Categories */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocalOffer className="w-4 h-4" />
+                  Categories <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  control={control}
+                  name="categories"
+                  rules={{ required: "Choose at least one category." }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      isMulti
+                      options={categories.map((c) => ({
+                        value: c.toLowerCase(),
+                        label: c,
+                      }))}
+                      className="text-sm w-full"
+                      placeholder="Select product categories"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#3b82f6" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                      value={
+                        field.value
+                          ? categories
+                              .filter((c) =>
+                                field.value.includes(c.toLowerCase())
+                              )
+                              .map((c) => ({
+                                value: c.toLowerCase(),
+                                label: c,
+                              }))
+                          : []
+                      }
+                      onChange={(selected) =>
+                        field.onChange(selected.map((s) => s.value))
+                      }
+                    />
+                  )}
+                />
+                {errors.categories && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.categories.message}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          <p className="text-xs text-gray-600 mt-1">
-            {imageURLs.length === 4
-              ? "You have uploaded 4 images."
-              : `Uploaded: ${imageURLs.length} / 4`}
-          </p>
-        </div>
+          {/* Pricing & Inventory Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdAttachMoney className="w-5 h-5 text-green-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Pricing & Inventory
+              </h2>
+            </div>
 
-        {/* Description */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Description <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            placeholder="Description"
-            className="textarea textarea-bordered w-full resize-none"
-            rows={4}
-            {...register("description", { required: true })}
-          />
-          {errors.description && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              Product description is required.
-            </p>
-          )}
-        </div>
-
-        {/* Submit */}
-        <div className="flex justify-end">
-          <button
-            className="btn w-full mt-8 btn-primary disabled:text-black/50 text-white"
-            disabled={uploading || isPending}
-            type="submit"
-          >
-            {uploading || isPending ? (
-              <>
-                <svg
-                  className="w-5 h-5 text-primary animate-spin"
-                  viewBox="0 0 100 100"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="50"
-                    y2="25"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="75"
-                    y2="50"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                </svg>{" "}
-                {uploading ? (
-                  <span className="animate-pulse">Uploading image(s)</span>
-                ) : (
-                  <span className="animate-pulse">Adding Product</span>
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Price */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdAttachMoney className="w-4 h-4" />
+                  Price (BDT) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  {...register("price", {
+                    required: "Price is required.",
+                    min: {
+                      value: 1,
+                      message: "Price must be greater than 0.",
+                    },
+                    max: {
+                      value: 1000000,
+                      message: "Price must be less than 1000000.",
+                    },
+                  })}
+                />
+                {errors.price && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.price.message}
+                  </p>
                 )}
-              </>
-            ) : (
-              "Add Product"
-            )}
-          </button>
-        </div>
-      </form>
+              </div>
+
+              {/* Discount */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocalOffer className="w-4 h-4" />
+                  Discount (%) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  defaultValue={0}
+                  {...register("discount", { min: 0, max: 100 })}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Default 0%. Maximum 100%
+                </p>
+              </div>
+            </div>
+
+            {/* Stock */}
+            <div>
+              <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                <AiOutlineStock className="w-4 h-4" />
+                Stock Quantity <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                placeholder="Enter available quantity"
+                className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                {...register("stock", {
+                  required: "Stock quantity is required.",
+                  min: {
+                    value: 0,
+                    message: "Stock must be greater than or equal to 0.",
+                  },
+                })}
+              />
+              {errors.stock && (
+                <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                  <span>⚠</span> {errors.stock.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Product Variants Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdPalette className="w-5 h-5 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Product Variants
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Color */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdPalette className="w-4 h-4" />
+                  Colors (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Red, Blue, Green"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  {...register("color")}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Separate multiple colors with commas
+                </p>
+              </div>
+
+              {/* Size */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdStraighten className="w-4 h-4" />
+                  Sizes (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="S, M, L, XL"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  {...register("size")}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Separate multiple sizes with commas
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Images Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdImage className="w-5 h-5 text-pink-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Product Images
+              </h2>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                <MdImage className="w-4 h-4" />
+                Upload Images <span className="text-red-500">*</span>
+              </label>
+
+              <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-400 transition-all bg-gray-50">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => handleImageUpload(e.target.files)}
+                  className="file-input file-input-bordered w-full max-w-md mx-auto"
+                  disabled={uploading || imageURLs.length >= 4}
+                />
+                <p className="text-sm text-gray-600 mt-3">
+                  {imageURLs.length === 4
+                    ? "✓ All 4 images uploaded"
+                    : `${imageURLs.length} / 4 images uploaded`}
+                </p>
+              </div>
+
+              {imageURLs.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  {imageURLs.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-40 sm:h-48 object-fit rounded-xl border-2 border-gray-200 shadow-md transition-transform group-hover:scale-105"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleImageRemove(index)}
+                        className="absolute top-2 cursor-pointer right-2 bg-red-500 text-white text-sm w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 flex items-center justify-center shadow-lg"
+                      >
+                        ✕
+                      </button>
+                      <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+                        Image {index + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Description Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdDescription className="w-5 h-5 text-indigo-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Product Description
+              </h2>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                <MdDescription className="w-4 h-4" />
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                placeholder="Describe your product in detail..."
+                className="textarea textarea-bordered w-full resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                rows={5}
+                {...register("description", { required: true })}
+              />
+              {errors.description && (
+                <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                  <span>⚠</span> Product description is required
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-6">
+            <button
+              className="btn w-full btn-primary text-white disabled:cursor-not-allowed"
+              disabled={uploading || isPending}
+              type="submit"
+            >
+              {uploading || isPending ? (
+                <div className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      className="opacity-25"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      className="opacity-75"
+                    />
+                  </svg>
+                  <span>
+                    {uploading ? "Uploading images..." : "Adding product..."}
+                  </span>
+                </div>
+              ) : (
+                "Add Product"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

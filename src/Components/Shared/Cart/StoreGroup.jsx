@@ -2,6 +2,7 @@ import { BsShop } from "react-icons/bs";
 import CartItem from "./CartItem";
 
 const StoreGroup = ({
+  storeId,
   storeName,
   items,
   cart,
@@ -26,8 +27,13 @@ const StoreGroup = ({
           onChange={onStoreCheckboxChange}
         />
         <span className="font-semibold flex gap-1.5 items-center text-xs sm:text-sm md:text-base">
-          <BsShop size={15} className="sm:w-[17px] sm:h-[17px]" /> 
-          <span className="truncate max-w-[200px] sm:max-w-none">{storeName}</span>
+          <BsShop size={15} className="sm:w-[17px] sm:h-[17px]" />
+          <span
+            className="truncate max-w-[200px] sm:max-w-none"
+            title={storeName}
+          >
+            {storeName}
+          </span>
         </span>
       </div>
 
@@ -37,7 +43,9 @@ const StoreGroup = ({
           const globalIndex = cart.indexOf(item);
           return (
             <CartItem
-              key={globalIndex}
+              key={`${storeId}-${item.productId}-${item.color || "no-color"}-${
+                item.size || "no-size"
+              }`}
               item={item}
               isSelected={selectedItems.includes(globalIndex)}
               onToggleSelection={() => onItemSelection(globalIndex)}
