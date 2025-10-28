@@ -159,7 +159,7 @@ const AddressBook = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <div className="min-h-screen px-4">
+    <div className="px-4">
       <AddressBookHeader
         onAddClick={() => setShowAddModal(true)}
         onDefaultShippingClick={openDefaultShippingModal}

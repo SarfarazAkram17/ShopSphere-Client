@@ -146,13 +146,10 @@ const Profile = () => {
     <div className="px-4">
       {/* Hero Section */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-1 h-8 bg-gradient-to-b from-primary to-purple-600 rounded-full"></div>
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-            My Profile
-          </h2>
-        </div>
-        <p className="text-gray-600 ml-6 text-lg">
+        <h2 className="text-4xl mb-2 md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          My Profile
+        </h2>
+        <p className="text-gray-600 text-lg">
           Welcome back, {user?.displayName} 👋
         </p>
       </div>

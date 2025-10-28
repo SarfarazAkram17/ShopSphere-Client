@@ -31,7 +31,7 @@ const CartItem = ({
         <img
           src={product.images?.[0]}
           alt={product.name}
-          className="w-full h-full object-cover rounded"
+          className="w-full h-full object-contain rounded"
         />
       </div>
 
@@ -61,11 +61,11 @@ const CartItem = ({
         )}
 
         <div className="flex flex-col mb-1">
-          <span className="text-green-600 font-bold text-sm sm:text-base">
+          <span className="text-green-600 font-bold text-base">
             ৳ {discountedPrice.toFixed(2)}
           </span>
           {product.discount > 0 && (
-            <span className="text-[10px] sm:text-xs text-gray-400 line-through">
+            <span className="text-xs text-gray-500 line-through">
               ৳ {product.price.toFixed(2)}
             </span>
           )}

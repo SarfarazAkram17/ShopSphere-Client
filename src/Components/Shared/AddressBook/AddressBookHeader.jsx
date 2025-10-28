@@ -10,7 +10,7 @@ const AddressBookHeader = ({
   return (
     <div className="bg-white rounded-2xl shadow-xl mb-8 overflow-hidden">
       <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-6 sm:flex-row sm:gap-4 justify-between sm:items-center">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
               <HiOutlineLocationMarker className="w-10 h-10" />
@@ -31,7 +31,7 @@ const AddressBookHeader = ({
       </div>
 
       <div className="p-6 bg-gradient-to-r from-slate-50 to-blue-50 border-t border-slate-200">
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
           <button
             onClick={onDefaultShippingClick}
             className="flex items-center gap-2 bg-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all text-teal-600 font-medium hover:scale-105 cursor-pointer"
