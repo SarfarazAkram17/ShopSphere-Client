@@ -25,14 +25,14 @@ export const getMenuItemsByRole = (role, provider) => {
         path: "/dashboard",
       },
       {
-        icon: <FaAddressBook size={18} />,
-        label: "Address Book",
-        path: "/dashboard/addressBook",
-      },
-      {
         icon: <FiUser size={16} />,
         label: "Profile",
         path: "/dashboard/profile",
+      },
+      {
+        icon: <FaAddressBook size={18} />,
+        label: "Address Book",
+        path: "/dashboard/addressBook",
       },
       {
         icon: <LuCodesandbox size={18} />,

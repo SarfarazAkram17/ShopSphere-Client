@@ -1,12 +1,10 @@
-import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAxios from "../../../Hooks/useAxios";
 import useAuth from "../../../Hooks/useAuth";
 
-const SocialLogin = ({ state, message }) => {
+const SocialLogin = ({ message }) => {
   const axiosInstance = useAxios();
   const { continueWithGoogle } = useAuth();
-  const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
     continueWithGoogle()
@@ -23,9 +21,7 @@ const SocialLogin = ({ state, message }) => {
           last_log_in: Date.now().toString(),
         };
 
-       await axiosInstance.post("/users", userInfo);
-
-        navigate(state || "/");
+        await axiosInstance.post("/users", userInfo);
         toast.success(message);
       })
       .catch((error) => toast.error(error.message));

@@ -10,6 +10,23 @@ import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 import Loader from "../../../Components/Loader/Loader";
 import Select from "react-select";
+import {
+  MdAttachMoney,
+  MdLocalOffer,
+  MdImage,
+  MdDescription,
+  MdPalette,
+  MdStraighten,
+} from "react-icons/md";
+import { FiPackage, FiEdit3 } from "react-icons/fi";
+import { AiOutlineStock } from "react-icons/ai";
+import { FormHeader } from "../../../Components/Shared/EditProduct/FormHeader";
+import { FormSection } from "../../../Components/Shared/EditProduct/FormSection";
+import { FormInput } from "../../../Components/Shared/EditProduct/FormInput";
+import { FormTextarea } from "../../../Components/Shared/EditProduct/FormTextarea";
+import { SubmitButton } from "../../../Components/Shared/EditProduct/SubmitButton";
+import { ImageUploadZone } from "../../../Components/Shared/EditProduct/ImageUploadZone";
+import { ImagePreview } from "../../../Components/Shared/EditProduct/ImagePreview";
 
 const EditProduct = () => {
   const { productId } = useParams();
@@ -23,11 +40,11 @@ const EditProduct = () => {
   const [existingImages, setExistingImages] = useState([]);
   const [newImageURLs, setNewImageURLs] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const cloudName = import.meta.env.VITE_cloudinary_cloud_name;
   const uploadPreset = import.meta.env.VITE_cloudinary_preset_name;
 
-  // React Hook Form
   const {
     register,
     handleSubmit,
@@ -78,24 +95,42 @@ const EditProduct = () => {
             categories.find((cat) => cat.toLowerCase() === c.toLowerCase()) ||
             c,
         }));
-
-        // ✅ set default value for Controller
         setValue("categories", formatted);
       }
     }
   }, [productData, reset, categories, setValue]);
 
-  // ---------------- IMAGE UPLOAD ----------------
+  // Image upload logic
   const handleImageUpload = async (files) => {
-    if (!files.length) return;
+    if (!files || files.length === 0) return;
+
+    const totalImages = existingImages.length + newImageURLs.length;
+    const remainingSlots = 4 - totalImages;
+
+    if (remainingSlots <= 0) {
+      toast.error(
+        "Maximum 4 images already uploaded! Remove some images first."
+      );
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      toast.error(
+        `You can only upload ${remainingSlots} more image(s). You selected ${files.length} images. Please select fewer images.`
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    const filesToUpload = Array.from(files);
     setUploading(true);
 
     try {
       const uploaded = [];
 
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < filesToUpload.length; i++) {
         const formData = new FormData();
-        formData.append("file", files[i]);
+        formData.append("file", filesToUpload[i]);
         formData.append("upload_preset", uploadPreset);
 
         const res = await axios.post(
@@ -108,6 +143,7 @@ const EditProduct = () => {
 
       setNewImageURLs((prev) => [...prev, ...uploaded]);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.success(`${uploaded.length} image(s) uploaded successfully!`);
     } catch (error) {
       toast.error(`Image upload failed: ${error.message}`);
     } finally {
@@ -115,15 +151,51 @@ const EditProduct = () => {
     }
   };
 
-  const handleRemoveExistingImage = (url) => {
-    setExistingImages((prev) => prev.filter((img) => img !== url));
+  // Drag & Drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleImageUpload(files);
+    }
+  };
+
+  const handleDropZoneClick = () => {
+    const totalImages = existingImages.length + newImageURLs.length;
+    if (totalImages < 4 && !uploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleRemoveExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleRemoveNewImage = (index) => {
     setNewImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ---------------- UPDATE Product MUTATION ----------------
+  // Update product mutation
   const { mutate: updateProduct, isPending } = useMutation({
     mutationFn: async (updatedProduct) => {
       const { data } = await axiosSecure.patch(
@@ -142,12 +214,13 @@ const EditProduct = () => {
     },
   });
 
-  // todo: send color and size and from backend handle required things
   const handleProductUpdate = async (data) => {
-    if (existingImages.length + newImageURLs.length < 4) {
+    const totalImages = existingImages.length + newImageURLs.length;
+    if (totalImages < 4) {
       toast.error("Please upload total 4 images.");
       return;
     }
+
     const price = Math.round(parseFloat(data.price) * 100) / 100;
     const discount = Math.round(parseFloat(data.discount) * 100) / 100;
     const stock = parseInt(data.stock);
@@ -174,7 +247,6 @@ const EditProduct = () => {
         .filter((c) => c.length > 0);
     }
 
-    // Conditionally add size if not empty
     if (data.size?.trim()) {
       updatedProduct.size = data.size
         .split(",")
@@ -187,294 +259,221 @@ const EditProduct = () => {
 
   if (isLoading) return <Loader />;
 
+  const totalImages = existingImages.length + newImageURLs.length;
+
   return (
     <div className="px-4">
-      <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6 text-center">
-        Edit Product: {productData.name}
-      </h2>
+      <FormHeader
+        icon={FiEdit3}
+        title="Edit Product"
+        description="Update your product information, images, and pricing to keep your listing current and competitive."
+        productName={productData?.name}
+      />
 
-      <form onSubmit={handleSubmit(handleProductUpdate)} className="space-y-4">
-        {/* Product Name */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Product Name"
-            className="input input-bordered w-full"
-            {...register("name", { required: true })}
-          />
-          {errors.name && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              Product name is required.
-            </p>
-          )}
-        </div>
-
-        {/* Price */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Price (BDT) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Price (BDT)"
-            className="input input-bordered w-full"
-            {...register("price", {
-              required: "Price is required.",
-              min: { value: 1, message: "Price must be greater than 0." },
-              max: {
-                value: 1000000,
-                message: "Price must be less than 1000000.",
-              },
-            })}
-          />
-          {errors.price && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              {errors.price.message}
-            </p>
-          )}
-        </div>
-
-        {/* Discount */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Discount (%) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Discount (%)"
-            className="input input-bordered w-full"
-            defaultValue={0}
-            {...register("discount", { min: 0, max: 100 })}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Default 0%. Can be updated up to 100%.
-          </p>
-        </div>
-
-        {/* Stock */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Stock <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            placeholder="Stock Quantity"
-            className="input input-bordered w-full"
-            {...register("stock", {
-              required: "Stock quantity is required.",
-              min: {
-                value: 0,
-                message: "Stock must be greater than or equal to 0.",
-              },
-            })}
-          />
-          {errors.stock && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              {errors.stock.message}
-            </p>
-          )}
-        </div>
-
-        {/* Category */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Product Categories <span className="text-red-500">*</span>
-          </label>
-          <Controller
-            name="categories"
-            control={control}
-            rules={{ required: "Choose at least one category." }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                isMulti
-                placeholder="Select Product Categories"
-                options={categories.map((c) => ({
-                  value: c.toLowerCase(),
-                  label: c,
-                }))}
-                className="text-xs xl:text-sm mt-1 w-full"
-              />
-            )}
-          />
-          {errors.categories && (
-            <span className="text-red-500 text-xs mt-1 font-semibold">
-              {errors.categories.message}
-            </span>
-          )}
-        </div>
-
-        {/* Color */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Color (Optional)
-          </label>
-          <input
-            type="text"
-            placeholder="Color (separated with comma)"
-            className="input input-bordered w-full"
-            {...register("color")}
-          />
-        </div>
-
-        {/* Size */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Size (Optional)
-          </label>
-          <input
-            type="text"
-            placeholder="Size (separated with comma)"
-            className="input input-bordered w-full"
-            {...register("size")}
-          />
-        </div>
-
-        {/* Existing Images */}
-        <div>
-          <label className="block font-semibold mb-1">
-            Existing Images <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {existingImages.length > 0 ? (
-              existingImages.map((url, i) => (
-                <div key={i} className="relative group">
-                  <img
-                    src={url}
-                    alt={`existing-img-${i}`}
-                    className="h-28 w-full object-cover rounded border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveExistingImage(url)}
-                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-xs text-gray-500 mt-1">
-                No existing image yet.
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* add New Image */}
-        <div>
-          <label className="block font-semibold mb-1">
-            Add New Images <span className="text-red-500">*</span>
-          </label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleImageUpload(e.target.files)}
-            className="file-input file-input-bordered w-full"
-            disabled={
-              uploading ||
-              existingImages.length === 4 ||
-              existingImages.length + newImageURLs.length >= 4
-            }
-          />
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-2">
-            {newImageURLs.length > 0 &&
-              newImageURLs.map((url, i) => (
-                <div key={i} className="relative group">
-                  <img
-                    src={url}
-                    alt={`new-uploaded-${i}`}
-                    className="h-28 w-full object-cover rounded border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveNewImage(i)}
-                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block font-semibold mb-1 text-sm text-gray-700">
-            Description <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            placeholder="Description"
-            className="textarea textarea-bordered w-full resize-none"
-            rows={4}
-            {...register("description", { required: true })}
-          />
-          {errors.description && (
-            <p className="text-red-500 text-xs font-semibold mt-1">
-              Product description is required.
-            </p>
-          )}
-        </div>
-
-        {/* Submit */}
-        <div className="flex justify-end">
-          <button
-            className="btn w-full mt-8 btn-primary disabled:text-black/50 text-white"
-            disabled={uploading || isPending}
-            type="submit"
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10">
+        <form
+          onSubmit={handleSubmit(handleProductUpdate)}
+          className="space-y-8"
+        >
+          {/* Basic Information */}
+          <FormSection
+            icon={FiPackage}
+            title="Basic Information"
+            iconColor="text-blue-600"
           >
-            {uploading || isPending ? (
-              <>
-                <svg
-                  className="w-5 h-5 text-primary animate-spin"
-                  viewBox="0 0 100 100"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="50"
-                    y2="25"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="75"
-                    y2="50"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                </svg>{" "}
-                {uploading ? (
-                  <span className="animate-pulse">Uploading image(s)</span>
-                ) : (
-                  <span className="animate-pulse">Updating Product</span>
+            <div className="grid md:grid-cols-2 gap-4">
+              <FormInput
+                label="Product Name"
+                icon={MdDescription}
+                required
+                placeholder="Enter product name"
+                register={register("name", { required: true })}
+                error={errors.name}
+              />
+
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocalOffer className="w-4 h-4" />
+                  Categories <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="categories"
+                  control={control}
+                  rules={{ required: "Choose at least one category." }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      isMulti
+                      placeholder="Select Product Categories"
+                      options={categories.map((c) => ({
+                        value: c.toLowerCase(),
+                        label: c,
+                      }))}
+                      className="text-sm w-full"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#3b82f6" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.categories && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.categories.message}
+                  </p>
                 )}
-              </>
-            ) : (
-              "Update Product"
+              </div>
+            </div>
+          </FormSection>
+
+          {/* Pricing & Inventory */}
+          <FormSection
+            icon={MdAttachMoney}
+            title="Pricing & Inventory"
+            iconColor="text-green-600"
+          >
+            <div className="grid md:grid-cols-2 gap-4">
+              <FormInput
+                label="Price (BDT)"
+                icon={MdAttachMoney}
+                required
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                register={register("price", {
+                  required: "Price is required.",
+                  min: { value: 1, message: "Price must be greater than 0." },
+                  max: {
+                    value: 1000000,
+                    message: "Price must be less than 1000000.",
+                  },
+                })}
+                error={errors.price}
+              />
+
+              <FormInput
+                label="Discount (%)"
+                icon={MdLocalOffer}
+                required
+                type="number"
+                step="0.01"
+                placeholder="0"
+                register={register("discount", { min: 0, max: 100 })}
+                helpText="Default 0%. Maximum 100%"
+                defaultValue={0}
+              />
+            </div>
+
+            <FormInput
+              label="Stock Quantity"
+              icon={AiOutlineStock}
+              required
+              type="number"
+              placeholder="Enter available quantity"
+              register={register("stock", {
+                required: "Stock quantity is required.",
+                min: {
+                  value: 0,
+                  message: "Stock must be greater than or equal to 0.",
+                },
+              })}
+              error={errors.stock}
+            />
+          </FormSection>
+
+          {/* Product Variants */}
+          <FormSection
+            icon={MdPalette}
+            title="Product Variants"
+            iconColor="text-purple-600"
+          >
+            <div className="grid md:grid-cols-2 gap-4">
+              <FormInput
+                label="Colors (Optional)"
+                icon={MdPalette}
+                placeholder="Red, Blue, Green"
+                register={register("color")}
+                helpText="Separate multiple colors with commas"
+              />
+
+              <FormInput
+                label="Sizes (Optional)"
+                icon={MdStraighten}
+                placeholder="S, M, L, XL"
+                register={register("size")}
+                helpText="Separate multiple sizes with commas"
+              />
+            </div>
+          </FormSection>
+
+          {/* Product Images */}
+          <FormSection
+            icon={MdImage}
+            title="Product Images"
+            iconColor="text-pink-600"
+          >
+            <ImageUploadZone
+              fileInputRef={fileInputRef}
+              uploading={uploading}
+              totalImages={totalImages}
+              maxImages={4}
+              isDragging={isDragging}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={handleDropZoneClick}
+              onFileChange={(e) => handleImageUpload(e.target.files)}
+            />
+
+            {(existingImages.length > 0 || newImageURLs.length > 0) && (
+              <div className="space-y-4">
+                <ImagePreview
+                  images={existingImages}
+                  label="Existing"
+                  onRemove={handleRemoveExistingImage}
+                />
+
+                <ImagePreview
+                  images={newImageURLs}
+                  label="New"
+                  onRemove={handleRemoveNewImage}
+                  badgeColor="green"
+                />
+              </div>
             )}
-          </button>
-        </div>
-      </form>
+          </FormSection>
+
+          {/* Description */}
+          <FormSection
+            icon={MdDescription}
+            title="Product Description"
+            iconColor="text-indigo-600"
+          >
+            <FormTextarea
+              label="Description"
+              icon={MdDescription}
+              required
+              placeholder="Describe your product in detail..."
+              register={register("description", { required: true })}
+              error={errors.description}
+              rows={5}
+            />
+          </FormSection>
+
+          <SubmitButton
+            uploading={uploading}
+            isPending={isPending}
+            icon={FiEdit3}
+            label="Update Product"
+          />
+        </form>
+      </div>
     </div>
   );
 };

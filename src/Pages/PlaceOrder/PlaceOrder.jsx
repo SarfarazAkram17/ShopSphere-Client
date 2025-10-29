@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaXmark } from "react-icons/fa6";
-// import { FaRegTrashAlt } from "react-icons/fa";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
-import // clearShopCart,
-// getShopCart,
-// getShopCartRemainingTime,
-// isShopCartValid,
-"../../lib/localStorage";
+import {
+  clearShopCart,
+  getShopCart,
+  getShopCartRemainingTime,
+  isShopCartValid,
+  removeShopCartItem,
+} from "../../lib/localStorage";
 import Loader from "../../Components/Loader/Loader";
 import useUserRole from "../../Hooks/useUserRole";
 
 const PlaceOrder = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { user, userEmail } = useAuth();
   const { roleLoading, role } = useUserRole();
   const axiosSecure = useAxiosSecure();
@@ -24,16 +26,13 @@ const PlaceOrder = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Address management
   const [selectedShippingAddress, setSelectedShippingAddress] = useState(null);
-  const [selectedBillingAddress, setSelectedBillingAddress] = useState(null);
 
   // Drawer states
   const [showShippingDrawer, setShowShippingDrawer] = useState(false);
-  const [showBillingDrawer, setShowBillingDrawer] = useState(false);
-  const [showInvoiceDrawer, setShowInvoiceDrawer] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [addingForBilling, setAddingForBilling] = useState(false);
 
@@ -113,85 +112,73 @@ const PlaceOrder = () => {
   //   },
   // });
 
-  // useEffect(() => {
-  //   const loadOrderData = async () => {
-  //     if (!user) {
-  //       toast.error("Please login first!");
-  //       navigate("/login");
-  //       return;
-  //     }
+  useEffect(() => {
+    const loadOrderData = async () => {
+      if (!user) {
+        toast.error("Please login first!");
+        navigate("/login");
+        return;
+      }
 
-  //     const shopCartData = await getShopCart(userEmail);
+      const shopCartData = await getShopCart(userEmail);
 
-  //     if (
-  //       !shopCartData ||
-  //       shopCartData.length === 0 ||
-  //       !isShopCartValid(userEmail)
-  //     ) {
-  //       toast.error("No items found or session expired!");
-  //       clearShopCart(userEmail);
-  //       navigate("/cart");
-  //       return;
-  //     }
+      if (
+        !shopCartData ||
+        shopCartData.length === 0 ||
+        !isShopCartValid(userEmail)
+      ) {
+        toast.error("No items found or session expired!");
+        clearShopCart(userEmail);
+        navigate(-1);
+        return;
+      }
 
-  //     try {
-  //       const response = await axiosSecure.get(
-  //         `/cart/details?email=${userEmail}`
-  //       );
-  //       const fullCart = response.data.cart || [];
+      try {
+        const response = await axiosSecure.get(
+          `/cart/details?email=${userEmail}`
+        );
+        const fullCart = response.data.cart || [];
 
-  //       const shopCartProductIds = shopCartData.map((item) => ({
-  //         productId: item.productId,
-  //         color: item.color,
-  //         size: item.size,
-  //       }));
+        const shopCartProductIds = shopCartData.map((item) => ({
+          productId: item.productId,
+          color: item.color,
+          size: item.size,
+        }));
 
-  //       const filteredCart = fullCart.filter((item) =>
-  //         shopCartProductIds.some(
-  //           (shopItem) =>
-  //             shopItem.productId === item.productId &&
-  //             shopItem.color === item.color &&
-  //             shopItem.size === item.size
-  //         )
-  //       );
+        const filteredCart = fullCart.filter((item) =>
+          shopCartProductIds.some(
+            (shopItem) =>
+              shopItem.productId === item.productId &&
+              shopItem.color === item.color &&
+              shopItem.size === item.size
+          )
+        );
 
-  //       setCartItems(filteredCart);
-  //       setRemainingTime(getShopCartRemainingTime(userEmail));
-  //       setEmail(userEmail);
-  //       setIsLoading(false);
-  //     } catch (error) {
-  //       toast.error(error.message || "Failed to load order data");
-  //       navigate("/cart");
-  //     }
-  //   };
+        setCartItems(filteredCart);
+        setRemainingTime(getShopCartRemainingTime(userEmail));
+        setIsLoading(false);
+      } catch (error) {
+        toast.error(error.message || "Failed to load order data");
+        navigate(-1);
+      }
+    };
 
-  //   loadOrderData();
+    loadOrderData();
 
-  //   const timer = setInterval(() => {
-  //     const remaining = getShopCartRemainingTime(userEmail);
+    const timer = setInterval(() => {
+      const remaining = getShopCartRemainingTime(userEmail);
 
-  //     if (remaining <= 0) {
-  //       clearShopCart(userEmail);
-  //       toast.error("Session expired! Please try again.");
-  //       navigate("/cart");
-  //     } else {
-  //       setRemainingTime(remaining);
-  //     }
-  //   }, 1000);
+      if (remaining <= 0) {
+        clearShopCart(userEmail);
+        toast.error("Session expired! Please try again.");
+        navigate(-1);
+      } else {
+        setRemainingTime(remaining);
+      }
+    }, 1000);
 
-  //   return () => clearInterval(timer);
-  // }, [navigate, user, userEmail, axiosSecure]);
-
-  // useEffect(() => {
-  //   if (addresses.length > 0 && !selectedShippingAddress) {
-  //     const defaultShipping = addresses.find((a) => a.isDefaultShipping);
-  //     const defaultBilling = addresses.find((a) => a.isDefaultBilling);
-  //     setSelectedShippingAddress(defaultShipping || addresses[0]);
-  //     setSelectedBillingAddress(defaultBilling || addresses[0]);
-  //   }
-  // }, [addresses, selectedShippingAddress]);
-
-  if (addressesLoading) return <Loader />;
+    return () => clearInterval(timer);
+  }, [navigate, user, userEmail, axiosSecure]);
 
   const formatTime = (ms) => {
     const minutes = Math.floor(ms / 60000);
@@ -199,84 +186,76 @@ const PlaceOrder = () => {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // const calculateItemPrice = (item) => {
-  //   if (!item?.product) return 0;
-  //   const price =
-  //     item.product.discount > 0
-  //       ? item.product.price -
-  //         (item.product.price * item.product.discount) / 100
-  //       : item.product.price;
-  //   return price;
-  // };
+  const calculateItemPrice = (item) => {
+    if (!item?.product) return 0;
+    const price =
+      item.product.discount > 0
+        ? item.product.price -
+          (item.product.price * item.product.discount) / 100
+        : item.product.price;
+    return price;
+  };
 
-  // const calculateTotal = () => {
-  //   const itemsTotal = cartItems.reduce((sum, item) => {
-  //     const price = calculateItemPrice(item);
-  //     return sum + price * item.quantity;
-  //   }, 0);
+  const calculateTotal = () => {
+    const itemsTotal = cartItems.reduce((sum, item) => {
+      const price = calculateItemPrice(item);
+      return sum + price * item.quantity;
+    }, 0);
 
-  //   const deliveryTotal = 150 * cartItems.length;
-  //   return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
-  // };
+    const deliveryTotal = 150 * cartItems.length;
+    return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
+  };
 
-  // const handleDeleteItem = async (item) => {
-  //   Swal.fire({
-  //     title: "Are you sure?",
-  //     text: "This product will be removed from your order.",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonText: "Yes, remove it!",
-  //   }).then(async (result) => {
-  //     if (result.isConfirmed) {
-  //       try {
-  //         const params = new URLSearchParams();
-  //         if (item.color) params.append("color", item.color);
-  //         if (item.size) params.append("size", item.size);
-  //         params.append("email", userEmail);
+  const handleRemoveItem = async (item) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This product will be removed from your order.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Remove from localStorage shop cart ONLY
+          const removed = removeShopCartItem(
+            {
+              productId: item.productId,
+              color: item.color,
+              size: item.size,
+            },
+            userEmail
+          );
 
-  //         await axiosSecure.delete(
-  //           `/cart/remove/${item.productId}${
-  //             params.toString() ? "?" + params.toString() : ""
-  //           }`
-  //         );
+          if (!removed) {
+            toast.error("Failed to remove item from session");
+            return;
+          }
 
-  //         const updatedItems = cartItems.filter(
-  //           (cartItem) =>
-  //             !(
-  //               cartItem.productId === item.productId &&
-  //               cartItem.color === item.color &&
-  //               cartItem.size === item.size
-  //             )
-  //         );
+          // Update local state (UI)
+          const updatedItems = cartItems.filter(
+            (cartItem) =>
+              !(
+                cartItem.productId === item.productId &&
+                cartItem.color === item.color &&
+                cartItem.size === item.size
+              )
+          );
 
-  //         setCartItems(updatedItems);
+          setCartItems(updatedItems);
+          toast.success("Item removed from order");
 
-  //         const shopCartData = getShopCart(userEmail);
-  //         const updatedShopCart = shopCartData.filter(
-  //           (shopItem) =>
-  //             !(
-  //               shopItem.productId === item.productId &&
-  //               shopItem.color === item.color &&
-  //               shopItem.size === item.size
-  //             )
-  //         );
-  //         localStorage.setItem(
-  //           `shopCart_${userEmail}`,
-  //           JSON.stringify(updatedShopCart)
-  //         );
-
-  //         toast.success("Item removed from order");
-
-  //         if (updatedItems.length === 0) {
-  //           clearShopCart(userEmail);
-  //           navigate("/cart");
-  //         }
-  //       } catch (error) {
-  //         toast.error(error.message || "Failed to remove item");
-  //       }
-  //     }
-  //   });
-  // };
+          // If no items left, clear shop cart and redirect
+          if (updatedItems.length === 0) {
+            clearShopCart(userEmail);
+            toast.info("All items removed. Redirecting...");
+            navigate(-1);
+          }
+        } catch (error) {
+          toast.error(error.message || "Failed to remove item");
+        }
+      }
+    });
+  };
 
   const handleAddAddress = () => {
     if (
@@ -299,11 +278,6 @@ const PlaceOrder = () => {
     setShowShippingDrawer(false);
   };
 
-  const handleSelectBilling = (address) => {
-    setSelectedBillingAddress(address);
-    setShowBillingDrawer(false);
-  };
-
   // const handlePlaceOrder = async () => {
   //   if (!selectedShippingAddress || !selectedBillingAddress) {
   //     toast.error("Please select shipping and billing addresses");
@@ -315,24 +289,31 @@ const PlaceOrder = () => {
   //   navigate("/");
   // };
 
-  // const groupedByStore = cartItems.reduce((acc, item) => {
-  //   const storeName = item.product?.storeName || "Unknown Store";
-  //   if (!acc[storeName]) {
-  //     acc[storeName] = [];
-  //   }
-  //   acc[storeName].push(item);
-  //   return acc;
-  // }, {});
+  const groupedByStore = cartItems.reduce((acc, item) => {
+    const storeId = item.product?.storeId || "unknown";
+    const storeName = item.product?.storeName || "Unknown Store";
 
-  // const totals = calculateTotal();
+    if (!acc[storeId]) {
+      acc[storeId] = {
+        storeName: storeName,
+        items: [],
+      };
+    }
+    acc[storeId].items.push(item);
+    return acc;
+  }, {});
+
+  const totals = calculateTotal();
+
+  if (isLoading || addressesLoading) return <Loader />;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1500px] mx-auto px-4 py-6">
         {/* Session Timer */}
-        <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+        <div className="bg-yellow-50 border border-yellow-300 rounded-lg shadow-lg p-4 mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">⏱️</span>
+            <span className="text-4xl">⏱️</span>
             <div>
               <p className="text-yellow-800 font-semibold text-lg">
                 Session expires in: {formatTime(remainingTime)}
@@ -348,7 +329,7 @@ const PlaceOrder = () => {
           {/* Left Section - Order Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Shipping Address */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold">Shipping & Billing</h2>
                 <button
@@ -388,12 +369,12 @@ const PlaceOrder = () => {
             </div>
 
             {/* Package Items by Store */}
-            {/* <div className="space-y-4">
+            <div className="space-y-4">
               {Object.entries(groupedByStore).map(
-                ([storeName, items], storeIndex) => (
+                ([storeId, storeData], storeIndex) => (
                   <div
-                    key={storeIndex}
-                    className="bg-white rounded-lg shadow-sm p-6"
+                    key={storeId}
+                    className="bg-white rounded-lg shadow-lg p-6"
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -403,13 +384,13 @@ const PlaceOrder = () => {
                         </p>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Shipped by {storeName}
+                        Shipped by: {storeData.storeName}
                       </p>
                     </div>
 
-                    <div className="border border-teal-500 rounded-lg p-4 mb-4">
+                    <div className="border border-teal-500 rounded-lg p-4 mb-4 w-fit">
                       <div className="flex items-start gap-2 mb-2">
-                        <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center mt-0.5">
                           <span className="text-white text-xs">✓</span>
                         </div>
                         <div>
@@ -425,31 +406,31 @@ const PlaceOrder = () => {
                     </div>
 
                     <div className="space-y-4">
-                      {items.map((item, itemIndex) => {
+                      {storeData.items.map((item, itemIndex) => {
                         const price = calculateItemPrice(item);
                         const originalPrice = item.product?.price || 0;
 
                         return (
                           <div
-                            key={itemIndex}
+                            key={`${item.productId}-${item.color}-${item.size}-${itemIndex}`}
                             className="flex gap-4 border-t pt-4 first:border-t-0 first:pt-0"
                           >
                             <img
-                              src={
-                                item.product?.imageURLs?.[0] ||
-                                "https://via.placeholder.com/80"
-                              }
+                              src={item.product?.images?.[0]}
                               alt={item.product?.name || "Product"}
-                              className="w-20 h-20 object-cover rounded"
+                              className="w-24 h-24 object-contain rounded"
                             />
                             <div className="flex-1">
                               <h3 className="text-sm font-medium mb-1">
                                 {item.product?.name}
                               </h3>
-                              <p className="text-xs text-gray-500 mb-2">
-                                {item.product?.brand}
-                                {item.color && `, Color: ${item.color}`}
-                                {item.size && `, Size: ${item.size}`}
+                              <p className="text-xs text-gray-500 mb-2 flex gap-2 items-center">
+                                {item.color && (
+                                  <span className="capitalize">
+                                    Color: {item.color},
+                                  </span>
+                                )}
+                                {item.size && <span>Size: {item.size}</span>}
                               </p>
                               <div className="flex items-center gap-3">
                                 <p className="text-orange-500 font-semibold">
@@ -469,8 +450,8 @@ const PlaceOrder = () => {
                             </div>
                             <div className="flex flex-col items-end justify-between">
                               <button
-                                onClick={() => handleDeleteItem(item)}
-                                className="text-gray-400 hover:text-red-500 transition-colors"
+                                onClick={() => handleRemoveItem(item)}
+                                className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                               >
                                 <FaRegTrashAlt size={18} />
                               </button>
@@ -485,24 +466,12 @@ const PlaceOrder = () => {
                   </div>
                 )
               )}
-            </div> */}
+            </div>
           </div>
 
           {/* Right Section - Summary */}
-          {/* <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6 space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-semibold">Invoice and Contact Info</h3>
-                  <button
-                    onClick={() => setShowInvoiceDrawer(true)}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-lg p-6 sticky top-18 space-y-6">
               <div>
                 <h3 className="font-semibold mb-4">Order Summary</h3>
                 <div className="space-y-3 text-sm">
@@ -529,13 +498,13 @@ const PlaceOrder = () => {
               </div>
 
               <button
-                onClick={handlePlaceOrder}
-                className="w-full bg-orange-500 text-white py-3 rounded font-semibold hover:bg-orange-600 transition-colors"
+                // onClick={handlePlaceOrder}
+                className="w-full btn btn-primary text-white"
               >
                 Proceed to Pay
               </button>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
 
@@ -626,179 +595,6 @@ const PlaceOrder = () => {
                 </button>
                 <button
                   onClick={() => setShowShippingDrawer(false)}
-                  className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
-                >
-                  SAVE
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Invoice and Contact Info Drawer */}
-      {showInvoiceDrawer && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
-            onClick={() => setShowInvoiceDrawer(false)}
-          />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">
-                  Invoice and Contact Info
-                </h2>
-                <button
-                  onClick={() => setShowInvoiceDrawer(false)}
-                  className="text-gray-400 hover:text-red-500 cursor-pointer"
-                >
-                  <FaXmark size={24} />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    <span className="text-red-500">*</span> Email
-                  </label>
-                  <input
-                    type="email"
-                    value={userEmail}
-                    disabled
-                    className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-gray-600"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium">
-                      <span className="text-red-500">*</span> Billing Address
-                    </label>
-                    <button
-                      onClick={() => setShowBillingDrawer(true)}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      EDIT
-                    </button>
-                  </div>
-                  {selectedBillingAddress && (
-                    <div className="border border-gray-300 rounded p-3 bg-gray-50">
-                      <p className="font-medium">
-                        {selectedBillingAddress.name}{" "}
-                        {selectedBillingAddress.phone}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {selectedBillingAddress.address}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setShowInvoiceDrawer(false)}
-                  className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
-                >
-                  CANCEL
-                </button>
-                <button
-                  onClick={() => setShowInvoiceDrawer(false)}
-                  className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
-                >
-                  SAVE
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Billing Address Drawer */}
-      {showBillingDrawer && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/10 bg-opacity-50 z-[60]"
-            onClick={() => setShowBillingDrawer(false)}
-          />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-[70] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Billing Address</h2>
-                <button
-                  onClick={() => setShowBillingDrawer(false)}
-                  className="text-gray-400 hover:text-red-500 cursor-pointer"
-                >
-                  <FaXmark size={24} />
-                </button>
-              </div>
-
-              <button
-                onClick={() => {
-                  setShowAddAddressModal(true);
-                  setAddingForBilling(true);
-                }}
-                className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2"
-              >
-                Add new address
-              </button>
-
-              <div className="space-y-4">
-                {addresses.map((addr) => (
-                  <div
-                    key={addr._id || addr.id}
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      selectedBillingAddress?.id === addr.id ||
-                      selectedBillingAddress?._id === addr._id
-                        ? "border-teal-500 bg-teal-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handleSelectBilling(addr)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="radio"
-                        checked={
-                          selectedBillingAddress?.id === addr.id ||
-                          selectedBillingAddress?._id === addr._id
-                        }
-                        onChange={() => handleSelectBilling(addr)}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium">{addr.name}</p>
-                          <span className="text-sm text-gray-600">
-                            {addr.phone}
-                          </span>
-                        </div>
-                        <span className="bg-teal-500 text-white text-xs px-2 py-0.5 rounded">
-                          {addr.label}
-                        </span>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {addr.region} - {addr.district} - {addr.thana}
-                        </p>
-                        {addr.isDefaultBilling && (
-                          <span className="text-xs text-blue-600 mt-1 inline-block">
-                            Default Billing Address
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setShowBillingDrawer(false)}
-                  className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
-                >
-                  CANCEL
-                </button>
-                <button
-                  onClick={() => setShowBillingDrawer(false)}
                   className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
                 >
                   SAVE

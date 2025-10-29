@@ -40,13 +40,18 @@ const Cart = () => {
 
   const cart = cartData || [];
 
-  // Group cart items by store
+  // Group cart items by storeId (not storeName)
   const groupedByStore = cart.reduce((acc, item) => {
+    const storeId = item.product?.storeId || "unknown";
     const storeName = item.product?.storeName || "Unknown Store";
-    if (!acc[storeName]) {
-      acc[storeName] = [];
+
+    if (!acc[storeId]) {
+      acc[storeId] = {
+        storeName: storeName,
+        items: [],
+      };
     }
-    acc[storeName].push(item);
+    acc[storeId].items.push(item);
     return acc;
   }, {});
 
@@ -202,7 +207,7 @@ const Cart = () => {
     }
 
     if (!roleLoading && role !== "customer") {
-      toast.info("You are not allowded to buy product(s)");
+      toast.info("You are not allowed to buy product(s)");
       return;
     }
 
@@ -269,15 +274,16 @@ const Cart = () => {
             />
 
             {/* Cart Items Grouped by Store */}
-            {Object.entries(groupedByStore).map(([storeName, items], i) => (
+            {Object.entries(groupedByStore).map(([storeId, storeData]) => (
               <StoreGroup
-                key={i}
-                storeName={storeName}
-                items={items}
+                key={storeId}
+                storeId={storeId}
+                storeName={storeData.storeName}
+                items={storeData.items}
                 cart={cart}
                 selectedItems={selectedItems}
                 onStoreCheckboxChange={(e) =>
-                  handleStoreCheckboxChange(items, e.target.checked)
+                  handleStoreCheckboxChange(storeData.items, e.target.checked)
                 }
                 onItemSelection={toggleItemSelection}
                 onUpdateQuantity={handleUpdateQuantity}

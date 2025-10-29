@@ -32,14 +32,14 @@ const MyStoreEditModal = ({
       {activeModal && (
         <>
           <div
-            className="fixed inset-0 z-40 backdrop-blur-md"
+            className="fixed inset-0 z-40 backdrop-blur-md bg-black/15"
             onClick={() => !loading && setActiveModal(null)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white max-h-[95vh] overflow-y-scroll hide-scrollbar border rounded-lg max-w-3xl w-full p-8 relative shadow-xl">
+            <div className="bg-white max-h-[95vh] overflow-y-scroll hide-scrollbar border rounded-lg max-w-3xl w-full p-5 relative shadow-xl">
               <button
                 onClick={() => !loading && setActiveModal(null)}
-                className="absolute top-4 right-4 hover:text-red-500 text-gray-500"
+                className="absolute top-4 right-4 hover:text-red-500 text-gray-500 cursor-pointer"
                 disabled={loading}
               >
                 <FiX size={26} />

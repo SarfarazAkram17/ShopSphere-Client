@@ -48,11 +48,12 @@ import TermsConditions from "../Pages/TermsConditions/TermsConditions";
 import CookiePolicy from "../Pages/CookiePolicy/CookiePolicy";
 import Support from "../Pages/Support/Support";
 import AddressBook from "../Pages/Dashboard/AddressBook/AddressBook";
+import ProtectAuthRoutes from "../Routes/ProtectAuthRoutes";
+import Register from "../Pages/Register/Register";
+import Login from "../Pages/Login/Login";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
-const Login = lazy(() => import("../Pages/Login/Login"));
-const Register = lazy(() => import("../Pages/Register/Register"));
 const ErrorPage = lazy(() => import("../Pages/ErrorPage/ErrorPage"));
 const Forbidden = lazy(() => import("../Pages/Forbidden/Forbidden"));
 
@@ -72,17 +73,17 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: (
-          <Suspense fallback={<Loader></Loader>}>
+          <ProtectAuthRoutes>
             <Login></Login>
-          </Suspense>
+          </ProtectAuthRoutes>
         ),
       },
       {
         path: "/register",
         element: (
-          <Suspense fallback={<Loader></Loader>}>
+          <ProtectAuthRoutes>
             <Register></Register>
-          </Suspense>
+          </ProtectAuthRoutes>
         ),
       },
       {

@@ -27,7 +27,7 @@ const AddressModal = ({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto hide-scrollbar">
-        <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-6 rounded-t-3xl">
+        <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-4 rounded-t-3xl flex flex-col sm:block">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-white flex items-center gap-3">
               <HiOutlineLocationMarker className="w-7 h-7" />
@@ -37,7 +37,7 @@ const AddressModal = ({
               {isEdit && (
                 <button
                   onClick={onDelete}
-                  className="bg-red-500 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 hover:bg-red-600 transition-all cursor-pointer"
+                  className="bg-red-500 text-white px-4 py-2 rounded-xl font-medium sm:flex items-center gap-2 hover:bg-red-600 transition-all cursor-pointer hidden"
                 >
                   <AiOutlineDelete size={18} />
                   Delete
@@ -51,6 +51,15 @@ const AddressModal = ({
               </button>
             </div>
           </div>
+          {isEdit && (
+            <button
+              onClick={onDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 hover:bg-red-600 transition-all cursor-pointer sm:hidden mt-6 w-fit"
+            >
+              <AiOutlineDelete size={18} />
+              Delete
+            </button>
+          )}
         </div>
 
         <div className="p-8">
@@ -68,7 +77,7 @@ const AddressModal = ({
             onThanaChange={onThanaChange}
           />
 
-          <div className="flex justify-end gap-4 pt-6 border-t mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 pt-6 border-t mt-8">
             <button
               onClick={onClose}
               className="px-8 py-3 border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-all cursor-pointer"
@@ -78,16 +87,9 @@ const AddressModal = ({
             <button
               onClick={onSubmit}
               disabled={isSubmitting}
-              className="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+              className="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isSubmitting ? (
-                "Saving..."
-              ) : (
-                <>
-                  <AiOutlineCheck size={20} />
-                  Save Address
-                </>
-              )}
+              {isSubmitting ? "Saving..." : "Save Address"}
             </button>
           </div>
         </div>
