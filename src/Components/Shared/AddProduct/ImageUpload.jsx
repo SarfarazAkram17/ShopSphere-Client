@@ -66,10 +66,24 @@ export const ImageUpload = ({
       {/* Drag & Drop Zone */}
       <div
         onClick={handleClick}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragEnter={
+          uploading || imageURLs.length >= maxImages
+            ? undefined
+            : handleDragEnter
+        }
+        onDragOver={
+          uploading || imageURLs.length >= maxImages
+            ? undefined
+            : handleDragOver
+        }
+        onDragLeave={
+          uploading || imageURLs.length >= maxImages
+            ? undefined
+            : handleDragLeave
+        }
+        onDrop={
+          uploading || imageURLs.length >= maxImages ? undefined : handleDrop
+        }
         className={`
           border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer
           ${

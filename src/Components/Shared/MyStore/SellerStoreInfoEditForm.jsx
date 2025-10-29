@@ -149,7 +149,7 @@ const SellerStoreInfoEditForm = ({
           <img
             src={coverPreview}
             alt="cover"
-            className="h-24 w-full rounded mb-2 object-cover"
+            className="h-28 w-full rounded mb-2"
           />
         </label>
         <button
