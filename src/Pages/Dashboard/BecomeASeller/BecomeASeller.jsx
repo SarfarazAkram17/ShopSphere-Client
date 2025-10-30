@@ -180,7 +180,7 @@ const BecomeASeller = () => {
   };
 
   return (
-    <div className="px-4 mb-8">
+    <div className="px-4 pt-12 pb-16 mb-8">
       <h1 className="text-3xl sm:text-4xl text-primary font-bold text-center mb-5">
         Become a Seller at ShopSphere
       </h1>

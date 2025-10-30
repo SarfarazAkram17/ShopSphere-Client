@@ -249,7 +249,7 @@ const MyStore = () => {
   };
 
   return (
-    <div className="px-4">
+    <div className="px-4 pt-12 pb-16">
       <h1 className="text-3xl sm:text-4xl text-primary font-bold text-center mb-5">
         My Store
       </h1>

@@ -66,7 +66,7 @@ const AllProducts = () => {
   const total = data?.total || 0;
 
   return (
-    <div className="px-4">
+    <div className="px-4 pt-12 pb-16">
       <h1 className="text-3xl sm:text-4xl text-gray-600 font-extrabold mb-6 text-center">
         All Products live on ShopSphere
       </h1>
