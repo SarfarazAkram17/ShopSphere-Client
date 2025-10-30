@@ -262,7 +262,7 @@ const EditProduct = () => {
   const totalImages = existingImages.length + newImageURLs.length;
 
   return (
-    <div className="px-4">
+    <div className="px-4 pt-12 pb-16">
       <FormHeader
         icon={FiEdit3}
         title="Edit Product"

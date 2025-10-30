@@ -143,7 +143,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="px-4">
+    <div className="px-4 pt-12 pb-16">
       {/* Hero Section */}
       <div className="mb-8">
         <h2 className="text-4xl mb-2 md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -169,7 +169,7 @@ const Profile = () => {
             {/* Profile Image */}
             <div className="flex flex-col md:flex-row md:items-end gap-8 -mt-20 mb-8">
               <div className="relative group">
-                <div className="w-40 h-40 rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-white">
+                <div className="w-40 h-40 rounded-3xl overflow-hidden border-secondary border-4 shadow-2xl bg-white">
                   <img
                     src={user?.photoURL}
                     alt="Profile"
@@ -181,7 +181,7 @@ const Profile = () => {
 
               {/* User Info */}
               <div className="flex-1 md:mb-4 mt-8">
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                <h3 className="text-3xl md:text-4xl font-bold text-white/90 mb-2">
                   {user?.displayName}
                 </h3>
                 <p className="text-gray-600 my-3">{userEmail}</p>

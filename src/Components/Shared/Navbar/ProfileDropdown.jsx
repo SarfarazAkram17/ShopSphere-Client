@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const { user, userEmail, logOutUser } = useAuth();
-  const { role } = useUserRole();
+  const { role, roleLoading } = useUserRole();
 
   const menuItems = getMenuItemsByRole(role, user.providerData[0].providerId);
 
@@ -47,17 +47,53 @@ const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
 
           {/* Menu Items */}
           <div className="py-2 max-h-96 overflow-y-auto hide-scrollbar">
-            {menuItems.map((item, index) => (
-              <Link
-                key={index}
-                to={item.path}
-                onClick={() => setIsProfileOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors"
-              >
-                <span className="text-gray-600">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            ))}
+            {roleLoading ? (
+              <div className="flex justify-center">
+                <svg
+                  className="w-8 h-8 text-primary my-8 animate-spin"
+                  viewBox="0 0 100 100"
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                  />
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="50"
+                    y2="25"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="50"
+                    y1="50"
+                    x2="75"
+                    y2="50"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            ) : (
+              menuItems.map((item, index) => (
+                <Link
+                  key={index}
+                  to={item.path}
+                  onClick={() => setIsProfileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  <span className="text-gray-600">{item.icon}</span>
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              ))
+            )}
           </div>
 
           {/* Logout Button */}
