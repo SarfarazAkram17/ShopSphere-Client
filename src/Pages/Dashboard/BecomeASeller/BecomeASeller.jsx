@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import useAuth from "../../../Hooks/useAuth";
 import { useEffect, useState } from "react";
 import Select from "react-select";
@@ -6,6 +6,19 @@ import { toast } from "react-toastify";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { uploadToCloudinary } from "../../../lib/imageUpload";
+import {
+  MdPerson,
+  MdEmail,
+  MdPhone,
+  MdStore,
+  MdImage,
+  MdLocationOn,
+  MdWorkHistory,
+  MdCategory,
+  MdAccountBalance,
+  MdCake,
+} from "react-icons/md";
+import { FaStore, FaHandshake } from "react-icons/fa";
 
 const BecomeASeller = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -16,17 +29,15 @@ const BecomeASeller = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-    trigger,
+    control,
     reset,
+    watch,
   } = useForm();
 
   const [regions, setRegions] = useState([]);
   const [outlets, setOutlets] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState(null);
   const [districts, setDistricts] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [thanas, setThanas] = useState([]);
-  const [selectedThana, setSelectedThana] = useState(null);
   const [categories] = useState([
     "Electronics",
     "Clothing",
@@ -36,22 +47,19 @@ const BecomeASeller = () => {
     "Sports",
     "Toys",
   ]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const [logoFile, setLogoFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
+
+  const selectedRegion = watch("region");
+  const selectedDistrict = watch("district");
 
   useEffect(() => {
     setValue("name", user.displayName);
     setValue("email", userEmail);
   }, [user, userEmail, setValue]);
-
-  useEffect(() => {
-    register("region", { required: "Region is required" });
-    register("district", { required: "District is required" });
-    register("thana", { required: "Thana is required" });
-    register("categories", { required: "Select at least one category" });
-  }, [register]);
 
   useEffect(() => {
     fetch("/regions.json")
@@ -63,56 +71,55 @@ const BecomeASeller = () => {
       .then((data) => setOutlets(data));
   }, []);
 
-  const handleRegionChange = (selected) => {
-    setSelectedRegion(selected);
-    setValue("region", selected ? selected.value : "");
-    trigger("region");
-
-    if (selected) {
+  useEffect(() => {
+    if (selectedRegion) {
       const filteredDistricts = outlets
-        .filter((o) => o.region === selected.value)
+        .filter((o) => o.region === selectedRegion.value)
         .map((o) => o.district);
       setDistricts([...new Set(filteredDistricts)]);
-    } else setDistricts([]);
+    } else {
+      setDistricts([]);
+    }
 
-    setSelectedDistrict(null);
+    setValue("district", null);
+    setValue("thana", null);
     setThanas([]);
-    setSelectedThana(null);
-    setValue("district", "");
-    setValue("thana", "");
-    trigger("district");
-    trigger("thana");
-  };
+  }, [selectedRegion, outlets, setValue]);
 
-  const handleDistrictChange = (selected) => {
-    setSelectedDistrict(selected);
-    setValue("district", selected ? selected.value : "");
-    trigger("district");
-
-    if (selected) {
+  useEffect(() => {
+    if (selectedDistrict && selectedRegion) {
       const districtOutlets = outlets.filter(
         (o) =>
-          o.region === selectedRegion?.value && o.district === selected.value
+          o.region === selectedRegion.value &&
+          o.district === selectedDistrict.value
       );
       const covered = districtOutlets.flatMap((o) => o.covered_area);
       setThanas(covered);
-    } else setThanas([]);
+    } else {
+      setThanas([]);
+    }
 
-    setSelectedThana(null);
-    setValue("thana", "");
-    trigger("thana");
+    setValue("thana", null);
+  }, [selectedDistrict, selectedRegion, outlets, setValue]);
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setLogoPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleThanaChange = (selected) => {
-    setSelectedThana(selected);
-    setValue("thana", selected ? selected.value : "");
-    trigger("thana");
-  };
-
-  const handleCategoryChange = (selected) => {
-    setSelectedCategories(selected || []);
-    setValue("categories", selected ? selected.map((c) => c.value) : []);
-    trigger("categories");
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCoverFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setCoverPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmitSellerForm = async (data) => {
@@ -124,7 +131,6 @@ const BecomeASeller = () => {
     setSubmitting(true);
 
     try {
-      // Upload images
       const logoUrl = await uploadToCloudinary(logoFile);
       const coverUrl = await uploadToCloudinary(coverFile);
 
@@ -135,13 +141,13 @@ const BecomeASeller = () => {
         phone: data.phone,
         experience: parseInt(data.experience),
         storeAddress: data.storeAddress,
-        region: data.region,
-        district: data.district,
-        thana: data.thana,
+        region: data.region.value,
+        district: data.district.value,
+        thana: data.thana.value,
         storeName: data.storeName,
         storeLogo: logoUrl,
         coverImage: coverUrl,
-        categories: data.categories,
+        categories: data.categories.map((c) => c.value),
         stripeAccountId: data.stripeAccountId.trim(),
         status: "pending",
         appliedAt: new Date().toISOString(),
@@ -154,20 +160,18 @@ const BecomeASeller = () => {
 
       if (res.data.insertedId) {
         reset();
-        setSelectedRegion(null);
-        setSelectedDistrict(null);
-        setThanas([]);
-        setSelectedThana(null);
-        setSelectedCategories([]);
         setLogoFile(null);
         setCoverFile(null);
-        setValue("thana", "");
+        setLogoPreview(null);
+        setCoverPreview(null);
+        setDistricts([]);
+        setThanas([]);
 
         Swal.fire({
           icon: "success",
-          title: "Application Submitted successfully!",
+          title: "Application Submitted Successfully!",
           text: "Waiting for admin approval.",
-          timer: 1500,
+          timer: 2000,
           timerProgressBar: true,
           showConfirmButton: false,
         });
@@ -181,329 +185,479 @@ const BecomeASeller = () => {
 
   return (
     <div className="px-4 pt-12 pb-16 mb-8">
-      <h1 className="text-3xl sm:text-4xl text-primary font-bold text-center mb-5">
-        Become a Seller at ShopSphere
-      </h1>
-      <p className="mb-10 text-center text-xs leading-relaxed max-w-2xl mx-auto">
-        Join ShopSphere as a seller and grow your business online! Fill out the
-        application form with your personal and store details, select your
-        region, district, thana, categories, and connect your Stripe account.
-        Once approved, you’ll gain access to the seller dashboard to manage
-        products, track orders, and receive secure payouts.
-      </p>
-
-      <form onSubmit={handleSubmit(handleSubmitSellerForm)}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 items-start">
-          {/* Name */}
-          <div>
-            <label className="text-xs font-semibold">
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={user.displayName}
-              readOnly
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("name", { required: "Name is required" })}
-            />
-            {errors.name && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.name.message}
-              </span>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="text-xs font-semibold">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              value={userEmail}
-              readOnly
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("email", { required: "Email is required" })}
-            />
-            {errors.email && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-
-          {/* Age */}
-          <div>
-            <label className="text-xs font-semibold">
-              Age <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              placeholder="Enter your age"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("age", {
-                required: "Age is required",
-                min: {
-                  value: 18,
-                  message: "You must be at least 18 years old",
-                },
-              })}
-            />
-            {errors.age && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.age.message}
-              </span>
-            )}
-          </div>
-
-          {/* Experience */}
-          <div>
-            <label className="text-xs font-semibold">
-              Experience in years <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              placeholder="Enter your experience"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("experience", {
-                required: "Experience is required",
-              })}
-            />
-            {errors.experience && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.experience.message}
-              </span>
-            )}
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="text-xs font-semibold">
-              Phone <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="tel"
-              placeholder="Enter your phone number"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("phone", { required: "Phone number is required" })}
-            />
-            {errors.phone && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.phone.message}
-              </span>
-            )}
-          </div>
-
-          {/* Store Name */}
-          <div>
-            <label className="text-xs font-semibold">
-              Store Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter store name"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("storeName", { required: "Store name is required" })}
-            />
-            {errors.storeName && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.storeName.message}
-              </span>
-            )}
-          </div>
-
-          {/* Store Logo */}
-          <div>
-            <label className="text-xs font-semibold">
-              Store Logo <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              onChange={(e) => setLogoFile(e.target.files[0])}
-            />
-          </div>
-
-          {/* Cover Image */}
-          <div>
-            <label className="text-xs font-semibold">
-              Cover Image <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              onChange={(e) => setCoverFile(e.target.files[0])}
-            />
-          </div>
-
-          {/* Stripe Account ID */}
-          <div>
-            <label className="text-xs font-semibold">Stripe Account ID</label>
-            <input
-              type="text"
-              placeholder="Enter your Stripe Account ID"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("stripeAccountId", {
-                required: "Stripe Account ID is required",
-              })}
-            />
-            {errors.stripeAccountId && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.stripeAccountId.message}
-              </span>
-            )}
-          </div>
-
-          {/* Store Address */}
-          <div>
-            <label className="text-xs font-semibold">
-              Store Address <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter store address (e.g: Gulistan, Dhaka-1213)"
-              className="w-full p-2 border border-gray-400 rounded-md text-xs xl:text-sm mt-1"
-              {...register("storeAddress", {
-                required: "Store address is required",
-              })}
-            />
-            {errors.storeAddress && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.storeAddress.message}
-              </span>
-            )}
-          </div>
-
-          {/* Region */}
-          <div>
-            <label className="text-xs font-semibold">
-              Region <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={regions.map((r) => ({ value: r, label: r }))}
-              value={selectedRegion}
-              onChange={handleRegionChange}
-              placeholder="Select Region"
-              className="text-xs xl:text-sm mt-1"
-            />
-            {errors.region && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.region.message}
-              </span>
-            )}
-          </div>
-
-          {/* District */}
-          <div>
-            <label className="text-xs font-semibold">
-              District <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={districts.map((d) => ({ value: d, label: d }))}
-              value={selectedDistrict}
-              onChange={handleDistrictChange}
-              isDisabled={!selectedRegion}
-              placeholder="Select District"
-              className="text-xs xl:text-sm mt-1"
-            />
-            {errors.district && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.district.message}
-              </span>
-            )}
-          </div>
-
-          {/* Thana */}
-          <div>
-            <label className="text-xs font-semibold">
-              Thana <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={thanas.map((t) => ({ value: t, label: t }))}
-              value={selectedThana}
-              onChange={handleThanaChange}
-              isDisabled={!selectedRegion || !selectedDistrict}
-              placeholder="Select Thana"
-              className="text-xs xl:text-sm mt-1"
-            />
-            {errors.thana && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.thana.message}
-              </span>
-            )}
-          </div>
-
-          {/* Product Categories */}
-          <div>
-            <label className="text-xs font-semibold">
-              Product Categories <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={categories.map((c) => ({
-                value: c.toLowerCase(),
-                label: c,
-              }))}
-              value={selectedCategories}
-              onChange={handleCategoryChange}
-              isMulti
-              placeholder="Select Product Categories"
-              className="text-xs xl:text-sm mt-1"
-            />
-            {errors.categories && (
-              <span className="text-red-500 text-xs mt-1 font-semibold">
-                {errors.categories.message}
-              </span>
-            )}
-          </div>
+      {/* Header Section */}
+      <div className="text-center mb-12">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/80 rounded-2xl mb-4 shadow-lg">
+          <FaHandshake className="w-8 h-8 text-white" />
         </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-3">
+          Become a Seller
+        </h1>
+        <p className="text-gray-600 max-w-3xl mx-auto text-base leading-relaxed">
+          Join ShopSphere as a seller and grow your business online! Fill out
+          the application form with your personal and store details. Once
+          approved, you'll gain access to the seller dashboard to manage
+          products, track orders, and receive secure payouts.
+        </p>
+      </div>
 
-        <button
-          type="submit"
-          className="btn mt-10 btn-primary w-full text-white disabled:text-black/50"
-          disabled={submitting}
+      {/* Form Container */}
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10">
+        <form
+          onSubmit={handleSubmit(handleSubmitSellerForm)}
+          className="space-y-8"
         >
-          {submitting ? (
-            <>
-              <svg
-                className="w-5 h-5 text-primary animate-spin"
-                viewBox="0 0 100 100"
-              >
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="45"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
+          {/* Personal Information Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdPerson className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Personal Information
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Name */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdPerson className="w-4 h-4" />
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={user.displayName}
+                  readOnly
+                  className="input input-bordered w-full bg-gray-50 focus:outline-none"
+                  {...register("name", { required: "Name is required" })}
                 />
-                <line
-                  x1="50"
-                  y1="50"
-                  x2="50"
-                  y2="25"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  strokeLinecap="round"
+                {errors.name && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdEmail className="w-4 h-4" />
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={userEmail}
+                  readOnly
+                  className="input input-bordered w-full bg-gray-50 focus:outline-none"
+                  {...register("email", { required: "Email is required" })}
                 />
-                <line
-                  x1="50"
-                  y1="50"
-                  x2="75"
-                  y2="50"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
+                {errors.email && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Age */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdCake className="w-4 h-4" />
+                  Age <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="Enter your age"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  {...register("age", {
+                    required: "Age is required",
+                    min: {
+                      value: 18,
+                      message: "You must be at least 18 years old",
+                    },
+                  })}
                 />
-              </svg>
-              <span className="animate-pulse">Submitting Application</span>
-            </>
-          ) : (
-            <>Submit Application</>
-          )}
-        </button>
-      </form>
+                {errors.age && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.age.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdPhone className="w-4 h-4" />
+                  Phone <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  {...register("phone", {
+                    required: "Phone number is required",
+                  })}
+                />
+                {errors.phone && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.phone.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Experience */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdWorkHistory className="w-4 h-4" />
+                  Experience (Years) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="Enter your experience in years"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  {...register("experience", {
+                    required: "Experience is required",
+                    min: { value: 0, message: "Experience cannot be negative" },
+                  })}
+                />
+                {errors.experience && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.experience.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Store Information Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <FaStore className="w-5 h-5 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Store Information
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Store Name */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdStore className="w-4 h-4" />
+                  Store Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter your store name"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  {...register("storeName", {
+                    required: "Store name is required",
+                  })}
+                />
+                {errors.storeName && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.storeName.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Store Address */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocationOn className="w-4 h-4" />
+                  Store Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g: Gulistan, Dhaka-1213"
+                  className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  {...register("storeAddress", {
+                    required: "Store address is required",
+                  })}
+                />
+                {errors.storeAddress && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.storeAddress.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Store Logo */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdImage className="w-4 h-4" />
+                  Store Logo <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full"
+                  onChange={handleLogoChange}
+                />
+                {logoPreview && (
+                  <div className="mt-3">
+                    <img
+                      src={logoPreview}
+                      alt="Logo Preview"
+                      className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Cover Image */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdImage className="w-4 h-4" />
+                  Cover Image <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full"
+                  onChange={handleCoverChange}
+                />
+                {coverPreview && (
+                  <div className="mt-3">
+                    <img
+                      src={coverPreview}
+                      alt="Cover Preview"
+                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Product Categories */}
+              <div className="md:col-span-2">
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdCategory className="w-4 h-4" />
+                  Product Categories <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="categories"
+                  control={control}
+                  rules={{ required: "Select at least one category" }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={categories.map((c) => ({
+                        value: c.toLowerCase(),
+                        label: c,
+                      }))}
+                      isMulti
+                      placeholder="Select product categories you'll sell"
+                      className="text-sm w-full"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#a855f7" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.categories && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.categories.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Location Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdLocationOn className="w-5 h-5 text-green-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Location Details
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Region */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocationOn className="w-4 h-4" />
+                  Region <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="region"
+                  control={control}
+                  rules={{ required: "Region is required" }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={regions.map((r) => ({ value: r, label: r }))}
+                      placeholder="Select Region"
+                      className="text-sm w-full"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#22c55e" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.region && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.region.message}
+                  </p>
+                )}
+              </div>
+
+              {/* District */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocationOn className="w-4 h-4" />
+                  District <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="district"
+                  control={control}
+                  rules={{ required: "District is required" }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={districts.map((d) => ({ value: d, label: d }))}
+                      isDisabled={!selectedRegion}
+                      placeholder="Select District"
+                      className="text-sm w-full"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#22c55e" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.district && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.district.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Thana */}
+              <div>
+                <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                  <MdLocationOn className="w-4 h-4" />
+                  Thana <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="thana"
+                  control={control}
+                  rules={{ required: "Thana is required" }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={thanas.map((t) => ({ value: t, label: t }))}
+                      isDisabled={!selectedRegion || !selectedDistrict}
+                      placeholder="Select Thana"
+                      className="text-sm w-full"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#e5e7eb",
+                          "&:hover": { borderColor: "#22c55e" },
+                          boxShadow: "none",
+                          minHeight: "45px",
+                        }),
+                      }}
+                    />
+                  )}
+                />
+                {errors.thana && (
+                  <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                    <span>⚠</span> {errors.thana.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Information Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+              <MdAccountBalance className="w-5 h-5 text-orange-600" />
+              <h2 className="text-xl font-semibold text-gray-800">
+                Payment Information
+              </h2>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
+                <MdAccountBalance className="w-4 h-4" />
+                Stripe Account ID <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your Stripe Account ID"
+                className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                {...register("stripeAccountId", {
+                  required: "Stripe Account ID is required",
+                })}
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Connect your Stripe account to receive payments securely
+              </p>
+              {errors.stripeAccountId && (
+                <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                  <span>⚠</span> {errors.stripeAccountId.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-6">
+            <button
+              type="submit"
+              className="btn w-full btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+              disabled={submitting}
+            >
+              {submitting ? (
+                <div className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      className="opacity-25"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      className="opacity-75"
+                    />
+                  </svg>
+                  <span>Submitting Application...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaHandshake className="w-5 h-5" />
+                  <span>Submit Application</span>
+                </div>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

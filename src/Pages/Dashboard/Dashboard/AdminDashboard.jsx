@@ -22,11 +22,10 @@ import {
   FaShoppingCart,
   FaBox,
   FaStore,
-  FaBiking,
-  FaArrowUp,
-  FaArrowDown,
-  FaMinus,
+  FaMotorcycle,
 } from "react-icons/fa";
+import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
+import { PiTildeBold } from "react-icons/pi";
 
 const AdminDashboard = () => {
   const [revenueYear, setRevenueYear] = useState("2024");
@@ -73,7 +72,7 @@ const AdminDashboard = () => {
       title: "Total Riders",
       value: "3,854",
       change: 0.5,
-      icon: FaBiking,
+      icon: FaMotorcycle,
       color: "bg-orange-500",
     },
     {
@@ -200,19 +199,19 @@ const AdminDashboard = () => {
       return {
         bgColor: "bg-red-50",
         textColor: "text-red-600",
-        icon: FaArrowDown,
+        icon: FaArrowTrendDown,
       };
     } else if (change >= 1) {
       return {
         bgColor: "bg-green-50",
         textColor: "text-green-600",
-        icon: FaArrowUp,
+        icon: FaArrowTrendUp,
       };
     } else {
       return {
         bgColor: "bg-blue-50",
         textColor: "text-blue-600",
-        icon: FaMinus,
+        icon: PiTildeBold,
       };
     }
   };
@@ -231,7 +230,7 @@ const AdminDashboard = () => {
           <div
             className={`${changeStyle.bgColor} ${changeStyle.textColor} px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold`}
           >
-            <ChangeIcon className="text-xs" />
+            <ChangeIcon className="text-sm" />
             {Math.abs(stat.change)}%
           </div>
         </div>
