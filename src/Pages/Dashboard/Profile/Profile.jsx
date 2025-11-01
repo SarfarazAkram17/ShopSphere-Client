@@ -115,7 +115,7 @@ const Profile = () => {
         name: nameToUpdate,
         photo: imageUrl,
       });
-
+      
       toast.success("Profile updated successfully");
       setIsModalOpen(false);
       window.location.reload();
@@ -198,13 +198,10 @@ const Profile = () => {
               {/* Edit Button */}
               <button
                 onClick={handleEditClick}
-                className="md:mb-4 group relative cursor-pointer overflow-hidden bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
+                className="btn btn-primary flex items-center gap-2 text-white px-8 py-6 text-lg rounded-xl"
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  <FiEdit2 className="w-5 h-5" />
-                  Edit Profile
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <FiEdit2 className="w-5 h-5" />
+                Edit Profile
               </button>
             </div>
 
@@ -273,7 +270,7 @@ const Profile = () => {
               </button>
 
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <FiEdit2 className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-3xl font-bold text-gray-800">
@@ -312,7 +309,7 @@ const Profile = () => {
                   onClick={() =>
                     document.getElementById("profileImage").click()
                   }
-                  className="bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
+                  className="btn btn-primary px-6 text-white py-4 rounded-lg font-semibold flex items-center gap-2"
                 >
                   <FiCamera className="w-5 h-5" />
                   Change Photo
@@ -359,14 +356,14 @@ const Profile = () => {
               <div className="flex gap-4 mt-8">
                 <button
                   onClick={() => !loading && setIsModalOpen(false)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  className="btn disabled:cursor-not-allowed disabled:text-black/50 flex-1 border-gray-400 border py-6 rounded-lg"
                   disabled={loading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdate}
-                  className="flex-1 bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary text-white disabled:text-black py-4 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 btn btn-primary text-white disabled:text-black/50 py-6 rounded-lg font-semibold disabled:cursor-not-allowed"
                   disabled={
                     loading ||
                     !formData.name.trim() ||
@@ -377,7 +374,7 @@ const Profile = () => {
                   {loading ? (
                     <div className="flex items-center gap-2">
                       <svg
-                        className="w-5 h-5 animate-spin"
+                        className="w-5 h-5 text-primary animate-spin"
                         viewBox="0 0 100 100"
                       >
                         <circle
