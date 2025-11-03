@@ -32,6 +32,7 @@ export const ServiceAreaSection = ({
             <Select
               {...field}
               options={regions.map((r) => ({ value: r, label: r }))}
+              isClearable
               placeholder="Select Region"
               className="text-sm w-full"
               styles={{
@@ -62,6 +63,7 @@ export const ServiceAreaSection = ({
             <Select
               {...field}
               options={districts.map((d) => ({ value: d, label: d }))}
+              isClearable
               isDisabled={!selectedRegion}
               placeholder="Select District"
               className="text-sm w-full"
@@ -93,6 +95,7 @@ export const ServiceAreaSection = ({
             <Select
               {...field}
               options={thanas.map((t) => ({ value: t, label: t }))}
+              isClearable
               isDisabled={!selectedRegion || !selectedDistrict}
               placeholder="Select Thana"
               className="text-sm w-full"
