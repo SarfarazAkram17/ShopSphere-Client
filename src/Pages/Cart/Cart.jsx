@@ -269,6 +269,7 @@ const Cart = () => {
             <CartHeader
               cartLength={cart.length}
               selectedLength={selectedItems.length}
+              totalQuantity={totalQuantity}
               onSelectAll={handleSelectAll}
               onDeleteSelected={handleDeleteSelected}
             />

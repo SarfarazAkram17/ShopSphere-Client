@@ -1,7 +1,6 @@
 import {
   AiOutlineClose,
   AiOutlineDelete,
-  AiOutlineCheck,
 } from "react-icons/ai";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import AddressForm from "./AddressForm";

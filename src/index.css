@@ -5,14 +5,14 @@
 @plugin "daisyui/theme" {
   name: "light";
 
-  --color-primary: #019E97;
+  --color-primary: #019e97;
   --color-secondary: #bf5b1f;
-  --color-error: #C10007;
+  --color-error: #c10007;
 }
 
 .active {
-  background-color: #019E9720;
-  color: #019E97;
+  background-color: #019e9720;
+  color: #019e97;
   font-weight: bold;
 }
 
@@ -43,4 +43,30 @@ body {
   100% {
     transform: translateX(100%);
   }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }

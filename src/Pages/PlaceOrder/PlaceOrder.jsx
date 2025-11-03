@@ -3,6 +3,10 @@ import { useNavigate } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FaXmark } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { AiOutlineUser, AiOutlinePhone, AiOutlineClose } from "react-icons/ai";
+import { BsBuilding } from "react-icons/bs";
+import { BiMap } from "react-icons/bi";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
@@ -51,14 +55,10 @@ const PlaceOrder = () => {
   const { data: addresses, isLoading: addressesLoading } = useQuery({
     queryKey: ["addresses", userEmail],
     queryFn: async () => {
-      const response = await axiosSecure.get(
-        `/users/address?email=${userEmail}`
-      );
+      const response = await axiosSecure.get(`/address?email=${userEmail}`);
 
-      const defaultBillingAddress = response.data.find(
-        (add) => add.isDefaultShipping && add.isDefaultBilling
-      );
-      setSelectedShippingAddress(defaultBillingAddress);
+      const defaultSelectedAddress = response.data.find((add) => add.selected);
+      setSelectedShippingAddress(defaultSelectedAddress);
       return response.data || [];
     },
 
@@ -69,7 +69,7 @@ const PlaceOrder = () => {
   const addAddressMutation = useMutation({
     mutationFn: async (addressData) => {
       const response = await axiosSecure.post(
-        `/users/address?email=${userEmail}`,
+        `/address?email=${userEmail}`,
         addressData
       );
       return response.data;
@@ -94,23 +94,6 @@ const PlaceOrder = () => {
     },
   });
 
-  // Update default address mutation
-  // const updateDefaultAddressMutation = useMutation({
-  //   mutationFn: async ({ addressId, type }) => {
-  //     const response = await axiosSecure.put(
-  //       `/users/address/${addressId}/default`,
-  //       { type }
-  //     );
-  //     return response.data;
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries(["addresses", userEmail]);
-  //   },
-  //   onError: (error) => {
-  //     toast.error(error.message || "Failed to update default address");
-  //   },
-  // });
-
   useEffect(() => {
     const loadOrderData = async () => {
       if (!user) {
@@ -126,9 +109,6 @@ const PlaceOrder = () => {
         shopCartData.length === 0 ||
         !isShopCartValid(userEmail)
       ) {
-        toast.error("No items found or session expired!");
-        clearShopCart(userEmail);
-        navigate(-1);
         return;
       }
 
@@ -168,9 +148,7 @@ const PlaceOrder = () => {
       const remaining = getShopCartRemainingTime(userEmail);
 
       if (remaining <= 0) {
-        clearShopCart(userEmail);
-        toast.error("Session expired! Please try again.");
-        navigate(-1);
+        // Handle expiration
       } else {
         setRemainingTime(remaining);
       }
@@ -215,7 +193,6 @@ const PlaceOrder = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Remove from localStorage shop cart ONLY
           const removed = removeShopCartItem(
             {
               productId: item.productId,
@@ -230,7 +207,6 @@ const PlaceOrder = () => {
             return;
           }
 
-          // Update local state (UI)
           const updatedItems = cartItems.filter(
             (cartItem) =>
               !(
@@ -243,7 +219,6 @@ const PlaceOrder = () => {
           setCartItems(updatedItems);
           toast.success("Item removed from order");
 
-          // If no items left, clear shop cart and redirect
           if (updatedItems.length === 0) {
             clearShopCart(userEmail);
             toast.info("All items removed. Redirecting...");
@@ -276,17 +251,6 @@ const PlaceOrder = () => {
     setSelectedShippingAddress(address);
     setShowShippingDrawer(false);
   };
-
-  // const handlePlaceOrder = async () => {
-  //   if (!selectedShippingAddress || !selectedBillingAddress) {
-  //     toast.error("Please select shipping and billing addresses");
-  //     return;
-  //   }
-
-  //   toast.success("Order placed successfully!");
-  //   clearShopCart(userEmail);
-  //   navigate("/");
-  // };
 
   const groupedByStore = cartItems.reduce((acc, item) => {
     const storeId = item.product?.storeId || "unknown";
@@ -383,17 +347,20 @@ const PlaceOrder = () => {
                         </p>
                       </div>
                       <p className="text-sm text-gray-600">
-                        Shipped by: {storeData.storeName}
+                        Shipped by{" "}
+                        <span className="font-bold text-black/90">
+                          {storeData.storeName}
+                        </span>
                       </p>
                     </div>
 
-                    <div className="border border-teal-500 rounded-lg p-4 mb-4 w-fit">
+                    <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
                       <div className="flex items-start gap-2 mb-2">
-                        <div className="w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center mt-0.5">
+                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
                           <span className="text-white text-xs">✓</span>
                         </div>
                         <div>
-                          <p className="font-medium">৳ 150</p>
+                          <p className="font-medium">৳ 80</p>
                           <p className="text-sm text-gray-600">
                             Standard Delivery
                           </p>
@@ -470,7 +437,7 @@ const PlaceOrder = () => {
 
           {/* Right Section - Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-lg p-6 sticky top-18 space-y-6">
+            <div className="bg-white rounded-lg shadow-xl p-6 sticky top-18 space-y-6">
               <div>
                 <h3 className="font-semibold mb-4">Order Summary</h3>
                 <div className="space-y-3 text-sm">
@@ -490,14 +457,14 @@ const PlaceOrder = () => {
                       ৳ {totals.total.toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-60 text-right">
                     VAT included, where applicable
                   </p>
                 </div>
               </div>
 
               <button
-                // onClick={handlePlaceOrder}
+                onClick={() => toast.info("Buy again")}
                 className="w-full btn btn-primary text-white"
               >
                 Proceed to Pay
@@ -511,10 +478,10 @@ const PlaceOrder = () => {
       {showShippingDrawer && (
         <>
           <div
-            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40 animate-fade-in"
             onClick={() => setShowShippingDrawer(false)}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Shipping Address</h2>
@@ -530,7 +497,7 @@ const PlaceOrder = () => {
                 onClick={() => {
                   setShowAddAddressModal(true);
                 }}
-                className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2"
+                className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2 cursor-pointer"
               >
                 Add new address
               </button>
@@ -542,7 +509,7 @@ const PlaceOrder = () => {
                     className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                       selectedShippingAddress?.id === addr.id ||
                       selectedShippingAddress?._id === addr._id
-                        ? "border-teal-500 bg-teal-50"
+                        ? "border-primary bg-teal-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => handleSelectShipping(addr)}
@@ -587,13 +554,13 @@ const PlaceOrder = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowShippingDrawer(false)}
-                  className="flex-1 border border-gray-300 py-2 rounded hover:bg-gray-50"
+                  className="flex-1 btn"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={() => setShowShippingDrawer(false)}
-                  className="flex-1 bg-teal-500 text-white py-2 rounded hover:bg-teal-600"
+                  className="flex-1 btn text-white btn-primary"
                 >
                   SAVE
                 </button>
@@ -605,177 +572,224 @@ const PlaceOrder = () => {
 
       {/* Add Address Modal */}
       {showAddAddressModal && (
-        <div className="fixed inset-0 bg-black/15 bg-opacity-50 flex items-center justify-center z-[80] p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">
-                  Add New Shipping Address
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[80] p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto hide-scrollbar animate-scale-in">
+            <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-6 rounded-t-3xl">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <HiOutlineLocationMarker className="w-7 h-7" />
+                  Add New Address
                 </h2>
                 <button
                   onClick={() => setShowAddAddressModal(false)}
-                  className="text-gray-400 hover:text-red-500 cursor-pointer"
+                  className="bg-white/20 text-white p-2 rounded-xl hover:bg-white/30 transition-all cursor-pointer"
                 >
-                  <FaXmark size={24} />
+                  <AiOutlineClose size={24} />
                 </button>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Full name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your first and last name"
-                    value={newAddress.name}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, name: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
+            <div className="p-8">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Full Name */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <AiOutlineUser size={16} className="text-teal-500" />
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your first and last name"
+                      value={newAddress.name}
+                      onChange={(e) =>
+                        setNewAddress({ ...newAddress, name: e.target.value })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Phone Number */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <AiOutlinePhone size={16} className="text-teal-500" />
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="Please enter your phone number"
+                      value={newAddress.phone}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          phone: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Region */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <BiMap size={16} className="text-teal-500" />
+                      Region <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={newAddress.region}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          region: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    >
+                      <option value="">Select Region</option>
+                      <option value="Dhaka">Dhaka</option>
+                      <option value="Chattogram">Chattogram</option>
+                      <option value="Rajshahi">Rajshahi</option>
+                      <option value="Khulna">Khulna</option>
+                      <option value="Barishal">Barishal</option>
+                      <option value="Sylhet">Sylhet</option>
+                      <option value="Rangpur">Rangpur</option>
+                      <option value="Mymensingh">Mymensingh</option>
+                    </select>
+                  </div>
+
+                  {/* District */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <BiMap size={16} className="text-teal-500" />
+                      District <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your district"
+                      value={newAddress.district}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          district: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Thana */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <BiMap size={16} className="text-teal-500" />
+                      Thana <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your thana"
+                      value={newAddress.thana}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          thana: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Building */}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <BsBuilding size={16} className="text-teal-500" />
+                      Building / House No / Floor / Street
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Please enter"
+                      value={newAddress.building}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          building: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {/* Full Address */}
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <HiOutlineLocationMarker
+                        size={16}
+                        className="text-teal-500"
+                      />
+                      Full Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="For Example: House# 123, Street# 123, ABC Road"
+                      value={newAddress.address}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          address: e.target.value,
+                        })
+                      }
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-teal-500 focus:outline-none transition-colors"
+                    />
+                  </div>
                 </div>
+
+                {/* Address Type Selector */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Region
+                  <label className="block text-sm font-semibold mb-4 text-gray-700">
+                    Select a label for effective delivery:
                   </label>
-                  <select
-                    value={newAddress.region}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, region: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  >
-                    <option value="">Please choose your region</option>
-                    <option value="Dhaka">Dhaka</option>
-                    <option value="Chattogram">Chattogram</option>
-                    <option value="Rajshahi">Rajshahi</option>
-                    <option value="Khulna">Khulna</option>
-                    <option value="Barishal">Barishal</option>
-                    <option value="Sylhet">Sylhet</option>
-                    <option value="Rangpur">Rangpur</option>
-                    <option value="Mymensingh">Mymensingh</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="Please enter your phone number"
-                    value={newAddress.phone}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, phone: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    District
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your district"
-                    value={newAddress.district}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, district: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Building / House No / Floor / Street
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Please enter"
-                    value={newAddress.building}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, building: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Thana
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your thana"
-                    value={newAddress.thana}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, thana: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="For Example: House# 123, Street# 123, ABC Road"
-                    value={newAddress.address}
-                    onChange={(e) =>
-                      setNewAddress({ ...newAddress, address: e.target.value })
-                    }
-                    className="w-full border border-gray-300 rounded px-3 py-2"
-                  />
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() =>
+                        setNewAddress({ ...newAddress, label: "OFFICE" })
+                      }
+                      className={`flex items-center gap-3 px-8 py-4 rounded-xl border-2 transition-all font-semibold ${
+                        newAddress.label === "OFFICE"
+                          ? "border-teal-500 bg-teal-50 text-teal-700 shadow-md"
+                          : "border-gray-300 hover:border-gray-400 text-gray-700"
+                      }`}
+                    >
+                      <span className="text-2xl">🏢</span>
+                      <span>OFFICE</span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        setNewAddress({ ...newAddress, label: "HOME" })
+                      }
+                      className={`flex items-center gap-3 px-8 py-4 rounded-xl border-2 transition-all font-semibold ${
+                        newAddress.label === "HOME"
+                          ? "border-orange-500 bg-orange-50 text-orange-700 shadow-md"
+                          : "border-gray-300 hover:border-gray-400 text-gray-700"
+                      }`}
+                    >
+                      <span className="text-2xl">🏠</span>
+                      <span>HOME</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <label className="block text-sm font-medium mb-3">
-                  Select a label for effective delivery:
-                </label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() =>
-                      setNewAddress({ ...newAddress, label: "OFFICE" })
-                    }
-                    className={`flex items-center gap-2 px-6 py-3 rounded border-2 transition-colors ${
-                      newAddress.label === "OFFICE"
-                        ? "border-teal-500 bg-teal-50 text-teal-700"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  >
-                    <span>🏢</span>
-                    <span>OFFICE</span>
-                  </button>
-                  <button
-                    onClick={() =>
-                      setNewAddress({ ...newAddress, label: "HOME" })
-                    }
-                    className={`flex items-center gap-2 px-6 py-3 rounded border-2 transition-colors ${
-                      newAddress.label === "HOME"
-                        ? "border-orange-500 bg-orange-50 text-orange-700"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  >
-                    <span>🏠</span>
-                    <span>HOME</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 pt-6 border-t mt-8">
                 <button
                   onClick={() => setShowAddAddressModal(false)}
-                  className="flex-1 border border-gray-300 py-3 rounded hover:bg-gray-50 font-medium"
+                  className="px-8 py-3 border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-all cursor-pointer"
                 >
-                  CANCEL
+                  Cancel
                 </button>
                 <button
                   onClick={handleAddAddress}
                   disabled={addAddressMutation.isPending}
-                  className="flex-1 bg-teal-500 text-white py-3 rounded hover:bg-teal-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {addAddressMutation.isPending ? "SAVING..." : "SAVE"}
+                  {addAddressMutation.isPending ? "Saving..." : "Save Address"}
                 </button>
               </div>
             </div>

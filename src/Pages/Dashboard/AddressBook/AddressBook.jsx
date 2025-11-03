@@ -34,7 +34,7 @@ const AddressBook = () => {
     queryKey: ["addresses", userEmail],
     queryFn: async () => {
       const response = await axiosSecure.get(
-        `/users/address?email=${userEmail}`
+        `/address?email=${userEmail}`
       );
       return response.data;
     },
