@@ -143,7 +143,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="px-4 pt-12 pb-16">
+    <div>
       {/* Hero Section */}
       <div className="mb-8">
         <h2 className="text-4xl mb-2 md:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -181,7 +181,7 @@ const Profile = () => {
 
               {/* User Info */}
               <div className="flex-1 md:mb-4 mt-8">
-                <h3 className="text-3xl md:text-4xl font-bold text-white/90 mb-2">
+                <h3 className="text-3xl md:text-4xl font-bold mb-2">
                   {user?.displayName}
                 </h3>
                 <p className="text-gray-600 my-3">{userEmail}</p>

@@ -34,7 +34,7 @@ const DashboardLayout = () => {
       {/* Main content area (scrollable) */}
       <main className="flex-1 flex flex-col overflow-y-auto">
         <DashboardNavbar setIsOpen={setIsOpen} />
-        <div className="bg-gray-50">
+        <div className="bg-gray-50 px-4 pt-12 pb-16">
           <Outlet />
         </div>
       </main>

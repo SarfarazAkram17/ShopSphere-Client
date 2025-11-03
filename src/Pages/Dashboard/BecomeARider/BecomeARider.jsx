@@ -79,7 +79,7 @@ const BecomeARider = () => {
   };
 
   return (
-    <div className="px-4 pt-12 pb-16 mb-8">
+    <div className="mb-8">
       <PageHeader />
 
       <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 md:p-10">

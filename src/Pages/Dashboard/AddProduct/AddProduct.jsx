@@ -146,7 +146,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="px-4 pt-12 pb-16">
+    <div>
       <FormHeader
         icon={FiPackage}
         title="Add New Product"

@@ -8,7 +8,7 @@ export const useAddressMutations = (
 ) => {
   const addMutation = useMutation({
     mutationFn: (newAddress) =>
-      axiosSecure.post(`/users/address?email=${userEmail}`, newAddress),
+      axiosSecure.post(`/address?email=${userEmail}`, newAddress),
     onSuccess: () => {
       refetch();
       callbacks.onAddSuccess?.();
@@ -17,7 +17,7 @@ export const useAddressMutations = (
 
   const updateMutation = useMutation({
     mutationFn: ({ id, ...data }) =>
-      axiosSecure.put(`/users/address/${id}?email=${userEmail}`, data),
+      axiosSecure.put(`/address/${id}?email=${userEmail}`, data),
     onSuccess: () => {
       refetch();
       callbacks.onUpdateSuccess?.();
@@ -26,7 +26,7 @@ export const useAddressMutations = (
 
   const deleteMutation = useMutation({
     mutationFn: (id) =>
-      axiosSecure.delete(`/users/address/${id}?email=${userEmail}`),
+      axiosSecure.delete(`/address/${id}?email=${userEmail}`),
     onSuccess: () => {
       refetch();
       callbacks.onDeleteSuccess?.();
@@ -36,7 +36,7 @@ export const useAddressMutations = (
   const setDefaultShippingMutation = useMutation({
     mutationFn: (id) =>
       axiosSecure.put(
-        `/users/address/${id}/default-shipping?email=${userEmail}`
+        `/address/${id}/default-shipping?email=${userEmail}`
       ),
     onSuccess: () => {
       refetch();
@@ -47,7 +47,7 @@ export const useAddressMutations = (
   const setDefaultBillingMutation = useMutation({
     mutationFn: (id) =>
       axiosSecure.put(
-        `/users/address/${id}/default-billing?email=${userEmail}`
+        `/address/${id}/default-billing?email=${userEmail}`
       ),
     onSuccess: () => {
       refetch();

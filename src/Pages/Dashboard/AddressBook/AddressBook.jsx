@@ -34,7 +34,7 @@ const AddressBook = () => {
     queryKey: ["addresses", userEmail],
     queryFn: async () => {
       const response = await axiosSecure.get(
-        `/users/address?email=${userEmail}`
+        `/address?email=${userEmail}`
       );
       return response.data;
     },
@@ -159,7 +159,7 @@ const AddressBook = () => {
   if (isLoading) return <Loader />;
 
   return (
-    <div className="px-4 pt-12 pb-16">
+    <div>
       <AddressBookHeader
         onAddClick={() => setShowAddModal(true)}
         onDefaultShippingClick={openDefaultShippingModal}
