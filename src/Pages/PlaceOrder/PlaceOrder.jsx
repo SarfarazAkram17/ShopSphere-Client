@@ -34,7 +34,6 @@ const PlaceOrder = () => {
   // Drawer states
   const [showShippingDrawer, setShowShippingDrawer] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
-  const [addingForBilling, setAddingForBilling] = useState(false);
 
   // Form states
   const [newAddress, setNewAddress] = useState({
@@ -530,7 +529,6 @@ const PlaceOrder = () => {
               <button
                 onClick={() => {
                   setShowAddAddressModal(true);
-                  setAddingForBilling(false);
                 }}
                 className="w-full mb-4 text-blue-600 hover:text-blue-700 text-sm font-medium border border-blue-600 rounded py-2"
               >
