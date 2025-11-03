@@ -71,7 +71,7 @@ const AllUsers = () => {
   }, [searchTerm, searchType, roleFilter, rowsPerPage, page, refetch]);
 
   return (
-    <div className="px-4 pt-12 pb-16">
+    <div>
       <h2 className="text-2xl font-bold mb-4 text-center text-primary">
         All Users
       </h2>

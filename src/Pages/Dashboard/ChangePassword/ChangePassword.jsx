@@ -124,7 +124,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="flex justify-center px-4 pt-12 pb-16">
+    <div className="flex justify-center">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl p-8">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-full mb-4">

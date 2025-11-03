@@ -53,7 +53,7 @@ const ManageProducts = () => {
   };
 
   return (
-    <div className="px-4 pt-12 pb-16">
+    <div>
       <h2 className="text-3xl md:text-4xl font-bold text-center text-primary mb-10">
         Manage Products
       </h2>

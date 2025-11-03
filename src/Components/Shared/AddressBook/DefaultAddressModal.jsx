@@ -34,7 +34,7 @@ const DefaultAddressModal = ({
           </h2>
         </div>
 
-        <div className="p-3 sm:p-6 md:p-8 overflow-y-auto flex-1">
+        <div className="p-3 sm:p-6 md:p-8 overflow-y-auto hide-scrollbar flex-1">
           <div className="space-y-3 sm:space-y-4">
             {addresses.length === 0 ? (
               <div className="flex justify-center items-center py-12 sm:py-15 text-gray-500 font-semibold text-sm sm:text-base">
