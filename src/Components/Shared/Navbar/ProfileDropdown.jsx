@@ -4,6 +4,7 @@ import useAuth from "../../../Hooks/useAuth";
 import useUserRole from "../../../Hooks/useUserRole";
 import { getMenuItemsByRole } from "../../../lib/roleMenuItems";
 import { toast } from "react-toastify";
+import MiniLoader from "../../Loader/MiniLoader";
 
 const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const { user, userEmail, logOutUser } = useAuth();
@@ -48,38 +49,8 @@ const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
           {/* Menu Items */}
           <div className="py-2 max-h-96 overflow-y-auto hide-scrollbar">
             {roleLoading ? (
-              <div className="flex justify-center">
-                <svg
-                  className="w-8 h-8 text-primary my-8 animate-spin"
-                  viewBox="0 0 100 100"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="50"
-                    y2="25"
-                    stroke="currentColor"
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="50"
-                    y1="50"
-                    x2="75"
-                    y2="50"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              <div className="flex justify-center py-8">
+                <MiniLoader size="w-8 h-8" />
               </div>
             ) : (
               menuItems.map((item, index) => (

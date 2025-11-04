@@ -78,7 +78,7 @@ const AdminDashboard = () => {
     {
       title: "Total Customers",
       value: "45,892",
-      change: 18.4,
+      change: 0,
       icon: FaUsers,
       color: "bg-pink-500",
     },
@@ -195,21 +195,21 @@ const AdminDashboard = () => {
   ];
 
   const getChangeStyle = (change) => {
-    if (change <= -1) {
+    if (change < 0) {
       return {
-        bgColor: "bg-red-50",
+        bgColor: "bg-red-100/75",
         textColor: "text-red-600",
         icon: FaArrowTrendDown,
       };
-    } else if (change >= 1) {
+    } else if (change > 0) {
       return {
-        bgColor: "bg-green-50",
+        bgColor: "bg-green-100/80",
         textColor: "text-green-600",
         icon: FaArrowTrendUp,
       };
     } else {
       return {
-        bgColor: "bg-blue-50",
+        bgColor: "bg-blue-100/75",
         textColor: "text-blue-600",
         icon: PiTildeBold,
       };
@@ -230,7 +230,7 @@ const AdminDashboard = () => {
           <div
             className={`${changeStyle.bgColor} ${changeStyle.textColor} px-3 py-1 rounded-full flex items-center gap-1 text-sm font-semibold`}
           >
-            <ChangeIcon className="text-sm" />
+            <ChangeIcon size={17} />
             {Math.abs(stat.change)}%
           </div>
         </div>
@@ -253,7 +253,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {stats.map((stat, index) => (
           <StatCard key={index} stat={stat} />
         ))}
