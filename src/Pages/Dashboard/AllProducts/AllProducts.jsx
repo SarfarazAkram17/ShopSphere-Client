@@ -91,7 +91,7 @@ const AllProducts = () => {
         </h1>
       ) : (
         <TableContainer component={Paper}>
-          <Table aria-label="pending sellers table" size="small">
+          <Table aria-label="all products table" size="small">
             <TableHead>
               <TableRow>
                 <TableCell align="center" sx={{ py: 0.5 }}>
@@ -131,16 +131,31 @@ const AllProducts = () => {
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {page * rowsPerPage + i + 1}
                   </TableCell>
-                  <TableCell align="center" sx={{ py: 0.5 }}>
+                  <TableCell
+                    className="max-w-[100px] truncate"
+                    title={p._id}
+                    align="center"
+                    sx={{ py: 0.5 }}
+                  >
                     {p._id}
                   </TableCell>
-                  <TableCell align="center" sx={{ py: 0.5 }}>
+                  <TableCell
+                    className="max-w-[100px] truncate"
+                    title={p.storeId}
+                    align="center"
+                    sx={{ py: 0.5 }}
+                  >
                     {p.storeId}
                   </TableCell>
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {p.storeName}
                   </TableCell>
-                  <TableCell align="center" sx={{ py: 0.5 }}>
+                  <TableCell
+                    className="max-w-[100px] truncate"
+                    title={p.name}
+                    align="center"
+                    sx={{ py: 0.5 }}
+                  >
                     {p.name}
                   </TableCell>
                   <TableCell align="center" sx={{ py: 0.5 }}>
@@ -149,7 +164,12 @@ const AllProducts = () => {
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {p.stock}
                   </TableCell>
-                  <TableCell align="center" sx={{ py: 0.5 }}>
+                  <TableCell
+                    className="max-w-[100px] truncate"
+                    title={new Date(p.addedAt).toLocaleString()}
+                    align="center"
+                    sx={{ py: 0.5 }}
+                  >
                     {new Date(p.addedAt).toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -181,9 +201,9 @@ const AllProducts = () => {
         </TableContainer>
       )}
 
-      {/* Modal for viewing rider details */}
+      {/* Modal for viewing product details */}
       {selectedProduct && (
-        <dialog id="riderDetailsModal" className="modal modal-open">
+        <dialog id="productDetailsModal" className="modal modal-open">
           <div className="modal-box max-w-2xl hide-scrollbar max-h-[95vh]">
             <h3 className="font-bold text-2xl mb-5">Product Details</h3>
             <div className="space-y-2">

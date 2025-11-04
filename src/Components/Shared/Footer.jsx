@@ -142,9 +142,10 @@ const Footer = () => {
       <div className="bg-gray-300/70">
         <div className="max-w-[1500px] px-4 mx-auto py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
-            <p className="flex items-center gap-1">
-              © {new Date().getFullYear()} ShopSphere. All rights reserved. Made
-              with <IoMdHeart className="text-error mx-1" /> in Bangladesh
+            <p>
+              &copy; {new Date().getFullYear()} ShopSphere. All rights reserved.
+              Made with <IoMdHeart className="text-error mx-1 inline" /> in
+              Bangladesh
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <Link
