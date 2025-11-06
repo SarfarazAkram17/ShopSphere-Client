@@ -92,8 +92,11 @@ const ProductSection = ({
       console.error("Add to cart error:", error);
       // Handle stock validation error from backend
       if (error.response?.data?.availableToAdd !== undefined) {
-        const { message } = error.response.data;
-        toast.error(message);
+        const { availableToAdd, existingQuantity, totalStock } =
+          error.response.data;
+        toast.error(
+          `Cannot add ${quantity} items. Only ${availableToAdd} more available (${existingQuantity} already in cart, ${totalStock} total stock)`
+        );
       } else {
         toast.error(
           error.response?.data?.message || "Failed to add product to cart"

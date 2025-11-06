@@ -134,8 +134,11 @@ const Cart = () => {
 
       // Handle backend validation error
       if (error.response?.data?.maxAllowed !== undefined) {
-        const { message } = error.response.data;
-        toast.error(message);
+        const { maxAllowed, otherVariantsQuantity, totalStock } =
+          error.response.data;
+        toast.error(
+          `Cannot set quantity to ${newQuantity}. Maximum allowed is ${maxAllowed} (${otherVariantsQuantity} in other variants, ${totalStock} total stock)`
+        );
       } else {
         toast.error(
           error.response?.data?.message || "Failed to update quantity"
