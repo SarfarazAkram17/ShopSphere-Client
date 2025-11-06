@@ -7,7 +7,7 @@ import useAuth from "../../../Hooks/useAuth";
 import { saveShopCart } from "../../../lib/localStorage";
 import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartCount } from "../../../Hooks/useCartCount";
 
 const ProductSection = ({
@@ -27,7 +27,26 @@ const ProductSection = ({
   const location = useLocation();
   const axiosSecure = useAxiosSecure();
   const [quantity, setQuantity] = useState(1);
-  const { refetch } = useCartCount();
+  const { refetch, cartData } = useCartCount();
+  const [maxQuantity, setMaxQuantity] = useState(product.stock);
+
+  useEffect(() => {
+    if (cartData && cartData.length > 0) {
+      const cartQuantity = cartData
+        .filter((item) => item.productId === product._id)
+        .reduce((total, item) => total + item.quantity, 0);
+
+      const available = product.stock - cartQuantity;
+      setMaxQuantity(available > 0 ? available : 0);
+
+      // Reset quantity if it exceeds available
+      if (quantity > available) {
+        setQuantity(available > 0 ? 1 : 0);
+      }
+    } else {
+      setMaxQuantity(product.stock);
+    }
+  }, [cartData, product._id, product.stock, quantity]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -38,6 +57,11 @@ const ProductSection = ({
 
     if (!roleLoading && role !== "customer") {
       toast.info("You are not allowded to add products on cart");
+      return;
+    }
+
+    if (maxQuantity === 0) {
+      toast.error("This product is already at maximum quantity in your cart");
       return;
     }
 
@@ -66,7 +90,15 @@ const ProductSection = ({
       setQuantity(1);
     } catch (error) {
       console.error("Add to cart error:", error);
-      toast.error("Failed to add product to cart");
+      // Handle stock validation error from backend
+      if (error.response?.data?.availableToAdd !== undefined) {
+        const { message } = error.response.data;
+        toast.error(message);
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to add product to cart"
+        );
+      }
     }
   };
 
@@ -185,14 +217,23 @@ const ProductSection = ({
         {/* stock */}
         <p className="text-md">
           <strong>In Stock:</strong>{" "}
-          {product.stock ? (
+          {product.stock > 0 ? (
             <span className="text-green-600 font-semibold">
               {product.stock}
             </span>
           ) : (
-            <span className="text-red-600 font-semibold">{product.stock}</span>
+            <span className="text-red-600 font-semibold">Out of Stock</span>
           )}
         </p>
+
+        {/* Show available quantity if some already in cart */}
+        {maxQuantity < product.stock && maxQuantity > 0 && (
+          <p className="text-sm text-orange-600">
+            <strong>Note:</strong> {product.stock - maxQuantity} already in your
+            cart.
+            {maxQuantity} more available to add.
+          </p>
+        )}
 
         {/* color */}
         {product?.color?.length > 0 && (
@@ -251,25 +292,35 @@ const ProductSection = ({
                 </span>
                 <button
                   onClick={() => setQuantity((prev) => prev + 1)}
-                  disabled={quantity === product.stock}
+                  disabled={
+                    quantity >= maxQuantity || quantity >= product.stock
+                  }
                   className="px-3 py-1 text-xl font-bold disabled:opacity-40 cursor-pointer"
                 >
                   +
                 </button>
               </div>
+
+              {maxQuantity === 0 && (
+                <span className="text-sm text-red-600">
+                  Maximum quantity in cart
+                </span>
+              )}
             </div>
 
             <div className="flex gap-2 items-center">
               <button
                 onClick={handleBuyNow}
-                className="btn btn-primary text-white flex items-center"
+                disabled={quantity > product.stock}
+                className="btn btn-primary text-white flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <PiBagBold size={20} className="mr-2" /> Buy Now
               </button>
 
               <button
                 onClick={handleAddToCart}
-                className="btn btn-secondary text-white flex items-center"
+                disabled={maxQuantity === 0}
+                className="btn btn-secondary text-white flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <PiShoppingCartBold size={20} className="mr-2" /> Add to Cart
               </button>
@@ -277,7 +328,7 @@ const ProductSection = ({
           </>
         )}
 
-        <div className="mt-15">
+        <div className="mt-16">
           <h2 className="font-bold text-xl mb-1">Like this product?</h2>
           <p className="text-sm text-gray-600 mb-3">
             Share it with your peers!
