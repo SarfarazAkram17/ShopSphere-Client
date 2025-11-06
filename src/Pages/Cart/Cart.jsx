@@ -55,6 +55,23 @@ const Cart = () => {
     return acc;
   }, {});
 
+  // Helper function to calculate total quantity for a product across all variants
+  const getTotalQuantityForProduct = (productId) => {
+    return cart
+      .filter((item) => item.productId === productId)
+      .reduce((total, item) => total + item.quantity, 0);
+  };
+
+  // Helper function to get max allowed quantity for a specific cart item
+  const getMaxAllowedQuantity = (item) => {
+    const totalStock = item.product?.stock || 0;
+    const totalInCart = getTotalQuantityForProduct(item.productId);
+    const currentItemQuantity = item.quantity;
+    const otherVariantsQuantity = totalInCart - currentItemQuantity;
+
+    return totalStock - otherVariantsQuantity;
+  };
+
   // Select all items
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -90,6 +107,19 @@ const Cart = () => {
   const handleUpdateQuantity = async (item, newQuantity) => {
     if (newQuantity < 1) return;
 
+    const maxAllowed = getMaxAllowedQuantity(item);
+
+    if (newQuantity > maxAllowed) {
+      const totalInCart = getTotalQuantityForProduct(item.productId);
+      const currentItemQuantity = item.quantity;
+      const otherVariantsQuantity = totalInCart - currentItemQuantity;
+
+      toast.error(
+        `Cannot set quantity to ${newQuantity}. Maximum allowed is ${maxAllowed} (${otherVariantsQuantity} in other variants, ${item.product?.stock} total stock)`
+      );
+      return;
+    }
+
     try {
       await axiosSecure.put(`/cart/update?email=${userEmail}`, {
         productId: item.productId,
@@ -100,7 +130,20 @@ const Cart = () => {
       refetch();
       cartCountRefetch();
     } catch (error) {
-      toast.error(error.message || "Failed to update quantity");
+      console.error("Update quantity error:", error);
+
+      // Handle backend validation error
+      if (error.response?.data?.maxAllowed !== undefined) {
+        const { maxAllowed, otherVariantsQuantity, totalStock } =
+          error.response.data;
+        toast.error(
+          `Cannot set quantity to ${newQuantity}. Maximum allowed is ${maxAllowed} (${otherVariantsQuantity} in other variants, ${totalStock} total stock)`
+        );
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to update quantity"
+        );
+      }
     }
   };
 

@@ -109,35 +109,40 @@ const PlaceOrder = () => {
         shopCartData.length === 0 ||
         !isShopCartValid(userEmail)
       ) {
+        toast.info("No items to checkout. Redirecting...");
+        navigate(-1);
         return;
       }
 
       try {
-        const response = await axiosSecure.get(
-          `/cart/details?email=${userEmail}`
-        );
-        const fullCart = response.data.cart || [];
-
-        const shopCartProductIds = shopCartData.map((item) => ({
-          productId: item.productId,
-          color: item.color,
-          size: item.size,
-        }));
-
-        const filteredCart = fullCart.filter((item) =>
-          shopCartProductIds.some(
-            (shopItem) =>
-              shopItem.productId === item.productId &&
-              shopItem.color === item.color &&
-              shopItem.size === item.size
-          )
+        // NEW: Use dedicated checkout endpoint
+        const response = await axiosSecure.post(
+          `/cart/checkout-items?email=${userEmail}`,
+          { items: shopCartData }
         );
 
-        setCartItems(filteredCart);
+        const checkoutItems = response.data.items || [];
+
+        // Filter out any items where product wasn't found
+        const validItems = checkoutItems.filter((item) => item.product);
+
+        if (validItems.length === 0) {
+          toast.error("No valid products found");
+          clearShopCart(userEmail);
+          navigate(-1);
+          return;
+        }
+
+        // If some items were invalid, show warning
+        if (validItems.length < shopCartData.length) {
+          toast.warning("Some products are no longer available");
+        }
+
+        setCartItems(validItems);
         setRemainingTime(getShopCartRemainingTime(userEmail));
         setIsLoading(false);
       } catch (error) {
-        toast.error(error.message || "Failed to load order data");
+        toast.error(error.response?.data?.message || "Failed to load order data");
         navigate(-1);
       }
     };
@@ -148,7 +153,9 @@ const PlaceOrder = () => {
       const remaining = getShopCartRemainingTime(userEmail);
 
       if (remaining <= 0) {
-        // Handle expiration
+        clearShopCart(userEmail);
+        toast.error("Session expired. Please try again.");
+        navigate("/products");
       } else {
         setRemainingTime(remaining);
       }
