@@ -1,6 +1,7 @@
 import { FormSection } from "./FormSection";
 import { ImageUpload } from "./ImageUpload";
 import { MdImage } from "react-icons/md";
+import { ImageUploadInstructions } from "./ImageUploadInstructions";
 
 export const ImagesSection = ({
   fileInputRef,
@@ -15,6 +16,9 @@ export const ImagesSection = ({
       title="Product Images"
       iconColor="text-pink-600"
     >
+      {/* 👇 Add the instruction card here */}
+      <ImageUploadInstructions />
+
       <ImageUpload
         fileInputRef={fileInputRef}
         imageURLs={imageURLs}

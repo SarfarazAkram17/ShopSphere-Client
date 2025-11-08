@@ -9,14 +9,19 @@ export const useCartCount = () => {
   const axiosSecure = useAxiosSecure();
 
   const {
-    data: cart,
+    data = {},
     isLoading,
     refetch,
   } = useQuery({
     queryKey: ["cartCount", userEmail],
     queryFn: async () => {
       const response = await axiosSecure.get(`/cart?email=${userEmail}`);
-      return response.data.cart || [];
+      const cart = response.data.cart || [];
+      const cartCount = cart.reduce(
+        (total, item) => total + (item.quantity || 0),
+        0
+      );
+      return { cart, cartCount };
     },
 
     enabled: !roleLoading && role === "customer" && !!user && !!userEmail,
@@ -24,13 +29,11 @@ export const useCartCount = () => {
     staleTime: 5000,
   });
 
-  const cartCount = cart.reduce(
-    (total, item) => total + (item.quantity || 0),
-    0
-  );
+  const cart = data.cart || [];
+  const cartCount = data.cartCount || 0;
 
   return {
-    cartCount: cartCount || 0,
+    cartCount: cartCount,
     cartData: cart,
     isLoading,
     refetch,
