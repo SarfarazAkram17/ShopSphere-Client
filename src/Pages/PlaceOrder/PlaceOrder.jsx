@@ -142,7 +142,9 @@ const PlaceOrder = () => {
         setRemainingTime(getShopCartRemainingTime(userEmail));
         setIsLoading(false);
       } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to load order data");
+        toast.error(
+          error.response?.data?.message || "Failed to load order data"
+        );
         navigate(-1);
       }
     };
@@ -397,13 +399,17 @@ const PlaceOrder = () => {
                               <h3 className="text-sm font-medium mb-1">
                                 {item.product?.name}
                               </h3>
-                              <p className="text-xs text-gray-500 mb-2 flex gap-2 items-center">
+                              <p className="text-xs text-gray-500 mb-2 flex gap-1.5 items-center">
                                 {item.color && (
                                   <span className="capitalize">
-                                    Color: {item.color},
+                                    Color: {item.color} {item.size && ", "}
                                   </span>
                                 )}
-                                {item.size && <span>Size: {item.size}</span>}
+                                {item.size && (
+                                  <span className="capitalize">
+                                    Size: {item.size}
+                                  </span>
+                                )}
                               </p>
                               <div className="flex items-center gap-3">
                                 <p className="text-orange-500 font-semibold">

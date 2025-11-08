@@ -130,8 +130,6 @@ const Cart = () => {
       refetch();
       cartCountRefetch();
     } catch (error) {
-      console.error("Update quantity error:", error);
-
       // Handle backend validation error
       if (error.response?.data?.maxAllowed !== undefined) {
         const { maxAllowed, otherVariantsQuantity, totalStock } =

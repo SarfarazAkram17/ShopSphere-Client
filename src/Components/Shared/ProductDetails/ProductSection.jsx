@@ -38,11 +38,6 @@ const ProductSection = ({
 
       const available = product.stock - cartQuantity;
       setMaxQuantity(available > 0 ? available : 0);
-
-      // Reset quantity if it exceeds available
-      if (quantity > available) {
-        setQuantity(available > 0 ? 1 : 0);
-      }
     } else {
       setMaxQuantity(product.stock);
     }
@@ -89,7 +84,6 @@ const ProductSection = ({
       refetch();
       setQuantity(1);
     } catch (error) {
-      console.error("Add to cart error:", error);
       // Handle stock validation error from backend
       if (error.response?.data?.availableToAdd !== undefined) {
         const { availableToAdd, existingQuantity, totalStock } =
@@ -285,7 +279,7 @@ const ProductSection = ({
               <div className="flex items-center border border-gray-400 rounded-lg">
                 <button
                   onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  disabled={quantity === 1}
+                  disabled={quantity <= 1}
                   className="px-3 py-1 text-xl font-bold disabled:opacity-40 cursor-pointer"
                 >
                   -
@@ -295,9 +289,7 @@ const ProductSection = ({
                 </span>
                 <button
                   onClick={() => setQuantity((prev) => prev + 1)}
-                  disabled={
-                    quantity >= maxQuantity || quantity >= product.stock
-                  }
+                  disabled={quantity === product.stock}
                   className="px-3 py-1 text-xl font-bold disabled:opacity-40 cursor-pointer"
                 >
                   +
@@ -315,7 +307,7 @@ const ProductSection = ({
               <button
                 onClick={handleBuyNow}
                 disabled={quantity > product.stock}
-                className="btn btn-primary text-white flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary disabled:text-black/50 text-white flex items-center disabled:cursor-not-allowed"
               >
                 <PiBagBold size={20} className="mr-2" /> Buy Now
               </button>
@@ -323,7 +315,7 @@ const ProductSection = ({
               <button
                 onClick={handleAddToCart}
                 disabled={maxQuantity === 0}
-                className="btn btn-secondary text-white flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-secondary disabled:text-black/50 text-white flex items-center disabled:cursor-not-allowed"
               >
                 <PiShoppingCartBold size={20} className="mr-2" /> Add to Cart
               </button>

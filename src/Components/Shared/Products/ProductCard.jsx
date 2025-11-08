@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useCartCount } from "../../../Hooks/useCartCount";
+import { useEffect, useState } from "react";
 
 const ProductCard = ({ product, discountedPrice }) => {
   const { user, userEmail } = useAuth();
@@ -13,7 +14,21 @@ const ProductCard = ({ product, discountedPrice }) => {
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const location = useLocation();
-  const { refetch } = useCartCount();
+  const { refetch, cartData } = useCartCount();
+  const [maxQuantity, setMaxQuantity] = useState(product.stock);
+
+  useEffect(() => {
+    if (cartData && cartData.length > 0) {
+      const cartQuantity = cartData
+        .filter((item) => item.productId === product._id)
+        .reduce((total, item) => total + item.quantity, 0);
+
+      const available = product.stock - cartQuantity;
+      setMaxQuantity(available > 0 ? available : 0);
+    } else {
+      setMaxQuantity(product.stock);
+    }
+  }, [cartData, product._id, product.stock]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -23,36 +38,60 @@ const ProductCard = ({ product, discountedPrice }) => {
     }
 
     if (!roleLoading && role !== "customer") {
-      toast.info("You are not allowded to add products on cart");
+      toast.info("You are not allowed to add products to cart");
+      return;
+    }
+
+    if (maxQuantity === 0) {
+      toast.error("This product is already at maximum quantity in your cart");
       return;
     }
 
     try {
-      // Prepare the request body
       const requestBody = {
         productId: product._id,
-        quantity: 1,
+        quantity: 1, // ProductCard always adds 1 at a time
       };
 
       // Only add color if product has color options (use first color as default)
-      if (product.color) {
+      if (product.color && product.color.length > 0) {
         requestBody.color = product.color[0];
       }
 
       // Only add size if product has size options (use first size as default)
-      if (product.size) {
+      if (product.size && product.size.length > 0) {
         requestBody.size = product.size[0];
       }
 
-      // Call the API to add to cart
       await axiosSecure.post(`/cart/add?email=${userEmail}`, requestBody);
 
       toast.success("Product added to cart!");
       refetch();
     } catch (error) {
-      console.error("Add to cart error:", error);
-      toast.error("Failed to add product to cart");
+      // Handle stock validation error from backend
+      if (error.response?.data?.availableToAdd !== undefined) {
+        const { availableToAdd, existingQuantity, totalStock } =
+          error.response.data;
+        toast.error(
+          `Cannot add item. Only ${availableToAdd} more available (${existingQuantity} already in cart, ${totalStock} total stock)`
+        );
+      } else {
+        toast.error(
+          error.response?.data?.message || "Failed to add product to cart"
+        );
+      }
     }
+  };
+
+  // Determine button state
+  const isOutOfStock = product.stock <= 0;
+  const isMaxedInCart = maxQuantity === 0;
+
+  // Button text
+  const getButtonText = () => {
+    if (isOutOfStock) return "Out of Stock";
+    if (isMaxedInCart) return "Max in Cart";
+    return "Add to Cart";
   };
 
   return (
@@ -73,14 +112,19 @@ const ProductCard = ({ product, discountedPrice }) => {
 
       {/* Card Content */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="text-lg font-semibold text-primary">{product.name}</h3>
+        <h3
+          className="text-lg font-semibold text-primary line-clamp-1"
+          title={product.name}
+        >
+          {product.name}
+        </h3>
 
         <p className="text-sm text-gray-600 line-clamp-2 mt-1">
           {product.description}
         </p>
 
         <p className="text-sm my-2">
-          <strong>Price:</strong> ৳{" "}
+          <strong>Price:</strong>{" "}
           {product.discount > 0 ? (
             <>
               <span className="text-green-600 font-semibold">
@@ -111,6 +155,13 @@ const ProductCard = ({ product, discountedPrice }) => {
           <Rate allowHalf disabled defaultValue={product.rating} />
         </ConfigProvider>
 
+        {/* Stock info */}
+        {maxQuantity < product.stock && maxQuantity > 0 && (
+          <p className="text-xs text-orange-600 mt-2">
+            {product.stock - maxQuantity} already in cart
+          </p>
+        )}
+
         {/* Buttons at the bottom */}
         <div className="mt-auto flex justify-between items-center pt-5">
           <Link to={`/products/${product._id}`}>
@@ -120,11 +171,11 @@ const ProductCard = ({ product, discountedPrice }) => {
           </Link>
 
           <button
-            onClick={() => handleAddToCart()}
-            disabled={product.stock <= 0}
-            className="btn btn-sm btn-outline btn-secondary hover:text-white"
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isMaxedInCart}
+            className="btn btn-sm btn-outline btn-secondary hover:text-white disabled:text-black/50 disabled:cursor-not-allowed"
           >
-            <PiShoppingCartBold size={18} className="mr-1" /> Add to Cart
+            <PiShoppingCartBold size={18} className="mr-1" /> {getButtonText()}
           </button>
         </div>
       </div>

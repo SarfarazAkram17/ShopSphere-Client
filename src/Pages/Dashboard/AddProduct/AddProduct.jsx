@@ -84,7 +84,6 @@ const AddProduct = () => {
     setImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // ---------------- POST Product MUTATION ----------------
   const { mutate: addProduct, isPending } = useMutation({
     mutationFn: async (newProduct) => {
       const { data } = await axiosSecure.post(

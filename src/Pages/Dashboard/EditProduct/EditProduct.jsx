@@ -27,6 +27,7 @@ import { FormTextarea } from "../../../Components/Shared/EditProduct/FormTextare
 import { SubmitButton } from "../../../Components/Shared/EditProduct/SubmitButton";
 import { ImageUploadZone } from "../../../Components/Shared/EditProduct/ImageUploadZone";
 import { ImagePreview } from "../../../Components/Shared/EditProduct/ImagePreview";
+import { ImageUploadInstructions } from "../../../Components/Shared/EditProduct/ImageUploadInstructions";
 
 const EditProduct = () => {
   const { productId } = useParams();
@@ -417,6 +418,8 @@ const EditProduct = () => {
             title="Product Images"
             iconColor="text-pink-600"
           >
+            <ImageUploadInstructions />
+
             <ImageUploadZone
               fileInputRef={fileInputRef}
               uploading={uploading}
