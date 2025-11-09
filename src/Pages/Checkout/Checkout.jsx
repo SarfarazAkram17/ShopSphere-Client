@@ -21,10 +21,8 @@ import { useAddressForm } from "../../Hooks/useAddressForm";
 import AddressModal from "../../Components/Shared/AddressBook/AddressModal";
 import { useAddressMutations } from "../../Hooks/useAddressMutations";
 import MiniLoader from "../../Components/Loader/MiniLoader";
-import { AiOutlineHome } from "react-icons/ai";
-import { BsBriefcase } from "react-icons/bs";
 
-const PlaceOrder = () => {
+const Checkout = () => {
   const {
     formData,
     selectedRegion,
@@ -188,6 +186,7 @@ const PlaceOrder = () => {
     return price;
   };
 
+  // have to fix
   const calculateTotal = () => {
     const itemsTotal = cartItems.reduce((sum, item) => {
       const price = calculateItemPrice(item);
@@ -253,8 +252,7 @@ const PlaceOrder = () => {
       !formData.region ||
       !formData.district ||
       !formData.thana ||
-      !formData.address ||
-      !formData.label
+      !formData.address
     ) {
       return toast.warn("Fill all the required fields");
     }
@@ -384,7 +382,7 @@ const PlaceOrder = () => {
                       options={regions.map((r) => ({ value: r, label: r }))}
                       value={selectedRegion}
                       onChange={handleRegionChange}
-                      placeholder="Select Region"
+                      placeholder="Please choose your region"
                       className="text-sm"
                       styles={{
                         control: (base) => ({
@@ -412,16 +410,16 @@ const PlaceOrder = () => {
                     />
                   </div>
 
-                  {/* District */}
+                  {/* City/District */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      District
+                      City
                     </label>
                     <Select
                       options={districts.map((d) => ({ value: d, label: d }))}
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
-                      placeholder="Select District"
+                      placeholder="Please choose your city"
                       isDisabled={!selectedRegion}
                       className="text-sm"
                       styles={{
@@ -457,16 +455,16 @@ const PlaceOrder = () => {
                     />
                   </div>
 
-                  {/* Thana */}
+                  {/* Area/Thana */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Thana
+                      Area
                     </label>
                     <Select
                       options={thanas.map((t) => ({ value: t, label: t }))}
                       value={selectedThana}
                       onChange={handleThanaChange}
-                      placeholder="Select Thana"
+                      placeholder="Please choose your area"
                       isDisabled={!selectedRegion || !selectedDistrict}
                       className="text-sm"
                       styles={{
@@ -486,10 +484,26 @@ const PlaceOrder = () => {
                     />
                   </div>
 
+                  {/* Colony/Locality */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Colony / Suburb / Locality / Landmark
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.locality}
+                      onChange={(e) =>
+                        setFormData({ ...formData, locality: e.target.value })
+                      }
+                      placeholder="Please enter"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
                   {/* Full Address */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Address
+                      Address
                     </label>
                     <input
                       type="text"
@@ -506,9 +520,9 @@ const PlaceOrder = () => {
                 {/* Address Type Selector */}
                 <div className="mt-6">
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select address type
+                    Select a label for effective delivery:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex gap-3">
                     <button
                       onClick={() =>
                         setFormData({ ...formData, label: "HOME" })
@@ -557,7 +571,7 @@ const PlaceOrder = () => {
                   <button
                     onClick={handleAddInlineAddress}
                     disabled={addMutation.isPending}
-                    className="btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {addMutation.isPending ? (
                       <span className="flex items-center gap-2">
@@ -638,7 +652,7 @@ const PlaceOrder = () => {
                               <h3 className="text-sm font-medium mb-1">
                                 {item.product?.name}
                               </h3>
-                              <p className="text-xs text-gray-500 mb-2 flex gap-1.5 items-center">
+                              <p className="text-xs text-gray-500 mb-2 flex gap-1.5 items-center flex-wrap">
                                 {item.color && (
                                   <span className="capitalize">
                                     Color: {item.color} {item.size && ", "}
@@ -739,7 +753,7 @@ const PlaceOrder = () => {
             className="fixed inset-0 bg-black/10 bg-opacity-50 z-40 animate-fade-in"
             onClick={cancelEditShippingAddress}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
+          <div className="fixed right-0 top-0 h-full w-full max-w-full sm:max-w-sm bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Shipping Address</h2>
@@ -870,4 +884,4 @@ const PlaceOrder = () => {
   );
 };
 
-export default PlaceOrder;
+export default Checkout;

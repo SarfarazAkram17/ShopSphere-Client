@@ -41,7 +41,6 @@ import SellerRequestPayout from "../Pages/Dashboard/SellerRequestPayout/SellerRe
 import RiderChatSupport from "../Pages/Dashboard/RiderChatSupport/RiderChatSupport";
 import SellerChatSupport from "../Pages/Dashboard/SellerChatSupport/SellerChatSupport";
 import Cart from "../Pages/Cart/Cart";
-import PlaceOrder from "../Pages/PlaceOrder/PlaceOrder";
 import ChangePassword from "../Pages/Dashboard/ChangePassword/ChangePassword";
 import PrivacyPolicy from "../Pages/PrivacyPolicy/PrivacyPolicy";
 import TermsConditions from "../Pages/TermsConditions/TermsConditions";
@@ -51,6 +50,7 @@ import AddressBook from "../Pages/Dashboard/AddressBook/AddressBook";
 import ProtectAuthRoutes from "../Routes/ProtectAuthRoutes";
 import Register from "../Pages/Register/Register";
 import Login from "../Pages/Login/Login";
+import Checkout from "../Pages/Checkout/Checkout";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -149,11 +149,11 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/placeOrder",
+        path: "/checkout",
         element: (
           <PrivateRoutes>
             <CustomerRoutes>
-              <PlaceOrder></PlaceOrder>
+              <Checkout></Checkout>
             </CustomerRoutes>
           </PrivateRoutes>
         ),
