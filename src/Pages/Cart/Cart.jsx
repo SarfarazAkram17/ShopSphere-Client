@@ -291,8 +291,8 @@ const Cart = () => {
     // Save to localStorage with user email
     saveShopCart(payload, userEmail);
 
-    // Redirect to place order page
-    navigate("/placeOrder");
+    // Redirect to checkout page
+    navigate("/checkout");
   };
 
   if (isLoading) return <Loader />;
