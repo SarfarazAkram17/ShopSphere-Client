@@ -5,6 +5,7 @@ import { FaXmark } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import Select from "react-select";
 import useAuth from "../../Hooks/useAuth";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import {
@@ -20,6 +21,8 @@ import { useAddressForm } from "../../Hooks/useAddressForm";
 import AddressModal from "../../Components/Shared/AddressBook/AddressModal";
 import { useAddressMutations } from "../../Hooks/useAddressMutations";
 import MiniLoader from "../../Components/Loader/MiniLoader";
+import { AiOutlineHome } from "react-icons/ai";
+import { BsBriefcase } from "react-icons/bs";
 
 const PlaceOrder = () => {
   const {
@@ -49,6 +52,7 @@ const PlaceOrder = () => {
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
   const [tempShippingAddress, setTempShippingAddress] = useState(null);
+  const [showInlineAddressForm, setShowInlineAddressForm] = useState(false);
 
   // Drawer states
   const [showShippingDrawer, setShowShippingDrawer] = useState(false);
@@ -68,7 +72,13 @@ const PlaceOrder = () => {
         (add) => add.isDefaultShipping
       );
       setShippingAddress(defaultShippingAddress || null);
-      setTempShippingAddress(defaultShippingAddress._id || null);
+      setTempShippingAddress(defaultShippingAddress?._id || null);
+
+      // Show inline form if no addresses exist
+      if (!response.data || response.data.length === 0) {
+        setShowInlineAddressForm(true);
+      }
+
       return response.data || [];
     },
 
@@ -76,25 +86,23 @@ const PlaceOrder = () => {
   });
 
   // Add address mutation
-  const {
-    addMutation,
-    setDefaultShippingMutation,
-    // setDefaultBillingMutation,
-  } = useAddressMutations(axiosSecure, userEmail, refetch, {
-    onAddSuccess: () => {
-      setShowAddAddressModal(false);
-      resetForm();
-      toast.success("Address added successfully");
-    },
-    onDefaultShippingSuccess: () => {
-      setShowShippingDrawer(false);
-      toast.success("Shipping address updated successfully");
-    },
-    // onDefaultBillingSuccess: () => {
-    //   setShowDefaultBillingModal(false);
-    //   setTempDefaultBilling(null);
-    // },
-  });
+  const { addMutation, setDefaultShippingMutation } = useAddressMutations(
+    axiosSecure,
+    userEmail,
+    refetch,
+    {
+      onAddSuccess: () => {
+        setShowAddAddressModal(false);
+        setShowInlineAddressForm(false);
+        resetForm();
+        toast.success("Address added successfully");
+      },
+      onDefaultShippingSuccess: () => {
+        setShowShippingDrawer(false);
+        toast.success("Shipping address updated successfully");
+      },
+    }
+  );
 
   useEffect(() => {
     const loadOrderData = async () => {
@@ -117,15 +125,12 @@ const PlaceOrder = () => {
       }
 
       try {
-        // NEW: Use dedicated checkout endpoint
         const response = await axiosSecure.post(
           `/cart/checkout-items?email=${userEmail}`,
           { items: shopCartData }
         );
 
         const checkoutItems = response.data.items || [];
-
-        // Filter out any items where product wasn't found
         const validItems = checkoutItems.filter((item) => item.product);
 
         if (validItems.length === 0) {
@@ -135,7 +140,6 @@ const PlaceOrder = () => {
           return;
         }
 
-        // If some items were invalid, show warning
         if (validItems.length < shopCartData.length) {
           toast.warning("Some products are no longer available");
         }
@@ -242,16 +246,17 @@ const PlaceOrder = () => {
     });
   };
 
-  const handleAddAddress = () => {
+  const handleAddInlineAddress = () => {
     if (
       !formData.name ||
       !formData.phone ||
       !formData.region ||
       !formData.district ||
       !formData.thana ||
-      !formData.address
+      !formData.address ||
+      !formData.label
     ) {
-      return toast.warn("Fill all the fields");
+      return toast.warn("Fill all the required fields");
     }
 
     addMutation.mutate(formData);
@@ -267,8 +272,8 @@ const PlaceOrder = () => {
   };
 
   const cancelEditShippingAddress = () => {
-    const currentDefault = addresses.find((add) => add.isDefaultShipping);
-    setTempShippingAddress(currentDefault._id);
+    const currentDefault = addresses?.find((add) => add.isDefaultShipping);
+    setTempShippingAddress(currentDefault?._id || null);
     setShowShippingDrawer(false);
   };
 
@@ -313,19 +318,19 @@ const PlaceOrder = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Section - Order Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Shipping Address */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Shipping & Billing</h2>
-                <button
-                  onClick={() => setShowShippingDrawer(true)}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm cursor-pointer"
-                >
-                  EDIT
-                </button>
-              </div>
+            {/* Shipping Address or Inline Form */}
+            {shippingAddress && !showInlineAddressForm ? (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold">Shipping & Billing</h2>
+                  <button
+                    onClick={() => setShowShippingDrawer(true)}
+                    className="text-blue-600 hover:text-blue-700 font-medium text-sm cursor-pointer"
+                  >
+                    EDIT
+                  </button>
+                </div>
 
-              {shippingAddress && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{shippingAddress.name}</p>
@@ -346,8 +351,225 @@ const PlaceOrder = () => {
                     </p>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-lg font-semibold mb-6">
+                  Delivery Information
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      placeholder="Enter your first and last name"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* Region */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Region
+                    </label>
+                    <Select
+                      options={regions.map((r) => ({ value: r, label: r }))}
+                      value={selectedRegion}
+                      onChange={handleRegionChange}
+                      placeholder="Select Region"
+                      className="text-sm"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          "&:hover": { borderColor: "#14b8a6" },
+                        }),
+                      }}
+                    />
+                  </div>
+
+                  {/* Phone Number */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
+                      placeholder="Please enter your phone number"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* District */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      District
+                    </label>
+                    <Select
+                      options={districts.map((d) => ({ value: d, label: d }))}
+                      value={selectedDistrict}
+                      onChange={handleDistrictChange}
+                      placeholder="Select District"
+                      isDisabled={!selectedRegion}
+                      className="text-sm"
+                      styles={{
+                        control: (base, state) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          backgroundColor: state.isDisabled
+                            ? "#f3f4f6"
+                            : "white",
+                          "&:hover": {
+                            borderColor: state.isDisabled
+                              ? "#d1d5db"
+                              : "#14b8a6",
+                          },
+                        }),
+                      }}
+                    />
+                  </div>
+
+                  {/* Building/House */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Building / House No / Floor / Street
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.building}
+                      onChange={(e) =>
+                        setFormData({ ...formData, building: e.target.value })
+                      }
+                      placeholder="Please enter"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* Thana */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Thana
+                    </label>
+                    <Select
+                      options={thanas.map((t) => ({ value: t, label: t }))}
+                      value={selectedThana}
+                      onChange={handleThanaChange}
+                      placeholder="Select Thana"
+                      isDisabled={!selectedRegion || !selectedDistrict}
+                      className="text-sm"
+                      styles={{
+                        control: (base, state) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          backgroundColor: state.isDisabled
+                            ? "#f3f4f6"
+                            : "white",
+                          "&:hover": {
+                            borderColor: state.isDisabled
+                              ? "#d1d5db"
+                              : "#14b8a6",
+                          },
+                        }),
+                      }}
+                    />
+                  </div>
+
+                  {/* Full Address */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Address
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.address}
+                      onChange={(e) =>
+                        setFormData({ ...formData, address: e.target.value })
+                      }
+                      placeholder="For Example: House# 123, Street# 123, ABC Road"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Address Type Selector */}
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select address type
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      onClick={() =>
+                        setFormData({ ...formData, label: "HOME" })
+                      }
+                      className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all cursor-pointer ${
+                        formData.label === "HOME"
+                          ? "border-orange-500 bg-orange-50 text-orange-600"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      <AiOutlineHome
+                        size={24}
+                        className={
+                          formData.label === "HOME"
+                            ? "text-orange-600"
+                            : "text-gray-400"
+                        }
+                      />
+                      HOME
+                    </button>
+                    <button
+                      onClick={() =>
+                        setFormData({ ...formData, label: "OFFICE" })
+                      }
+                      className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all cursor-pointer ${
+                        formData.label === "OFFICE"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      <BsBriefcase
+                        size={24}
+                        className={
+                          formData.label === "OFFICE"
+                            ? "text-teal-600"
+                            : "text-gray-400"
+                        }
+                      />
+                      OFFICE
+                    </button>
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={handleAddInlineAddress}
+                    disabled={addMutation.isPending}
+                    className="btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+                  >
+                    {addMutation.isPending ? (
+                      <span className="flex items-center gap-2">
+                        <MiniLoader /> SAVING...
+                      </span>
+                    ) : (
+                      "SAVE"
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Package Items by Store */}
             <div className="space-y-4">
@@ -372,28 +594,30 @@ const PlaceOrder = () => {
                       </p>
                     </div>
 
-                    <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
-                      <div className="flex items-start gap-2 mb-2">
-                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            ৳{" "}
-                            {shippingAddress.district ===
-                            storeData.storeInfo.district
-                              ? 80
-                              : 150}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Standard Delivery
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Guaranteed by 28 Oct-1 Nov
-                          </p>
+                    {shippingAddress && (
+                      <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
+                        <div className="flex items-start gap-2 mb-2">
+                          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              ৳{" "}
+                              {shippingAddress.district ===
+                              storeData.storeInfo?.district
+                                ? 80
+                                : 150}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Standard Delivery
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Guaranteed by 28 Oct-1 Nov
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="space-y-4">
                       {storeData.items.map((item, itemIndex) => {
@@ -492,11 +716,17 @@ const PlaceOrder = () => {
               </div>
 
               <button
-                onClick={() => toast.info("Buy again")}
-                className="w-full btn btn-primary text-white"
+                onClick={() => toast.info("Proceed to payment")}
+                disabled={!shippingAddress}
+                className="w-full btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Proceed to Pay
               </button>
+              {!shippingAddress && (
+                <p className="text-xs text-red-500 text-center -mt-2">
+                  Please add shipping address to proceed
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -531,69 +761,81 @@ const PlaceOrder = () => {
               </button>
 
               <div className="space-y-4">
-                {addresses.map((addr) => (
-                  <div
-                    key={addr._id || addr.id}
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      tempShippingAddress === addr._id
-                        ? "border-primary bg-teal-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => setTempShippingAddress(addr._id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="radio"
-                        checked={tempShippingAddress === addr._id}
-                        onChange={() => setTempShippingAddress(addr._id)}
-                        className="radio radio-primary radio-sm"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-medium">{addr.name}</p>
-                          <span className="text-sm text-gray-600">
-                            {addr.phone}
+                {addresses?.length > 0 ? (
+                  addresses.map((addr) => (
+                    <div
+                      key={addr._id || addr.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        tempShippingAddress === addr._id
+                          ? "border-primary bg-teal-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => setTempShippingAddress(addr._id)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          checked={tempShippingAddress === addr._id}
+                          onChange={() => setTempShippingAddress(addr._id)}
+                          className="radio radio-primary radio-sm mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium">{addr.name}</p>
+                            <span className="text-sm text-gray-600">
+                              {addr.phone}
+                            </span>
+                          </div>
+                          <span
+                            className={`${
+                              addr.label === "HOME"
+                                ? "bg-orange-500"
+                                : "bg-primary"
+                            } text-white text-xs px-2 py-0.5 rounded-full`}
+                          >
+                            {addr.label}
                           </span>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {addr.address}
+                          </p>
+                          {addr.isDefaultShipping && (
+                            <span className="text-xs text-blue-600 mt-1 inline-block">
+                              Default Shipping Address
+                            </span>
+                          )}
                         </div>
-                        <span
-                          className={`${
-                            addr.label === "HOME"
-                              ? "bg-orange-500"
-                              : "bg-primary"
-                          } text-white text-xs px-2 py-0.5 rounded-full`}
-                        >
-                          {addr.label}
-                        </span>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {addr.address}
-                        </p>
-                        {addr.isDefaultShipping && (
-                          <span className="text-xs text-blue-600 mt-1 inline-block">
-                            Default Shipping Address
-                          </span>
-                        )}
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No addresses found</p>
+                    <p className="text-sm mt-2">
+                      Add a new address to continue
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
 
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={cancelEditShippingAddress}
                   className="flex-1 btn"
+                  disabled={setDefaultShippingMutation.isPending}
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={handleSaveShippingAddress}
-                  disabled={setDefaultShippingMutation.isPending}
+                  disabled={
+                    setDefaultShippingMutation.isPending || !tempShippingAddress
+                  }
                   className="flex-1 btn text-white btn-primary disabled:text-black/50"
                 >
                   {setDefaultShippingMutation.isPending ? (
-                    <>
+                    <span className="flex items-center gap-2">
                       <MiniLoader /> Saving...
-                    </>
+                    </span>
                   ) : (
                     "SAVE"
                   )}
@@ -619,7 +861,7 @@ const PlaceOrder = () => {
           onRegionChange={handleRegionChange}
           onDistrictChange={handleDistrictChange}
           onThanaChange={handleThanaChange}
-          onSubmit={handleAddAddress}
+          onSubmit={handleAddInlineAddress}
           onClose={() => setShowAddAddressModal(false)}
           isSubmitting={addMutation.isPending}
         />

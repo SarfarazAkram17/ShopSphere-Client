@@ -1,9 +1,7 @@
-import {
-  AiOutlineClose,
-  AiOutlineDelete,
-} from "react-icons/ai";
+import { AiOutlineClose, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import AddressForm from "./AddressForm";
+import MiniLoader from "../../Loader/MiniLoader";
 
 const AddressModal = ({
   isEdit,
@@ -88,7 +86,13 @@ const AddressModal = ({
               disabled={isSubmitting}
               className="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isSubmitting ? "Saving..." : "Save Address"}
+              {isSubmitting ? (
+                <>
+                  <MiniLoader /> Saving...
+                </>
+              ) : (
+                "Save Address"
+              )}
             </button>
           </div>
         </div>
