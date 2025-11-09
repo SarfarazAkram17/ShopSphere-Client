@@ -123,7 +123,7 @@ const Products = () => {
       </div>
 
       {/* Drawer for Mobile */}
-      <Drawer     
+      <Drawer
         title="Filters"
         placement="left"
         onClose={() => setDrawerOpen(false)}

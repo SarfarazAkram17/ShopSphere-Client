@@ -157,7 +157,7 @@ const PlaceOrder = () => {
       if (remaining <= 0) {
         clearShopCart(userEmail);
         toast.error("Session expired. Please try again.");
-        navigate("/products");
+        navigate(-1);
       } else {
         setRemainingTime(remaining);
       }
@@ -264,10 +264,12 @@ const PlaceOrder = () => {
   const groupedByStore = cartItems.reduce((acc, item) => {
     const storeId = item.product?.storeId || "unknown";
     const storeName = item.product?.storeName || "Unknown Store";
+    const storeInfo = item.product?.storeInfo
 
     if (!acc[storeId]) {
       acc[storeId] = {
-        storeName: storeName,
+        storeName,
+        storeInfo,
         items: [],
       };
     }
@@ -369,7 +371,13 @@ const PlaceOrder = () => {
                           <span className="text-white text-xs">✓</span>
                         </div>
                         <div>
-                          <p className="font-medium">৳ 80</p>
+                          <p className="font-medium">
+                            ৳{" "}
+                            {selectedShippingAddress.district ===
+                            storeData.storeInfo.district
+                              ? 80
+                              : 150}
+                          </p>
                           <p className="text-sm text-gray-600">
                             Standard Delivery
                           </p>
@@ -391,7 +399,7 @@ const PlaceOrder = () => {
                             className="flex gap-4 border-t pt-4 first:border-t-0 first:pt-0"
                           >
                             <img
-                              src={item.product?.images?.[0]}
+                              src={item.product?.image}
                               alt={item.product?.name || "Product"}
                               className="w-24 h-24 object-contain rounded"
                             />
@@ -494,7 +502,7 @@ const PlaceOrder = () => {
             className="fixed inset-0 bg-black/10 bg-opacity-50 z-40 animate-fade-in"
             onClick={() => setShowShippingDrawer(false)}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
+          <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Shipping Address</h2>

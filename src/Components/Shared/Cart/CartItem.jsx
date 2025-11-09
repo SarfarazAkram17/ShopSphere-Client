@@ -29,7 +29,7 @@ const CartItem = ({
       {/* Product Image */}
       <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex-shrink-0">
         <img
-          src={product.images?.[0]}
+          src={product.image}
           alt={product.name}
           className="w-full h-full object-contain rounded"
         />
