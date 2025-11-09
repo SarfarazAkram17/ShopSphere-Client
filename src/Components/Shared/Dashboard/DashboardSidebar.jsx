@@ -17,7 +17,7 @@ import { LuCodesandbox } from "react-icons/lu";
 // import { TiMessages } from "react-icons/ti";
 import { MdLogout, MdStorefront } from "react-icons/md";
 // import { AiFillMessage } from "react-icons/ai";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 import useAuth from "../../../Hooks/useAuth";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import { toast } from "react-toastify";
@@ -26,6 +26,7 @@ import { FaAddressBook } from "react-icons/fa6";
 export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
   const { roleLoading, role } = useUserRole();
+  const { pathname } = useLocation();
   const sidebarRef = useRef(null);
   const provider = user.providerData[0].providerId;
 
@@ -257,7 +258,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
                 key={route.name}
                 to={route.path}
                 end
-                className="flex items-center gap-2 px-4 py-2 text-sm rounded-md transition-colors duration-200 hover:bg-gray-300"
+                className={`flex items-center gap-2 px-4 py-2 border-r-4 text-sm rounded-md transition-colors duration-200 hover:bg-gray-300 ${
+                  pathname === route.path
+                    ? "border-primary/75"
+                    : "border-transparent"
+                }`}
               >
                 {route.icon}
                 <span className="font-medium">{route.name}</span>
