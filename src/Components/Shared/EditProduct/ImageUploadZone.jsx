@@ -4,7 +4,6 @@ export const ImageUploadZone = ({
   fileInputRef,
   uploading,
   totalImages,
-  maxImages = 4,
   isDragging,
   onDragEnter,
   onDragOver,
@@ -28,29 +27,21 @@ export const ImageUploadZone = ({
         multiple
         onChange={onFileChange}
         className="hidden"
-        disabled={uploading || totalImages >= maxImages}
+        disabled={uploading}
       />
 
       {/* Drag & Drop Zone */}
       <div
         onClick={onClick}
-        onDragEnter={
-          totalImages >= maxImages || uploading ? undefined : onDragEnter
-        }
-        onDragOver={
-          totalImages >= maxImages || uploading ? undefined : onDragOver
-        }
-        onDragLeave={
-          totalImages >= maxImages || uploading ? undefined : onDragLeave
-        }
-        onDrop={totalImages >= maxImages || uploading ? undefined : onDrop}
+        onDragEnter={uploading ? undefined : onDragEnter}
+        onDragOver={uploading ? undefined : onDragOver}
+        onDragLeave={uploading ? undefined : onDragLeave}
+        onDrop={uploading ? undefined : onDrop}
         className={`
           border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer
           ${
             isDragging
               ? "border-blue-500 bg-blue-50 scale-[1.02]"
-              : totalImages >= maxImages
-              ? "border-green-400 bg-green-50 cursor-not-allowed"
               : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50/50"
           }
         `}
@@ -59,20 +50,10 @@ export const ImageUploadZone = ({
           <div
             className={`
             w-16 h-16 rounded-full flex items-center justify-center transition-all
-            ${
-              isDragging
-                ? "bg-blue-500 scale-110"
-                : totalImages >= maxImages
-                ? "bg-green-500"
-                : "bg-gray-400"
-            }
+            ${isDragging ? "bg-blue-500 scale-110" : "bg-gray-400"}
           `}
           >
-            {totalImages >= maxImages ? (
-              <span className="text-3xl text-white">✓</span>
-            ) : (
-              <MdCloudUpload className="w-8 h-8 text-white" />
-            )}
+            <MdCloudUpload className="w-8 h-8 text-white" />
           </div>
 
           {uploading ? (
@@ -81,15 +62,6 @@ export const ImageUploadZone = ({
                 Uploading...
               </p>
               <p className="text-sm text-gray-500 mt-1">Please wait</p>
-            </div>
-          ) : totalImages >= maxImages ? (
-            <div>
-              <p className="text-lg font-semibold text-green-600">
-                All {maxImages} images uploaded!
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Remove an image to upload more
-              </p>
             </div>
           ) : (
             <div>
@@ -103,8 +75,7 @@ export const ImageUploadZone = ({
                 </span>
               </p>
               <p className="text-xs text-gray-400 mt-2">
-                {totalImages} / {maxImages} images • {maxImages - totalImages}{" "}
-                remaining
+                {totalImages} image{totalImages > 1 ? "s" : ""} uploaded
               </p>
             </div>
           )}

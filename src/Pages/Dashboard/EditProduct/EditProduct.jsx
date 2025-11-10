@@ -105,24 +105,6 @@ const EditProduct = () => {
   const handleImageUpload = async (files) => {
     if (!files || files.length === 0) return;
 
-    const totalImages = existingImages.length + newImageURLs.length;
-    const remainingSlots = 4 - totalImages;
-
-    if (remainingSlots <= 0) {
-      toast.error(
-        "Maximum 4 images already uploaded! Remove some images first."
-      );
-      return;
-    }
-
-    if (files.length > remainingSlots) {
-      toast.error(
-        `You can only upload ${remainingSlots} more image(s). You selected ${files.length} images. Please select fewer images.`
-      );
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      return;
-    }
-
     const filesToUpload = Array.from(files);
     setUploading(true);
 
@@ -181,13 +163,6 @@ const EditProduct = () => {
     }
   };
 
-  const handleDropZoneClick = () => {
-    const totalImages = existingImages.length + newImageURLs.length;
-    if (totalImages < 4 && !uploading) {
-      fileInputRef.current?.click();
-    }
-  };
-
   const handleRemoveExistingImage = (index) => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
@@ -217,8 +192,8 @@ const EditProduct = () => {
 
   const handleProductUpdate = async (data) => {
     const totalImages = existingImages.length + newImageURLs.length;
-    if (totalImages < 4) {
-      toast.error("Please upload total 4 images.");
+    if (totalImages < 1) {
+      toast.error("Please upload at least 1 image.");
       return;
     }
 
@@ -430,7 +405,7 @@ const EditProduct = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              onClick={handleDropZoneClick}
+              onClick={() => fileInputRef.current?.click()}
               onFileChange={(e) => handleImageUpload(e.target.files)}
             />
 

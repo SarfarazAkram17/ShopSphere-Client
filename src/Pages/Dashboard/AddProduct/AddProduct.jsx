@@ -48,12 +48,6 @@ const AddProduct = () => {
   const handleImageUpload = async (files) => {
     if (!files.length) return;
 
-    const totalImages = imageURLs.length + files.length;
-    if (totalImages > 4) {
-      toast.error("You can upload 4 images.");
-      return;
-    }
-
     setUploading(true);
     try {
       const uploaded = [];
@@ -105,8 +99,8 @@ const AddProduct = () => {
   });
 
   const handleAddProduct = async (data) => {
-    if (imageURLs.length < 4) {
-      toast.error("Please upload 4 image before submitting.");
+    if (imageURLs.length < 1) {
+      toast.error("Please upload at least 1 image before submitting.");
       return;
     }
 
