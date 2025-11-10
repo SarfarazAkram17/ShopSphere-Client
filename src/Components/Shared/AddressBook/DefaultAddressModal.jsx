@@ -25,7 +25,7 @@ const DefaultAddressModal = ({
     : "from-cyan-500 to-blue-500";
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         <div className={`bg-gradient-to-r ${gradientClass} p-4 sm:p-6`}>
           <h2 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">

@@ -21,6 +21,8 @@ import { useAddressForm } from "../../Hooks/useAddressForm";
 import AddressModal from "../../Components/Shared/AddressBook/AddressModal";
 import { useAddressMutations } from "../../Hooks/useAddressMutations";
 import MiniLoader from "../../Components/Loader/MiniLoader";
+import { AiOutlineHome } from "react-icons/ai";
+import { BsBriefcase } from "react-icons/bs";
 
 const Checkout = () => {
   const {
@@ -37,24 +39,29 @@ const Checkout = () => {
     handleThanaChange,
     resetForm,
   } = useAddressForm();
-
   const navigate = useNavigate();
   const { user, userEmail } = useAuth();
   const { roleLoading, role } = useUserRole();
   const axiosSecure = useAxiosSecure();
-
   const [cartItems, setCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
+  const [billingAddress, setBillingAddress] = useState(null);
   const [tempShippingAddress, setTempShippingAddress] = useState(null);
+  const [tempBillingAddress, setTempBillingAddress] = useState(null);
   const [showInlineAddressForm, setShowInlineAddressForm] = useState(false);
 
-  // Drawer states
+  // Drawer/Modal states
   const [showShippingDrawer, setShowShippingDrawer] = useState(false);
+  const [showInvoiceDrawer, setShowInvoiceDrawer] = useState(false);
+  const [showBillingDrawer, setShowBillingDrawer] = useState(false);
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [isClosingShipping, setIsClosingShipping] = useState(false);
+  const [isClosingInvoice, setIsClosingInvoice] = useState(false);
+  const [isClosingBilling, setIsClosingBilling] = useState(false);
 
   // Fetch addresses from API
   const {
@@ -69,8 +76,14 @@ const Checkout = () => {
       const defaultShippingAddress = response.data.find(
         (add) => add.isDefaultShipping
       );
+      const defaultBillingAddress = response.data.find(
+        (add) => add.isDefaultBilling
+      );
+
       setShippingAddress(defaultShippingAddress || null);
+      setBillingAddress(defaultBillingAddress || null);
       setTempShippingAddress(defaultShippingAddress?._id || null);
+      setTempBillingAddress(defaultBillingAddress?._id || null);
 
       // Show inline form if no addresses exist
       if (!response.data || response.data.length === 0) {
@@ -79,16 +92,12 @@ const Checkout = () => {
 
       return response.data || [];
     },
-
     enabled: !!user && !!userEmail && !roleLoading && role === "customer",
   });
 
   // Add address mutation
-  const { addMutation, setDefaultShippingMutation } = useAddressMutations(
-    axiosSecure,
-    userEmail,
-    refetch,
-    {
+  const { addMutation, setDefaultShippingMutation, setDefaultBillingMutation } =
+    useAddressMutations(axiosSecure, userEmail, refetch, {
       onAddSuccess: () => {
         setShowAddAddressModal(false);
         setShowInlineAddressForm(false);
@@ -96,11 +105,22 @@ const Checkout = () => {
         toast.success("Address added successfully");
       },
       onDefaultShippingSuccess: () => {
-        setShowShippingDrawer(false);
+        setIsClosingShipping(true);
+        setTimeout(() => {
+          setShowShippingDrawer(false);
+          setIsClosingShipping(false);
+        }, 300);
         toast.success("Shipping address updated successfully");
       },
-    }
-  );
+      onDefaultBillingSuccess: () => {
+        setIsClosingBilling(true);
+        setTimeout(() => {
+          setShowBillingDrawer(false);
+          setIsClosingBilling(false);
+        }, 300);
+        toast.success("Billing address updated successfully");
+      },
+    });
 
   useEffect(() => {
     const loadOrderData = async () => {
@@ -176,27 +196,6 @@ const Checkout = () => {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const calculateItemPrice = (item) => {
-    if (!item?.product) return 0;
-    const price =
-      item.product.discount > 0
-        ? item.product.price -
-          (item.product.price * item.product.discount) / 100
-        : item.product.price;
-    return price;
-  };
-
-  // have to fix
-  const calculateTotal = () => {
-    const itemsTotal = cartItems.reduce((sum, item) => {
-      const price = calculateItemPrice(item);
-      return sum + price * item.quantity;
-    }, 0);
-
-    const deliveryTotal = 150 * cartItems.length;
-    return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
-  };
-
   const handleRemoveItem = async (item) => {
     Swal.fire({
       title: "Are you sure?",
@@ -269,10 +268,58 @@ const Checkout = () => {
     setDefaultShippingMutation.mutate(tempShippingAddress);
   };
 
+  const handleSaveBillingAddress = () => {
+    if (!tempBillingAddress) {
+      toast.warn("Please select a billing address");
+      return;
+    }
+
+    setDefaultBillingMutation.mutate(tempBillingAddress);
+  };
+
+  const handleSaveInvoiceInfo = () => {
+    if (!userEmail) {
+      toast.warn("Please enter email address");
+      return;
+    }
+
+    if (!billingAddress) {
+      toast.warn("Please select a billing address");
+      return;
+    }
+
+    setIsClosingInvoice(true);
+    setShowInvoiceDrawer(false);
+    setIsClosingInvoice(false);
+    toast.success("Invoice information updated successfully");
+  };
+
   const cancelEditShippingAddress = () => {
     const currentDefault = addresses?.find((add) => add.isDefaultShipping);
     setTempShippingAddress(currentDefault?._id || null);
-    setShowShippingDrawer(false);
+    setIsClosingShipping(true);
+    setTimeout(() => {
+      setShowShippingDrawer(false);
+      setIsClosingShipping(false);
+    }, 300);
+  };
+
+  const cancelEditBillingAddress = () => {
+    const currentDefault = addresses?.find((add) => add.isDefaultBilling);
+    setTempBillingAddress(currentDefault?._id || null);
+    setIsClosingBilling(true);
+    setTimeout(() => {
+      setShowBillingDrawer(false);
+      setIsClosingBilling(false);
+    }, 300);
+  };
+
+  const cancelEditInvoiceInfo = () => {
+    setIsClosingInvoice(true);
+    setTimeout(() => {
+      setShowInvoiceDrawer(false);
+      setIsClosingInvoice(false);
+    }, 300);
   };
 
   const groupedByStore = cartItems.reduce((acc, item) => {
@@ -290,6 +337,38 @@ const Checkout = () => {
     acc[storeId].items.push(item);
     return acc;
   }, {});
+
+  const calculateItemPrice = (item) => {
+    if (!item?.product) return 0;
+    const price =
+      item.product.discount > 0
+        ? item.product.price -
+          (item.product.price * item.product.discount) / 100
+        : item.product.price;
+    return price;
+  };
+
+  const calculateTotal = () => {
+    const itemsTotal = cartItems.reduce((sum, item) => {
+      const price = calculateItemPrice(item);
+      return sum + price * item.quantity;
+    }, 0);
+
+    // Calculate delivery charge per store
+    const deliveryTotal = Object.entries(groupedByStore).reduce(
+      // eslint-disable-next-line no-unused-vars
+      (sum, [storeId, storeData]) => {
+        const deliveryCharge =
+          shippingAddress?.district === storeData.storeInfo?.district
+            ? 80
+            : 150;
+        return sum + deliveryCharge;
+      },
+      0
+    );
+
+    return { itemsTotal, deliveryTotal, total: itemsTotal + deliveryTotal };
+  };
 
   const totals = calculateTotal();
 
@@ -320,7 +399,7 @@ const Checkout = () => {
             {shippingAddress && !showInlineAddressForm ? (
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Shipping & Billing</h2>
+                  <h2 className="text-lg font-semibold">Shipping Address</h2>
                   <button
                     onClick={() => setShowShippingDrawer(true)}
                     className="text-blue-600 hover:text-blue-700 font-medium text-sm cursor-pointer"
@@ -345,7 +424,8 @@ const Checkout = () => {
                       {shippingAddress.label}
                     </span>
                     <p className="text-sm text-gray-600">
-                      {shippingAddress.address}
+                      {shippingAddress.address}, {shippingAddress.thana},{" "}
+                      {shippingAddress.district}, {shippingAddress.region}
                     </p>
                   </div>
                 </div>
@@ -373,27 +453,6 @@ const Checkout = () => {
                     />
                   </div>
 
-                  {/* Region */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Region
-                    </label>
-                    <Select
-                      options={regions.map((r) => ({ value: r, label: r }))}
-                      value={selectedRegion}
-                      onChange={handleRegionChange}
-                      placeholder="Please choose your region"
-                      className="text-sm"
-                      styles={{
-                        control: (base) => ({
-                          ...base,
-                          borderColor: "#d1d5db",
-                          "&:hover": { borderColor: "#14b8a6" },
-                        }),
-                      }}
-                    />
-                  </div>
-
                   {/* Phone Number */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -410,17 +469,67 @@ const Checkout = () => {
                     />
                   </div>
 
-                  {/* City/District */}
+                  {/* Region */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City
+                      Region
+                    </label>
+                    <Select
+                      options={regions.map((r) => ({ value: r, label: r }))}
+                      value={selectedRegion}
+                      onChange={handleRegionChange}
+                      placeholder="Select Region"
+                      className="text-sm"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          "&:hover": { borderColor: "#14b8a6" },
+                        }),
+                      }}
+                    />
+                  </div>
+
+                  {/* District */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      District
                     </label>
                     <Select
                       options={districts.map((d) => ({ value: d, label: d }))}
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
-                      placeholder="Please choose your city"
+                      placeholder="Select District"
                       isDisabled={!selectedRegion}
+                      className="text-sm"
+                      styles={{
+                        control: (base, state) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          backgroundColor: state.isDisabled
+                            ? "#f3f4f6"
+                            : "white",
+                          "&:hover": {
+                            borderColor: state.isDisabled
+                              ? "#d1d5db"
+                              : "#14b8a6",
+                          },
+                        }),
+                      }}
+                    />
+                  </div>
+
+                  {/* Thana */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Thana
+                    </label>
+                    <Select
+                      options={thanas.map((t) => ({ value: t, label: t }))}
+                      value={selectedThana}
+                      onChange={handleThanaChange}
+                      placeholder="Select Thana"
+                      isDisabled={!selectedRegion || !selectedDistrict}
                       className="text-sm"
                       styles={{
                         control: (base, state) => ({
@@ -449,51 +558,6 @@ const Checkout = () => {
                       value={formData.building}
                       onChange={(e) =>
                         setFormData({ ...formData, building: e.target.value })
-                      }
-                      placeholder="Please enter"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  {/* Area/Thana */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Area
-                    </label>
-                    <Select
-                      options={thanas.map((t) => ({ value: t, label: t }))}
-                      value={selectedThana}
-                      onChange={handleThanaChange}
-                      placeholder="Please choose your area"
-                      isDisabled={!selectedRegion || !selectedDistrict}
-                      className="text-sm"
-                      styles={{
-                        control: (base, state) => ({
-                          ...base,
-                          borderColor: "#d1d5db",
-                          backgroundColor: state.isDisabled
-                            ? "#f3f4f6"
-                            : "white",
-                          "&:hover": {
-                            borderColor: state.isDisabled
-                              ? "#d1d5db"
-                              : "#14b8a6",
-                          },
-                        }),
-                      }}
-                    />
-                  </div>
-
-                  {/* Colony/Locality */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Colony / Suburb / Locality / Landmark
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.locality}
-                      onChange={(e) =>
-                        setFormData({ ...formData, locality: e.target.value })
                       }
                       placeholder="Please enter"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -571,7 +635,7 @@ const Checkout = () => {
                   <button
                     onClick={handleAddInlineAddress}
                     disabled={addMutation.isPending}
-                    className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
                   >
                     {addMutation.isPending ? (
                       <span className="flex items-center gap-2">
@@ -704,12 +768,49 @@ const Checkout = () => {
           {/* Right Section - Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-xl p-6 sticky top-18 space-y-6">
+              {/* Promotion Section */}
+              <div>
+                <h3 className="font-semibold mb-3">Promotion</h3>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Enter Store/ShopSphere Coupon Code"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                  />
+                  <button className="btn btn-sm btn-secondary text-white">
+                    APPLY
+                  </button>
+                </div>
+              </div>
+
+              {/* Invoice and Contact Info */}
+              <div className="my-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-semibold text-lg">
+                    Invoice and Contact Info
+                  </h3>
+                  <button
+                    onClick={() => setShowInvoiceDrawer(true)}
+                    className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                  >
+                    EDIT
+                  </button>
+                </div>
+              </div>
+
+              {/* Order Summary */}
               <div>
                 <h3 className="font-semibold mb-4">Order Summary</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">
-                      Items Total ({cartItems.length} Items)
+                      Items Total (
+                      {cartItems.reduce(
+                        (total, item) => total + (item.quantity || 0),
+                        0
+                      )}{" "}
+                      Item
+                      {cartItems.length > 1 ? "s" : ""})
                     </span>
                     <span>৳ {totals.itemsTotal.toFixed(2)}</span>
                   </div>
@@ -723,7 +824,7 @@ const Checkout = () => {
                       ৳ {totals.total.toFixed(2)}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-60 text-right">
+                  <p className="text-xs text-gray-600 text-right">
                     VAT included, where applicable
                   </p>
                 </div>
@@ -731,14 +832,23 @@ const Checkout = () => {
 
               <button
                 onClick={() => toast.info("Proceed to payment")}
-                disabled={!shippingAddress}
-                className="w-full btn btn-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!shippingAddress || !billingAddress}
+                className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
               >
-                Proceed to Pay
+                Proceed to Pay (
+                {cartItems.reduce(
+                  (total, item) => total + (item.quantity || 0),
+                  0
+                )}
+                )
               </button>
-              {!shippingAddress && (
+              {(!shippingAddress || !billingAddress) && (
                 <p className="text-xs text-red-500 text-center -mt-2">
-                  Please add shipping address to proceed
+                  {!shippingAddress && !billingAddress
+                    ? "Please add shipping and billing address to proceed"
+                    : !shippingAddress
+                    ? "Please add shipping address to proceed"
+                    : "Please add billing address to proceed"}
                 </p>
               )}
             </div>
@@ -750,10 +860,16 @@ const Checkout = () => {
       {showShippingDrawer && (
         <>
           <div
-            className="fixed inset-0 bg-black/10 bg-opacity-50 z-40 animate-fade-in"
+            className={`fixed inset-0 bg-black/10 bg-opacity-50 z-40 transition-opacity duration-300 ${
+              isClosingShipping ? "opacity-0" : "opacity-100"
+            }`}
             onClick={cancelEditShippingAddress}
           />
-          <div className="fixed right-0 top-0 h-full w-full max-w-full sm:max-w-sm bg-white shadow-2xl z-50 overflow-y-auto hide-scrollbar animate-slide-in-right">
+          <div
+            className={`fixed right-0 top-0 h-full w-full max-w-[300px] sm:max-w-sm bg-white shadow-2xl z-50  animate-slide-in-right overflow-y-auto hide-scrollbar transition-transform duration-300 ease-in-out ${
+              isClosingShipping ? "translate-x-full" : "translate-x-0"
+            }`}
+          >
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Shipping Address</h2>
@@ -834,7 +950,7 @@ const Checkout = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={cancelEditShippingAddress}
-                  className="flex-1 btn"
+                  className="flex-1 btn disabled:text-black/50"
                   disabled={setDefaultShippingMutation.isPending}
                 >
                   CANCEL
@@ -847,6 +963,243 @@ const Checkout = () => {
                   className="flex-1 btn text-white btn-primary disabled:text-black/50"
                 >
                   {setDefaultShippingMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <MiniLoader /> Saving...
+                    </span>
+                  ) : (
+                    "SAVE"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Invoice and Contact Info Drawer */}
+      {showInvoiceDrawer && (
+        <>
+          <div
+            className={`fixed inset-0 bg-black/10 bg-opacity-50 z-40 transition-opacity duration-300 ${
+              isClosingInvoice ? "opacity-0" : "opacity-100"
+            }`}
+            onClick={cancelEditInvoiceInfo}
+          />
+          <div
+            className={`fixed right-0 top-0 h-full w-full max-w-[300px] sm:max-w-sm bg-white animate-slide-in-right shadow-2xl z-50 overflow-y-auto hide-scrollbar transition-transform duration-300 ease-in-out ${
+              isClosingInvoice ? "translate-x-full" : "translate-x-0"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">
+                  Invoice and Contact Info
+                </h2>
+                <button
+                  onClick={cancelEditInvoiceInfo}
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
+                >
+                  <FaXmark size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Email Section */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={userEmail}
+                    readOnly
+                    placeholder="Enter your email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter your email to get delivery status updates
+                  </p>
+                </div>
+
+                {/* Billing Address Section */}
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Billing Address <span className="text-red-500">*</span>
+                    </label>
+                    <button
+                      onClick={() => setShowBillingDrawer(true)}
+                      className="text-blue-600 hover:text-blue-700 font-medium text-sm cursor-pointer"
+                    >
+                      EDIT
+                    </button>
+                  </div>
+
+                  {billingAddress ? (
+                    <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium">{billingAddress.name}</p>
+                        <span className="text-sm text-gray-600">
+                          {billingAddress.phone}
+                        </span>
+                      </div>
+                      <span
+                        className={`${
+                          billingAddress.label === "HOME"
+                            ? "bg-orange-500"
+                            : "bg-primary"
+                        } text-white text-xs px-2 py-0.5 rounded-full inline-block mb-2`}
+                      >
+                        {billingAddress.label}
+                      </span>
+                      <p className="text-sm text-gray-600">
+                        {billingAddress.address}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {billingAddress.thana} - {billingAddress.district} -{" "}
+                        {billingAddress.region}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      <p className="text-sm text-gray-500">
+                        Please edit your billing address
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={cancelEditInvoiceInfo}
+                  className="flex-1 btn btn-outline disabled:text-black/50"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={handleSaveInvoiceInfo}
+                  disabled={!userEmail || !billingAddress}
+                  className="flex-1 btn text-white btn-primary disabled:text-black/50"
+                >
+                  SAVE
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Billing Address Drawer (opens over Invoice drawer) */}
+      {showBillingDrawer && (
+        <>
+          <div
+            className={`fixed inset-0 bg-black/10 bg-opacity-50 z-60 transition-opacity duration-300 ${
+              isClosingBilling ? "opacity-0" : "opacity-100"
+            }`}
+            onClick={cancelEditBillingAddress}
+          />
+          <div
+            className={`fixed right-0 top-0 h-full w-full max-w-[300px] sm:max-w-sm bg-white animate-slide-in-right shadow-2xl z-70 overflow-y-auto hide-scrollbar transition-transform duration-300 ease-in-out ${
+              isClosingBilling ? "translate-x-full" : "translate-x-0"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">Billing Address</h2>
+                <button
+                  onClick={cancelEditBillingAddress}
+                  className="text-gray-400 hover:text-red-500 cursor-pointer"
+                >
+                  <FaXmark size={24} />
+                </button>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowAddAddressModal(true);
+                }}
+                className="w-full mb-4 btn btn-secondary btn-outline hover:text-white"
+              >
+                Add new address
+              </button>
+
+              <div className="space-y-4">
+                {addresses?.length > 0 ? (
+                  addresses.map((addr) => (
+                    <div
+                      key={addr._id || addr.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                        tempBillingAddress === addr._id
+                          ? "border-primary bg-teal-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => setTempBillingAddress(addr._id)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          checked={tempBillingAddress === addr._id}
+                          onChange={() => setTempBillingAddress(addr._id)}
+                          className="radio radio-primary radio-sm mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium">{addr.name}</p>
+                            <span className="text-sm text-gray-600">
+                              {addr.phone}
+                            </span>
+                          </div>
+                          <span
+                            className={`${
+                              addr.label === "HOME"
+                                ? "bg-orange-500"
+                                : "bg-primary"
+                            } text-white text-xs px-2 py-0.5 rounded-full`}
+                          >
+                            {addr.label}
+                          </span>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {addr.address}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {addr.thana} - {addr.district} - {addr.region}
+                          </p>
+                          {addr.isDefaultBilling && (
+                            <span className="text-xs text-blue-600 mt-1 inline-block">
+                              Default Billing Address
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No addresses found</p>
+                    <p className="text-sm mt-2">
+                      Add a new address to continue
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={cancelEditBillingAddress}
+                  className="flex-1 btn disabled:text-black/50"
+                  disabled={setDefaultBillingMutation.isPending}
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={handleSaveBillingAddress}
+                  disabled={
+                    setDefaultBillingMutation.isPending || !tempBillingAddress
+                  }
+                  className="flex-1 btn text-white btn-primary disabled:text-black/50"
+                >
+                  {setDefaultBillingMutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <MiniLoader /> Saving...
                     </span>

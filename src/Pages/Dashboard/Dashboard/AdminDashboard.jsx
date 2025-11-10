@@ -34,7 +34,7 @@ const AdminDashboard = () => {
   // Stats data with growth rates
   const stats = [
     {
-      title: "Total Earnings",
+      title: "Total Payments",
       value: "$2,847,563",
       change: 12.5,
       icon: FaDollarSign,
