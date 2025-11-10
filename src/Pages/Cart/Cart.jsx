@@ -231,7 +231,7 @@ const Cart = () => {
   };
 
   const subtotal = calculateSubtotal();
-  const shippingFee = subtotal > 0 ? 270 : 0;
+  const shippingFee = subtotal > 0 ? Object.keys(groupedByStore).length * 100 : 0;
   const total = subtotal + shippingFee;
 
   // Calculate total quantity

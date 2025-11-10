@@ -7,7 +7,6 @@ export const ImageUpload = ({
   uploading,
   onImageUpload,
   onImageRemove,
-  maxImages = 4,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -39,12 +38,6 @@ export const ImageUpload = ({
     }
   };
 
-  const handleClick = () => {
-    if (imageURLs.length < maxImages && !uploading) {
-      fileInputRef.current?.click();
-    }
-  };
-
   return (
     <div>
       <label className="flex items-center gap-2 font-semibold mb-2 text-gray-700">
@@ -60,37 +53,21 @@ export const ImageUpload = ({
         multiple
         onChange={(e) => onImageUpload(e.target.files)}
         className="hidden"
-        disabled={uploading || imageURLs.length >= maxImages}
+        disabled={uploading}
       />
 
       {/* Drag & Drop Zone */}
       <div
-        onClick={handleClick}
-        onDragEnter={
-          uploading || imageURLs.length >= maxImages
-            ? undefined
-            : handleDragEnter
-        }
-        onDragOver={
-          uploading || imageURLs.length >= maxImages
-            ? undefined
-            : handleDragOver
-        }
-        onDragLeave={
-          uploading || imageURLs.length >= maxImages
-            ? undefined
-            : handleDragLeave
-        }
-        onDrop={
-          uploading || imageURLs.length >= maxImages ? undefined : handleDrop
-        }
+        onClick={() => fileInputRef.current?.click()}
+        onDragEnter={uploading ? undefined : handleDragEnter}
+        onDragOver={uploading ? undefined : handleDragOver}
+        onDragLeave={uploading ? undefined : handleDragLeave}
+        onDrop={uploading ? undefined : handleDrop}
         className={`
           border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer
           ${
             isDragging
               ? "border-blue-500 bg-blue-50"
-              : imageURLs.length >= maxImages
-              ? "border-green-400 bg-green-50 cursor-not-allowed"
               : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50/50"
           }
         `}
@@ -99,20 +76,10 @@ export const ImageUpload = ({
           <div
             className={`
             w-16 h-16 rounded-full flex items-center justify-center transition-all
-            ${
-              isDragging
-                ? "bg-blue-500"
-                : imageURLs.length >= maxImages
-                ? "bg-green-500"
-                : "bg-gray-400"
-            }
+            ${isDragging ? "bg-blue-500" : "bg-gray-400"}
           `}
           >
-            {imageURLs.length >= maxImages ? (
-              <span className="text-3xl text-white">✓</span>
-            ) : (
-              <MdCloudUpload className="w-8 h-8 text-white" />
-            )}
+            <MdCloudUpload className="w-8 h-8 text-white" />
           </div>
 
           {uploading ? (
@@ -121,15 +88,6 @@ export const ImageUpload = ({
                 Uploading...
               </p>
               <p className="text-sm text-gray-500 mt-1">Please wait</p>
-            </div>
-          ) : imageURLs.length >= maxImages ? (
-            <div>
-              <p className="text-lg font-semibold text-green-600">
-                All {maxImages} images uploaded!
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Remove an image to upload more
-              </p>
             </div>
           ) : (
             <div>
@@ -143,7 +101,8 @@ export const ImageUpload = ({
                 </span>
               </p>
               <p className="text-xs text-gray-400 mt-2">
-                {imageURLs.length} / {maxImages} images uploaded
+                {imageURLs.length} image{imageURLs.length > 1 ? "s" : ""}{" "}
+                uploaded
               </p>
             </div>
           )}

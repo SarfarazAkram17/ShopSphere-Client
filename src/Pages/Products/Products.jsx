@@ -36,7 +36,7 @@ const Products = () => {
       const res = await axiosInstance.get(`/products/all`, {
         params: {
           page,
-          limit: 24,
+          limit: 20,
           search,
           category: category.join(","),
           color,
@@ -149,7 +149,7 @@ const Products = () => {
 
       {/* Products Grid */}
       {isPending ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 items-center gap-4">
           {[...Array(12)].map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -158,7 +158,7 @@ const Products = () => {
         <p className="text-center text-gray-500">No products found.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 items-center gap-4">
             {products.map((product) => {
               const discountedPrice =
                 product.discount > 0
