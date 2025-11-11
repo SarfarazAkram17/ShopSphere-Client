@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { FaXmark } from "react-icons/fa6";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -23,6 +23,7 @@ import { useAddressMutations } from "../../Hooks/useAddressMutations";
 import MiniLoader from "../../Components/Loader/MiniLoader";
 import { AiOutlineHome } from "react-icons/ai";
 import { BsBriefcase } from "react-icons/bs";
+import { useCartCount } from "../../Hooks/useCartCount";
 
 const Checkout = () => {
   const {
@@ -46,6 +47,20 @@ const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [remainingTime, setRemainingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const { refetch: cartCountRefetch } = useCartCount();
+
+  // Payment section states
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  // Card payment form states
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [saveCard, setSaveCard] = useState(false);
 
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
@@ -85,7 +100,6 @@ const Checkout = () => {
       setTempShippingAddress(defaultShippingAddress?._id || null);
       setTempBillingAddress(defaultBillingAddress?._id || null);
 
-      // Show inline form if no addresses exist
       if (!response.data || response.data.length === 0) {
         setShowInlineAddressForm(true);
       }
@@ -137,7 +151,6 @@ const Checkout = () => {
         shopCartData.length === 0 ||
         !isShopCartValid(userEmail)
       ) {
-        toast.info("No items to checkout. Redirecting...");
         navigate(-1);
         return;
       }
@@ -354,7 +367,6 @@ const Checkout = () => {
       return sum + price * item.quantity;
     }, 0);
 
-    // Calculate delivery charge per store
     const deliveryTotal = Object.entries(groupedByStore).reduce(
       // eslint-disable-next-line no-unused-vars
       (sum, [storeId, storeData]) => {
@@ -372,7 +384,492 @@ const Checkout = () => {
 
   const totals = calculateTotal();
 
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData) => {
+      const response = await axiosSecure.post(
+        `/orders?email=${userEmail}`,
+        orderData
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setCreatedOrder(data);
+      setShowPaymentSection(true);
+      cartCountRefetch();
+    },
+  });
+
+  const handleProceedToPay = async () => {
+    if (!shippingAddress || !billingAddress) {
+      toast.error("Please add shipping and billing addresses");
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    const stores = Object.entries(groupedByStore).map(
+      ([storeId, storeData]) => {
+        const storeItems = storeData.items.map((item) => {
+          const unitPrice = item.product.price;
+          const discount = item.product.discount || 0;
+          const discountedPrice =
+            discount > 0 ? unitPrice - (unitPrice * discount) / 100 : unitPrice;
+          const subtotal = discountedPrice * item.quantity;
+
+          return {
+            productId: item.productId,
+            productName: item.product.name,
+            productImage: item.product.image,
+            color: item.color || null,
+            size: item.size || null,
+            quantity: item.quantity,
+            unitPrice,
+            discount,
+            discountedPrice: Number(discountedPrice.toFixed(2)),
+            subtotal: Number(subtotal.toFixed(2)),
+          };
+        });
+
+        const storeTotal = storeItems.reduce(
+          (sum, item) => sum + item.subtotal,
+          0
+        );
+        const deliveryCharge =
+          shippingAddress.district === storeData.storeInfo?.district ? 80 : 150;
+        const platformCommission = 10;
+        const platformCommissionAmount =
+          (storeTotal * platformCommission) / 100;
+        const sellerAmount = storeTotal - platformCommissionAmount;
+        const riderAmount =
+          shippingAddress.district === storeData.storeInfo?.district ? 70 : 50;
+
+        return {
+          storeId,
+          storeName: storeData.storeName,
+          storeEmail: storeData.storeInfo?.storeEmail || "",
+          storeOrderStatus: "cancelled",
+          items: storeItems,
+          deliveryCharge,
+          storeTotal: Number(parseFloat(storeTotal).toFixed(2)),
+          platformCommission,
+          platformCommissionAmount: Number(platformCommissionAmount.toFixed(2)),
+          sellerAmount: Number(sellerAmount.toFixed(2)),
+          riderAmount,
+        };
+      }
+    );
+
+    const orderData = {
+      customerEmail: userEmail,
+      orderStatus: "cancelled",
+      paymentStatus: "unpaid",
+      shippingAddress: {
+        name: shippingAddress.name,
+        phone: shippingAddress.phone,
+        email: shippingAddress.email || userEmail,
+        address: shippingAddress.address,
+        building: shippingAddress.building || "",
+        thana: shippingAddress.thana,
+        district: shippingAddress.district,
+        region: shippingAddress.region,
+        label: shippingAddress.label,
+      },
+      billingAddress: {
+        name: billingAddress.name,
+        phone: billingAddress.phone,
+        email: billingAddress.email || userEmail,
+        address: billingAddress.address,
+        building: billingAddress.building || "",
+        thana: billingAddress.thana,
+        district: billingAddress.district,
+        region: billingAddress.region,
+        label: billingAddress.label,
+      },
+      stores,
+      itemsTotal: Number(totals.itemsTotal.toFixed(2)),
+      totalDeliveryCharge: totals.deliveryTotal,
+      totalAmount: Number(totals.total.toFixed(2)),
+      paymentMethod: null,
+      transactionId: null,
+    };
+
+    createOrderMutation.mutate(orderData);
+  };
+
+  const handlePaymentMethodSelect = (method) => {
+    setSelectedPaymentMethod(method);
+    if (method === "cod") {
+      // Reset card form when switching to COD
+      setCardNumber("");
+      setCardName("");
+      setExpiryDate("");
+      setCvv("");
+      setSaveCard(false);
+    }
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!selectedPaymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+
+    if (selectedPaymentMethod === "card") {
+      // Validate card details
+      if (!cardNumber || !cardName || !expiryDate || !cvv) {
+        toast.error("Please fill in all card details");
+        return;
+      }
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // Update order with payment method
+      const updateData = {
+        paymentMethod:
+          selectedPaymentMethod === "card" ? "card" : "cash_on_delivery",
+        orderStatus: "pending",
+        paymentStatus: selectedPaymentMethod === "card" ? "paid" : "unpaid",
+      };
+
+      // If card payment, add dummy transaction ID
+      if (selectedPaymentMethod === "card") {
+        updateData.transactionId = `TXN${Date.now()}`;
+      }
+
+      const response = await axiosSecure.patch(
+        `/orders/${createdOrder._id || createdOrder.id}?email=${userEmail}`,
+        updateData
+      );
+      console.log(response);
+
+      // Clear cart
+      clearShopCart(userEmail);
+      cartCountRefetch();
+
+      toast.success("Order placed successfully!");
+
+      // Navigate to order success or orders page
+      setTimeout(() => {
+        navigate("/orders");
+      }, 1500);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to confirm order");
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   if (isLoading || addressesLoading) return <Loader />;
+
+  // Payment Section Component
+  if (showPaymentSection && createdOrder) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-[1500px] mx-auto px-4 py-6">
+          {/* Session Timer */}
+          <div className="bg-yellow-50 border border-yellow-300 rounded-lg shadow-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">⏱️</span>
+              <div>
+                <p className="text-yellow-800 font-semibold text-lg">
+                  Session expires in: {formatTime(remainingTime)}
+                </p>
+                <p className="text-yellow-700 text-sm">
+                  Complete your payment within the time limit
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Section - Payment Methods */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-2xl font-semibold mb-6">
+                  Select Payment Method
+                </h2>
+
+                {/* Payment Method Options */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {/* Credit/Debit Card */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect("card")}
+                    className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                      selectedPaymentMethod === "card"
+                        ? "border-primary bg-teal-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-blue-600"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
+                        </svg>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-semibold text-sm">
+                          Credit/Debit Card
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Visa, Mastercard, Amex
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Cash on Delivery */}
+                  <button
+                    onClick={() => handlePaymentMethodSelect("cod")}
+                    className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
+                      selectedPaymentMethod === "cod"
+                        ? "border-primary bg-teal-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-green-600"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
+                        </svg>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-semibold text-sm">
+                          Cash on Delivery
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Pay when you receive
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Card Payment Form */}
+                {selectedPaymentMethod === "card" && (
+                  <div className="border-t pt-6 space-y-4">
+                    {/* <div className="flex gap-2 mb-4">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
+                        alt="Visa"
+                        className="h-8"
+                      />
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                        alt="Mastercard"
+                        className="h-8"
+                      />
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
+                        alt="Amex"
+                        className="h-8"
+                      />
+                    </div> */}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Card Number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={cardNumber}
+                        onChange={(e) =>
+                          setCardNumber(
+                            e.target.value
+                              .replace(/\s/g, "")
+                              .replace(/(.{4})/g, "$1 ")
+                              .trim()
+                          )
+                        }
+                        placeholder="1234 5678 9012 3456"
+                        maxLength="19"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Name on Card <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Expiry Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={expiryDate}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, "");
+                            if (value.length >= 2) {
+                              value =
+                                value.slice(0, 2) + "/" + value.slice(2, 4);
+                            }
+                            setExpiryDate(value);
+                          }}
+                          placeholder="MM/YY"
+                          maxLength="5"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                          CVV <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={cvv}
+                          onChange={(e) =>
+                            setCvv(
+                              e.target.value.replace(/\D/g, "").slice(0, 3)
+                            )
+                          }
+                          placeholder="123"
+                          maxLength="3"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="saveCard"
+                        checked={saveCard}
+                        onChange={(e) => setSaveCard(e.target.checked)}
+                        className="checkbox checkbox-primary checkbox-sm"
+                      />
+                      <label
+                        htmlFor="saveCard"
+                        className="text-sm text-gray-600 cursor-pointer"
+                      >
+                        Save card for future purchases (We will save this card
+                        for your convenience. If required, you can remove the
+                        card in the Payment Options under My Account.)
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* COD Instructions */}
+                {selectedPaymentMethod === "cod" && (
+                  <div className="border-t pt-6">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
+                      <h4 className="font-semibold text-amber-900">
+                        Cash on Delivery Instructions:
+                      </h4>
+                      <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
+                        <li>
+                          You may pay in cash to our Courier upon receiving your
+                          parcel at the doorstep
+                        </li>
+                        <li>
+                          Before agreeing to receive the parcel, check if your
+                          delivery status has been updated to 'Out for Delivery'
+                        </li>
+                        <li>
+                          Before receiving, confirm that the airway bill shows
+                          that the parcel is from ShopSphere
+                        </li>
+                        <li>
+                          Before making payment to the courier, confirm that the
+                          order number, sender information and tracking number
+                          on the parcel
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                {/* Confirm Button */}
+                <div className="mt-6">
+                  <button
+                    onClick={handleConfirmOrder}
+                    disabled={!selectedPaymentMethod || isProcessingPayment}
+                    className="w-full btn btn-primary text-white disabled:text-black/50"
+                  >
+                    {isProcessingPayment ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <MiniLoader /> Processing...
+                      </span>
+                    ) : selectedPaymentMethod === "card" ? (
+                      "Pay Now"
+                    ) : (
+                      "Confirm Order"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Section - Order Summary */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-xl p-6 sticky top-6">
+                <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
+
+                <div className="space-y-3 text-sm mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      Subtotal (
+                      {cartItems.reduce(
+                        (total, item) => total + (item.quantity || 0),
+                        0
+                      )}{" "}
+                      items and shipping fee included)
+                    </span>
+                    <span className="font-semibold">
+                      ৳ {totals.itemsTotal.toFixed(2)}
+                    </span>
+                  </div>
+                  {selectedPaymentMethod === "cod" && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Cash Payment Fee</span>
+                      <span className="font-semibold">৳ 20</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-3 flex justify-between items-center">
+                    <span className="font-bold text-lg">Total Amount</span>
+                    <span className="text-orange-500 font-bold text-2xl">
+                      ৳{" "}
+                      {(
+                        totals.total +
+                        (selectedPaymentMethod === "cod" ? 20 : 0)
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-500 text-center">
+                  By proceeding, you agree to ShopSphere's Terms and Conditions
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -769,7 +1266,7 @@ const Checkout = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-xl p-6 sticky top-18 space-y-6">
               {/* Promotion Section */}
-              <div>
+              {/* <div>
                 <h3 className="font-semibold mb-3">Promotion</h3>
                 <div className="flex items-center gap-2">
                   <input
@@ -781,7 +1278,7 @@ const Checkout = () => {
                     APPLY
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               {/* Invoice and Contact Info */}
               <div className="my-4">
@@ -831,7 +1328,7 @@ const Checkout = () => {
               </div>
 
               <button
-                onClick={() => toast.info("Proceed to payment")}
+                onClick={handleProceedToPay}
                 disabled={!shippingAddress || !billingAddress}
                 className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
               >
