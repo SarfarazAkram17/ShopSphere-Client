@@ -14,6 +14,7 @@ import TablePaginationActions from "../../../lib/pagination";
 import AllProductsSearchAndFilter from "../../../Components/Shared/AllProducts/AllProductsSearchAndFilter";
 import AllProductsTableSkeleton from "../../../Components/Shared/AllProducts/AllProductsTableSkeleton";
 import useAuth from "../../../Hooks/useAuth";
+import { Chip } from "@mui/material";
 
 const searchOptions = [
   { value: "product name", label: "Search by Product Name" },
@@ -116,6 +117,9 @@ const AllProducts = () => {
                   Stock
                 </TableCell>
                 <TableCell align="center" sx={{ py: 0.5 }}>
+                  Status
+                </TableCell>
+                <TableCell align="center" sx={{ py: 0.5 }}>
                   Added At
                 </TableCell>
               </TableRow>
@@ -164,6 +168,14 @@ const AllProducts = () => {
                   <TableCell align="center" sx={{ py: 0.5 }}>
                     {p.stock}
                   </TableCell>
+                  <TableCell align="center" sx={{ py: 0.5 }}>
+                    {p.status === "active" && (
+                      <Chip label="Active" color="success" size="small" />
+                    )}
+                    {p.status === "deactive" && (
+                      <Chip label="Deactive" color="error" size="small" />
+                    )}
+                  </TableCell>
                   <TableCell
                     className="max-w-[100px] truncate"
                     title={new Date(p.addedAt).toLocaleString()}
@@ -180,7 +192,7 @@ const AllProducts = () => {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 20, 30]}
-                  colSpan={8}
+                  colSpan={9}
                   count={total}
                   rowsPerPage={rowsPerPage}
                   page={page}

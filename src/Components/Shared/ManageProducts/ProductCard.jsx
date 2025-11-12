@@ -45,6 +45,10 @@ const ProductCard = ({ product, handleDelete }) => {
           </p>
         )}
 
+          <p className="text-sm capitalize">
+            <strong>Status:</strong> <span className={`${product.status === 'active' ? 'text-green-500' : 'text-red-500'} font-semibold`}>{product.status}</span>
+          </p>
+
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-2">
             <Link to={`/products/${product._id}`}>
