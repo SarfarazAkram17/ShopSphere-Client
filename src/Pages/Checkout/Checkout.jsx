@@ -48,27 +48,23 @@ const Checkout = () => {
   const [remainingTime, setRemainingTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const { refetch: cartCountRefetch } = useCartCount();
-
   // Payment section states
   const [showPaymentSection, setShowPaymentSection] = useState(false);
   const [createdOrder, setCreatedOrder] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-
   // Card payment form states
   const [cardNumber, setCardNumber] = useState("");
   const [cardName, setCardName] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [saveCard, setSaveCard] = useState(false);
-
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
   const [billingAddress, setBillingAddress] = useState(null);
   const [tempShippingAddress, setTempShippingAddress] = useState(null);
   const [tempBillingAddress, setTempBillingAddress] = useState(null);
   const [showInlineAddressForm, setShowInlineAddressForm] = useState(false);
-
   // Drawer/Modal states
   const [showShippingDrawer, setShowShippingDrawer] = useState(false);
   const [showInvoiceDrawer, setShowInvoiceDrawer] = useState(false);
@@ -450,7 +446,7 @@ const Checkout = () => {
           storeId,
           storeName: storeData.storeName,
           storeEmail: storeData.storeInfo?.storeEmail || "",
-          storeOrderStatus: "cancelled",
+          storeOrderStatus: "cancelled - didn't confirmed",
           items: storeItems,
           deliveryCharge,
           storeTotal: Number(parseFloat(storeTotal).toFixed(2)),
@@ -464,7 +460,7 @@ const Checkout = () => {
 
     const orderData = {
       customerEmail: userEmail,
-      orderStatus: "cancelled",
+      orderStatus: "cancelled - didn't confirmed",
       paymentStatus: "unpaid",
       shippingAddress: {
         name: shippingAddress.name,
@@ -1154,7 +1150,7 @@ const Checkout = () => {
                     key={storeId}
                     className="bg-white rounded-lg shadow-lg p-6"
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-center mb-4">
                       <div>
                         <p className="text-sm text-gray-600">
                           Package {storeIndex + 1} of{" "}
@@ -1169,30 +1165,28 @@ const Checkout = () => {
                       </p>
                     </div>
 
-                    {shippingAddress && (
-                      <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
-                        <div className="flex items-start gap-2 mb-2">
-                          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
-                            <span className="text-white text-xs">✓</span>
-                          </div>
-                          <div>
-                            <p className="font-medium">
-                              ৳{" "}
-                              {shippingAddress.district ===
-                              storeData.storeInfo?.district
-                                ? 80
-                                : 150}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Standard Delivery
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Guaranteed by 28 Oct-1 Nov
-                            </p>
-                          </div>
+                    <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
+                      <div className="flex items-start gap-2 mb-2">
+                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            ৳{" "}
+                            {shippingAddress?.district ===
+                            storeData.storeInfo.district
+                              ? 80
+                              : 150}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Standard Delivery
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Guaranteed by 28 Oct-1 Nov
+                          </p>
                         </div>
                       </div>
-                    )}
+                    </div>
 
                     <div className="space-y-4">
                       {storeData.items.map((item, itemIndex) => {
@@ -1391,7 +1385,7 @@ const Checkout = () => {
                 {addresses?.length > 0 ? (
                   addresses.map((addr) => (
                     <div
-                      key={addr._id || addr.id}
+                      key={addr._id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                         tempShippingAddress === addr._id
                           ? "border-primary bg-teal-50"
@@ -1424,6 +1418,9 @@ const Checkout = () => {
                           </span>
                           <p className="text-sm text-gray-600 mt-1">
                             {addr.address}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {addr.thana} - {addr.district} - {addr.region}
                           </p>
                           {addr.isDefaultShipping && (
                             <span className="text-xs text-blue-600 mt-1 inline-block">
@@ -1625,7 +1622,7 @@ const Checkout = () => {
                 {addresses?.length > 0 ? (
                   addresses.map((addr) => (
                     <div
-                      key={addr._id || addr.id}
+                      key={addr._id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                         tempBillingAddress === addr._id
                           ? "border-primary bg-teal-50"

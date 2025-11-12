@@ -20,7 +20,7 @@ const ProductCardSkeleton = () => {
         </div>
 
         {/* Small lines */}
-        {[...Array(5)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <div key={i} className="relative w-full h-3 bg-base-300 rounded">
             <div
               className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
@@ -36,6 +36,14 @@ const ProductCardSkeleton = () => {
             bg-gradient-to-r from-transparent via-gray-300 to-transparent"
           />
         </div>
+        <div className="relative w-1/3 h-3 bg-base-300 rounded">
+          <div
+            className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
+            bg-gradient-to-r from-transparent via-gray-300 to-transparent"
+          />
+        </div>
+
+        {/* Status */}
         <div className="relative w-1/3 h-3 bg-base-300 rounded">
           <div
             className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] 
