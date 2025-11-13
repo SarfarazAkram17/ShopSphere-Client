@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { FaXmark } from "react-icons/fa6";
+import { FaDollarSign, FaXmark } from "react-icons/fa6";
+import { TbCurrencyTaka } from "react-icons/tb";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -24,6 +25,7 @@ import MiniLoader from "../../Components/Loader/MiniLoader";
 import { AiOutlineHome } from "react-icons/ai";
 import { BsBriefcase } from "react-icons/bs";
 import { useCartCount } from "../../Hooks/useCartCount";
+import { MdOutlineCreditCard } from "react-icons/md";
 
 const Checkout = () => {
   const {
@@ -58,7 +60,6 @@ const Checkout = () => {
   const [cardName, setCardName] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
-  const [saveCard, setSaveCard] = useState(false);
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
   const [billingAddress, setBillingAddress] = useState(null);
@@ -503,7 +504,6 @@ const Checkout = () => {
       setCardName("");
       setExpiryDate("");
       setCvv("");
-      setSaveCard(false);
     }
   };
 
@@ -513,52 +513,27 @@ const Checkout = () => {
       return;
     }
 
-    if (selectedPaymentMethod === "card") {
-      // Validate card details
-      if (!cardNumber || !cardName || !expiryDate || !cvv) {
-        toast.error("Please fill in all card details");
-        return;
-      }
-    }
-
     setIsProcessingPayment(true);
 
     try {
-      // Update order with payment method
-      const updateData = {
-        paymentMethod:
-          selectedPaymentMethod === "card" ? "card" : "cash_on_delivery",
-        orderStatus: "pending",
-        paymentStatus: selectedPaymentMethod === "card" ? "paid" : "unpaid",
-      };
-
-      // If card payment, add dummy transaction ID
-      if (selectedPaymentMethod === "card") {
-        updateData.transactionId = `TXN${Date.now()}`;
-      }
-
-      const response = await axiosSecure.patch(
-        `/orders/${createdOrder._id || createdOrder.id}?email=${userEmail}`,
-        updateData
+      await axiosSecure.patch(
+        `/orders/${createdOrder.id}/confirm?email=${userEmail}`
       );
-      console.log(response);
 
       // Clear cart
       clearShopCart(userEmail);
+      navigate("/dashboard/myOrders");
       cartCountRefetch();
 
       toast.success("Order placed successfully!");
-
-      // Navigate to order success or orders page
-      setTimeout(() => {
-        navigate("/orders");
-      }, 1500);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to confirm order");
     } finally {
       setIsProcessingPayment(false);
     }
   };
+
+  const handlePay = () => {};
 
   if (isLoading || addressesLoading) return <Loader />;
 
@@ -597,26 +572,20 @@ const Checkout = () => {
                     onClick={() => handlePaymentMethodSelect("card")}
                     className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
                       selectedPaymentMethod === "card"
-                        ? "border-primary bg-teal-50"
+                        ? "border-primary bg-primary/10"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-8 h-8 text-blue-600"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" />
-                        </svg>
+                      <div className="w-12 h-12 bg-blue-200/70 rounded-lg flex items-center justify-center">
+                        <MdOutlineCreditCard className="text-blue-700 h-8 w-8" />
                       </div>
                       <div className="text-center">
                         <p className="font-semibold text-sm">
                           Credit/Debit Card
                         </p>
                         <p className="text-xs text-gray-500">
-                          Visa, Mastercard, Amex
+                          Visa, Mastercard, Amex etc.
                         </p>
                       </div>
                     </div>
@@ -627,19 +596,13 @@ const Checkout = () => {
                     onClick={() => handlePaymentMethodSelect("cod")}
                     className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
                       selectedPaymentMethod === "cod"
-                        ? "border-primary bg-teal-50"
+                        ? "border-primary bg-primary/10"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-8 h-8 text-green-600"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
-                        </svg>
+                      <div className="w-12 h-12 bg-green-200/70 rounded-lg flex items-center justify-center">
+                        <TbCurrencyTaka className="w-8 h-8 text-green-700" />
                       </div>
                       <div className="text-center">
                         <p className="font-semibold text-sm">
@@ -654,6 +617,7 @@ const Checkout = () => {
                 </div>
 
                 {/* Card Payment Form */}
+                {/* to be understand */}
                 {selectedPaymentMethod === "card" && (
                   <div className="border-t pt-6 space-y-4">
                     {/* <div className="flex gap-2 mb-4">
@@ -747,24 +711,6 @@ const Checkout = () => {
                         />
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="saveCard"
-                        checked={saveCard}
-                        onChange={(e) => setSaveCard(e.target.checked)}
-                        className="checkbox checkbox-primary checkbox-sm"
-                      />
-                      <label
-                        htmlFor="saveCard"
-                        className="text-sm text-gray-600 cursor-pointer"
-                      >
-                        Save card for future purchases (We will save this card
-                        for your convenience. If required, you can remove the
-                        card in the Payment Options under My Account.)
-                      </label>
-                    </div>
                   </div>
                 )}
 
@@ -777,7 +723,7 @@ const Checkout = () => {
                       </h4>
                       <ul className="text-sm text-amber-800 space-y-1 list-disc list-inside">
                         <li>
-                          You may pay in cash to our Courier upon receiving your
+                          You may pay in cash to our rider upon receiving your
                           parcel at the doorstep
                         </li>
                         <li>
@@ -789,7 +735,7 @@ const Checkout = () => {
                           that the parcel is from ShopSphere
                         </li>
                         <li>
-                          Before making payment to the courier, confirm that the
+                          Before making payment to the rider, confirm that the
                           order number, sender information and tracking number
                           on the parcel
                         </li>
@@ -798,24 +744,43 @@ const Checkout = () => {
                   </div>
                 )}
 
+                {/* Pay Button */}
+                {selectedPaymentMethod === "card" && (
+                  <div className="mt-6">
+                    <button
+                      onClick={handlePay}
+                      disabled={!selectedPaymentMethod || isProcessingPayment}
+                      className="w-full btn btn-primary text-white disabled:text-black/50"
+                    >
+                      {isProcessingPayment ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <MiniLoader /> Processing...
+                        </span>
+                      ) : (
+                        "Pay Now"
+                      )}
+                    </button>
+                  </div>
+                )}
+
                 {/* Confirm Button */}
-                <div className="mt-6">
-                  <button
-                    onClick={handleConfirmOrder}
-                    disabled={!selectedPaymentMethod || isProcessingPayment}
-                    className="w-full btn btn-primary text-white disabled:text-black/50"
-                  >
-                    {isProcessingPayment ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <MiniLoader /> Processing...
-                      </span>
-                    ) : selectedPaymentMethod === "card" ? (
-                      "Pay Now"
-                    ) : (
-                      "Confirm Order"
-                    )}
-                  </button>
-                </div>
+                {selectedPaymentMethod === "cod" && (
+                  <div className="mt-6">
+                    <button
+                      onClick={handleConfirmOrder}
+                      disabled={!selectedPaymentMethod || isProcessingPayment}
+                      className="w-full btn btn-primary text-white disabled:text-black/50"
+                    >
+                      {isProcessingPayment ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <MiniLoader /> Processing...
+                        </span>
+                      ) : (
+                        "Confirm Order"
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -835,7 +800,7 @@ const Checkout = () => {
                       items and shipping fee included)
                     </span>
                     <span className="font-semibold">
-                      ৳ {totals.itemsTotal.toFixed(2)}
+                      ৳ {totals.total.toFixed(2)}
                     </span>
                   </div>
                   {selectedPaymentMethod === "cod" && (
@@ -1165,28 +1130,30 @@ const Checkout = () => {
                       </p>
                     </div>
 
-                    <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
-                      <div className="flex items-start gap-2 mb-2">
-                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            ৳{" "}
-                            {shippingAddress?.district ===
-                            storeData.storeInfo.district
-                              ? 80
-                              : 150}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Standard Delivery
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Guaranteed by 28 Oct-1 Nov
-                          </p>
+                    {shippingAddress && (
+                      <div className="border border-primary rounded-lg p-4 mb-4 w-fit">
+                        <div className="flex items-start gap-2 mb-2">
+                          <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-0.5">
+                            <span className="text-white text-xs">✓</span>
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              ৳{" "}
+                              {shippingAddress.district ===
+                              storeData.storeInfo?.district
+                                ? 80
+                                : 150}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Standard Delivery
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Guaranteed by 28 Oct-1 Nov
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="space-y-4">
                       {storeData.items.map((item, itemIndex) => {
@@ -1385,7 +1352,7 @@ const Checkout = () => {
                 {addresses?.length > 0 ? (
                   addresses.map((addr) => (
                     <div
-                      key={addr._id}
+                      key={addr._id || addr.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                         tempShippingAddress === addr._id
                           ? "border-primary bg-teal-50"
@@ -1418,9 +1385,6 @@ const Checkout = () => {
                           </span>
                           <p className="text-sm text-gray-600 mt-1">
                             {addr.address}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {addr.thana} - {addr.district} - {addr.region}
                           </p>
                           {addr.isDefaultShipping && (
                             <span className="text-xs text-blue-600 mt-1 inline-block">
@@ -1622,7 +1586,7 @@ const Checkout = () => {
                 {addresses?.length > 0 ? (
                   addresses.map((addr) => (
                     <div
-                      key={addr._id}
+                      key={addr._id || addr.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                         tempBillingAddress === addr._id
                           ? "border-primary bg-teal-50"
