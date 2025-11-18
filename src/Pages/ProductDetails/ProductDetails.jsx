@@ -37,7 +37,7 @@ const ProductDetails = () => {
 
   if (isPending) {
     return (
-      <section className="max-w-[1500px] mx-auto px-4 space-y-4">
+      <section className="max-w-[1500px] mx-auto p-4 space-y-4">
         <ProductSectionSkeleton></ProductSectionSkeleton>
         <ReviewSectionSkeleton></ReviewSectionSkeleton>
 
@@ -85,7 +85,7 @@ const ProductDetails = () => {
   const displayRating = roundToHalf(avgRating);
 
   return (
-    <section className="max-w-[1500px] mx-auto px-4 space-y-4 py-8">
+    <section className="max-w-[1500px] mx-auto p-4 space-y-4">
       <ProductSection
         selectedImage={selectedImage}
         product={product}

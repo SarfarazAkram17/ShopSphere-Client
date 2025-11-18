@@ -129,7 +129,7 @@ const CardPaymentForm = ({
         // Step 5: Update order with payment details
         await axiosSecure.post(`/payments?email=${userEmail}`, {
           orderId: createdOrder.id,
-          amount: parseFloat(totalAmount * 100),
+          amount: Number((paymentIntent.amount / 100).toFixed(2)),
           paymentMethod: "card",
           transactionId: paymentIntent.id,
           paymentStatus: "paid",
@@ -149,11 +149,11 @@ const CardPaymentForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Accepted Cards */}
-      <div className="flex gap-2 mb-4">
-        <img src={visa} alt="Visa" className="h-10" />
-        <img src={master} alt="Mastercard" className="h-10" />
-        <img src={amex} alt="Amex" className="h-10" />
-        <img src={discover} alt="Discover" className="h-10" />
+      <div className="flex gap-2 items-center mb-4">
+        <img src={visa} alt="Visa" className="h-13.5" />
+        <img src={master} alt="Mastercard" className="h-13.5" />
+        <img src={amex} alt="Amex" className="h-13.5" />
+        <img src={discover} alt="Discover" className="h-8" />
       </div>
 
       {/* Card Details (Stripe CardElement) */}
