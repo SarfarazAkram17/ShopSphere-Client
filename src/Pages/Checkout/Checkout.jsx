@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { FaDollarSign, FaXmark } from "react-icons/fa6";
+import { FaXmark } from "react-icons/fa6";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -26,6 +26,7 @@ import { AiOutlineHome } from "react-icons/ai";
 import { BsBriefcase } from "react-icons/bs";
 import { useCartCount } from "../../Hooks/useCartCount";
 import { MdOutlineCreditCard } from "react-icons/md";
+import { StripeCardPayment } from "../../Components/Shared/Checkout/StripeCardPayment";
 
 const Checkout = () => {
   const {
@@ -55,11 +56,6 @@ const Checkout = () => {
   const [createdOrder, setCreatedOrder] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  // Card payment form states
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
   // Address management
   const [shippingAddress, setShippingAddress] = useState(null);
   const [billingAddress, setBillingAddress] = useState(null);
@@ -447,7 +443,7 @@ const Checkout = () => {
           storeId,
           storeName: storeData.storeName,
           storeEmail: storeData.storeInfo?.storeEmail || "",
-          storeOrderStatus: "cancelled - didn't confirmed",
+          storeOrderStatus: "pending",
           items: storeItems,
           deliveryCharge,
           storeTotal: Number(parseFloat(storeTotal).toFixed(2)),
@@ -461,7 +457,7 @@ const Checkout = () => {
 
     const orderData = {
       customerEmail: userEmail,
-      orderStatus: "cancelled - didn't confirmed",
+      orderStatus: "pending",
       paymentStatus: "unpaid",
       shippingAddress: {
         name: shippingAddress.name,
@@ -488,8 +484,9 @@ const Checkout = () => {
       stores,
       itemsTotal: Number(totals.itemsTotal.toFixed(2)),
       totalDeliveryCharge: totals.deliveryTotal,
-      totalAmount: Number(totals.total.toFixed(2)),
-      paymentMethod: null,
+      totalAmount: Number((totals.total + 20).toFixed(2)),
+      paymentMethod: "cash_on_delivery",
+      cashPaymentFee: 20,
       transactionId: null,
     };
 
@@ -498,13 +495,6 @@ const Checkout = () => {
 
   const handlePaymentMethodSelect = (method) => {
     setSelectedPaymentMethod(method);
-    if (method === "cod") {
-      // Reset card form when switching to COD
-      setCardNumber("");
-      setCardName("");
-      setExpiryDate("");
-      setCvv("");
-    }
   };
 
   const handleConfirmOrder = async () => {
@@ -533,7 +523,21 @@ const Checkout = () => {
     }
   };
 
-  const handlePay = () => {};
+  const handlePaymentSuccess = async () => {
+    try {
+      toast.success("Payment successful! Redirecting to my orders page...");
+      setTimeout(() => {
+        navigate("/dashboard/myOrders");
+        clearShopCart(userEmail);
+        cartCountRefetch();
+      }, 1000);
+    } catch (error) {
+      toast.error(
+        error.message ||
+          "Payment successful but there was an error. Please contact support."
+      );
+    }
+  };
 
   if (isLoading || addressesLoading) return <Loader />;
 
@@ -617,100 +621,14 @@ const Checkout = () => {
                 </div>
 
                 {/* Card Payment Form */}
-                {/* to be understand */}
                 {selectedPaymentMethod === "card" && (
-                  <div className="border-t pt-6 space-y-4">
-                    {/* <div className="flex gap-2 mb-4">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
-                        alt="Visa"
-                        className="h-8"
-                      />
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
-                        alt="Mastercard"
-                        className="h-8"
-                      />
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
-                        alt="Amex"
-                        className="h-8"
-                      />
-                    </div> */}
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Card Number <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={cardNumber}
-                        onChange={(e) =>
-                          setCardNumber(
-                            e.target.value
-                              .replace(/\s/g, "")
-                              .replace(/(.{4})/g, "$1 ")
-                              .trim()
-                          )
-                        }
-                        placeholder="1234 5678 9012 3456"
-                        maxLength="19"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Name on Card <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={cardName}
-                        onChange={(e) => setCardName(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Expiry Date <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={expiryDate}
-                          onChange={(e) => {
-                            let value = e.target.value.replace(/\D/g, "");
-                            if (value.length >= 2) {
-                              value =
-                                value.slice(0, 2) + "/" + value.slice(2, 4);
-                            }
-                            setExpiryDate(value);
-                          }}
-                          placeholder="MM/YY"
-                          maxLength="5"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                          CVV <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={cvv}
-                          onChange={(e) =>
-                            setCvv(
-                              e.target.value.replace(/\D/g, "").slice(0, 3)
-                            )
-                          }
-                          placeholder="123"
-                          maxLength="3"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                    </div>
+                  <div className="border-t pt-6">
+                    <StripeCardPayment
+                      createdOrder={createdOrder}
+                      totalAmount={totals.total}
+                      userEmail={userEmail}
+                      onSuccess={handlePaymentSuccess}
+                    />
                   </div>
                 )}
 
@@ -741,25 +659,6 @@ const Checkout = () => {
                         </li>
                       </ul>
                     </div>
-                  </div>
-                )}
-
-                {/* Pay Button */}
-                {selectedPaymentMethod === "card" && (
-                  <div className="mt-6">
-                    <button
-                      onClick={handlePay}
-                      disabled={!selectedPaymentMethod || isProcessingPayment}
-                      className="w-full btn btn-primary text-white disabled:text-black/50"
-                    >
-                      {isProcessingPayment ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <MiniLoader /> Processing...
-                        </span>
-                      ) : (
-                        "Pay Now"
-                      )}
-                    </button>
                   </div>
                 )}
 
@@ -1385,6 +1284,9 @@ const Checkout = () => {
                           </span>
                           <p className="text-sm text-gray-600 mt-1">
                             {addr.address}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {addr.thana} - {addr.district} - {addr.region}
                           </p>
                           {addr.isDefaultShipping && (
                             <span className="text-xs text-blue-600 mt-1 inline-block">
