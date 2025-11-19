@@ -111,7 +111,7 @@ const AddressDrawer = ({
           <div className="flex gap-3 mt-6">
             <button
               onClick={onCancel}
-              className="flex-1 btn disabled:text-black/50"
+              className="flex-1 btn btn-outline disabled:text-black/50"
               disabled={isSaving}
             >
               CANCEL

@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 import { useCartCount } from "../../Hooks/useCartCount";
-import Loader from "../../Components/Loader/Loader";
 import CartHeader from "../../Components/Shared/Cart/CartHeader";
 import StoreGroup from "../../Components/Shared/Cart/StoreGroup";
 import OrderSummary from "../../Components/Shared/Cart/OrderSummary";

@@ -21,19 +21,28 @@ const OrderItemCard = ({ item, calculateItemPrice, onRemove }) => {
           )}
           {item.size && <span className="capitalize">Size: {item.size}</span>}
         </p>
-        <div className="flex items-center gap-3">
-          <p className="text-orange-500 font-semibold">৳ {price.toFixed(2)}</p>
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <p className="text-orange-500 font-semibold whitespace-nowrap">৳ {price.toFixed(2)}</p>
           {item.product?.discount > 0 && (
-            <>
-              <p className="text-gray-400 line-through text-sm">
+            <div className="flex gap-2 items-center flex-row mb-4">
+              <p className="text-gray-400 line-through text-sm whitespace-nowrap">
                 ৳ {originalPrice}
               </p>
               <p className="text-sm text-gray-600">-{item.product.discount}%</p>
-            </>
+            </div>
           )}
         </div>
+        <div className="flex items-center gap-8 sm:hidden">
+          <button
+            onClick={() => onRemove(item)}
+            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            <FaRegTrashAlt size={18} />
+          </button>
+          <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+        </div>
       </div>
-      <div className="flex flex-col items-end justify-between">
+      <div className="sm:flex flex-col items-end justify-between hidden">
         <button
           onClick={() => onRemove(item)}
           className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"

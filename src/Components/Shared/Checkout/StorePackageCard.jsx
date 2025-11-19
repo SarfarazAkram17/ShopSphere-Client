@@ -46,7 +46,7 @@ const StorePackageCard = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col gap-5 sm:flex-row sm:gap-0 sm:justify-between sm:items-center mb-4">
         <div>
           <p className="text-sm text-gray-600">
             Package {storeIndex + 1} of {totalStores}

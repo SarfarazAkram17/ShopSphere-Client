@@ -258,7 +258,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
                 key={route.name}
                 to={route.path}
                 end
-                className={`flex items-center gap-2 px-4 py-2 border-r-4 text-sm rounded-md transition-colors duration-200 hover:bg-gray-300 ${
+                className={`flex items-center gap-2 px-4 py-2 border-r-5 text-sm rounded-md transition-colors duration-200 hover:bg-gray-300 ${
                   pathname === route.path
                     ? "border-primary/75"
                     : "border-transparent"

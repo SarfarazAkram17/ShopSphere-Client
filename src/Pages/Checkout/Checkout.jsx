@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import useAuth from "../../Hooks/useAuth";
-import Loader from "../../Components/Loader/Loader";
 import { useAddressForm } from "../../Hooks/useAddressForm";
 import { useCartManagement } from "../../Hooks/useCartManagement";
 import { useCheckoutAddress } from "../../Hooks/useCheckoutAddress";
@@ -15,6 +14,7 @@ import {
 import PaymentSection from "../../Components/Shared/Checkout/PaymentSection";
 import CheckoutContent from "../../Components/Shared/Checkout/CheckoutContent";
 import CheckoutModals from "../../Components/Shared/Checkout/CheckoutModals";
+import CheckoutSkeleton from "../../Components/Shared/Checkout/CheckoutSkeleton";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ const Checkout = () => {
   }
 
   if (cart.isLoading || address.addressesLoading) {
-    return <Loader />;
+    return <CheckoutSkeleton />;
   }
 
   // Payment section
