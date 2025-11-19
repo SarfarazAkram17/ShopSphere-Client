@@ -13,6 +13,7 @@ import OrderSummary from "../../Components/Shared/Cart/OrderSummary";
 import EmptyCart from "../../Components/Shared/Cart/EmptyCart";
 import { saveShopCart } from "../../lib/localStorage";
 import useUserRole from "../../Hooks/useUserRole";
+import CartSkeleton from "../../Components/Shared/Cart/CartSkeleton";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -295,7 +296,7 @@ const Cart = () => {
     navigate("/checkout");
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <CartSkeleton />;
 
   if (cart.length === 0) {
     return <EmptyCart onContinueShopping={() => navigate("/products")} />;
