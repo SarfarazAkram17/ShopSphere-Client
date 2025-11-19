@@ -6,310 +6,159 @@ import { useAddressForm } from "../../Hooks/useAddressForm";
 import { useCartManagement } from "../../Hooks/useCartManagement";
 import { useCheckoutAddress } from "../../Hooks/useCheckoutAddress";
 import { useCheckoutOrder } from "../../Hooks/useCheckoutOrder";
+import { useCheckoutHandlers } from "../../Hooks/useCheckoutHandlers";
 import {
   groupCartItemsByStore,
   calculateCartTotals,
-  calculateItemPrice,
   formatTime,
 } from "../../lib/checkoutCalculations";
-// Components
-import AddressModal from "../../Components/Shared/AddressBook/AddressModal";
-import SessionTimer from "../../Components/Shared/Checkout/SessionTimer";
-import ShippingAddressCard from "../../Components/Shared/Checkout/ShippingAddressCard";
-import DeliveryInformationForm from "../../Components/Shared/Checkout/DeliveryInformationForm";
-import StorePackageCard from "../../Components/Shared/Checkout/StorePackageCard";
-import OrderSummary from "../../Components/Shared/Checkout/OrderSummary";
-import AddressDrawer from "../../Components/Shared/Checkout/AddressDrawer";
-import InvoiceDrawer from "../../Components/Shared/Checkout/InvoiceDrawer";
 import PaymentSection from "../../Components/Shared/Checkout/PaymentSection";
+import CheckoutContent from "../../Components/Shared/Checkout/CheckoutContent";
+import CheckoutModals from "../../Components/Shared/Checkout/CheckoutModals";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { user, userEmail } = useAuth();
 
-  // Address form management
-  const {
-    formData,
-    selectedRegion,
-    selectedDistrict,
-    selectedThana,
-    districts,
-    thanas,
-    regions,
-    setFormData,
-    handleRegionChange,
-    handleDistrictChange,
-    handleThanaChange,
-    resetForm,
-  } = useAddressForm();
+  // Form management
+  const addressForm = useAddressForm();
 
-  // Cart management
-  const { cartItems, remainingTime, isLoading, handleRemoveItem } =
-    useCartManagement();
+  // Data management
+  const cart = useCartManagement();
+  const address = useCheckoutAddress(addressForm.resetForm);
+  const order = useCheckoutOrder();
 
-  // Address management
-  const {
-    shippingAddress,
-    billingAddress,
-    tempShippingAddress,
-    tempBillingAddress,
-    showInlineAddressForm,
-    showShippingDrawer,
-    showInvoiceDrawer,
-    showBillingDrawer,
-    showAddAddressModal,
-    isClosingShipping,
-    isClosingInvoice,
-    isClosingBilling,
-    addresses,
-    addressesLoading,
-    addMutation,
-    setDefaultShippingMutation,
-    setDefaultBillingMutation,
-    setTempShippingAddress,
-    setTempBillingAddress,
-    setShowShippingDrawer,
-    setShowInvoiceDrawer,
-    setShowBillingDrawer,
-    setShowAddAddressModal,
-    cancelEditShippingAddress,
-    cancelEditBillingAddress,
-    cancelEditInvoiceInfo,
-  } = useCheckoutAddress(resetForm);
-
-  // Order management
-  const {
-    showPaymentSection,
-    createdOrder,
-    selectedPaymentMethod,
-    isProcessingPayment,
-    setSelectedPaymentMethod,
-    handleProceedToPay,
-    handleConfirmOrder,
-    handlePaymentSuccess,
-  } = useCheckoutOrder();
-
-  // Calculate grouped stores and totals
-  const groupedByStore = groupCartItemsByStore(cartItems);
+  // Calculations
+  const groupedByStore = groupCartItemsByStore(cart.cartItems);
   const totals = calculateCartTotals(
-    cartItems,
+    cart.cartItems,
     groupedByStore,
-    shippingAddress
+    address.shippingAddress
   );
 
-  // Handle inline address form submission
-  const handleAddInlineAddress = () => {
-    if (
-      !formData.name ||
-      !formData.phone ||
-      !formData.region ||
-      !formData.district ||
-      !formData.thana ||
-      !formData.address
-    ) {
-      return toast.warn("Fill all the required fields");
-    }
+  // Handlers
+  const handlers = useCheckoutHandlers({
+    formData: addressForm.formData,
+    userEmail,
+    tempShippingAddress: address.tempShippingAddress,
+    tempBillingAddress: address.tempBillingAddress,
+    billingAddress: address.billingAddress,
+    addMutation: address.addMutation,
+    setDefaultShippingMutation: address.setDefaultShippingMutation,
+    setDefaultBillingMutation: address.setDefaultBillingMutation,
+    setShowInvoiceDrawer: address.setShowInvoiceDrawer,
+  });
 
-    addMutation.mutate(formData);
+  const handleProceedToPayWrapper = () => {
+    order.handleProceedToPay(
+      address.shippingAddress,
+      address.billingAddress,
+      cart.cartItems,
+      groupedByStore,
+      totals
+    );
   };
 
-  // Handle shipping address save
-  const handleSaveShippingAddress = () => {
-    if (!tempShippingAddress) {
-      toast.warn("Please select an address");
-      return;
-    }
-
-    setDefaultShippingMutation.mutate(tempShippingAddress);
-  };
-
-  // Handle billing address save
-  const handleSaveBillingAddress = () => {
-    if (!tempBillingAddress) {
-      toast.warn("Please select a billing address");
-      return;
-    }
-
-    setDefaultBillingMutation.mutate(tempBillingAddress);
-  };
-
-  // Handle invoice info save
-  const handleSaveInvoiceInfo = () => {
-    if (!userEmail) {
-      toast.warn("Please enter email address");
-      return;
-    }
-
-    if (!billingAddress) {
-      toast.warn("Please select a billing address");
-      return;
-    }
-
-    toast.success("Invoice information updated successfully");
-    setShowInvoiceDrawer(false);
-  };
-
+  // Early returns
   if (!user) {
     toast.error("Please login first!");
     navigate("/login");
     return null;
   }
 
-  if (isLoading || addressesLoading) return <Loader />;
+  if (cart.isLoading || address.addressesLoading) {
+    return <Loader />;
+  }
 
-  // Payment Section
-  if (showPaymentSection && createdOrder) {
+  // Payment section
+  if (order.showPaymentSection && order.createdOrder) {
     return (
       <PaymentSection
-        remainingTime={remainingTime}
+        remainingTime={cart.remainingTime}
         formatTime={formatTime}
-        selectedPaymentMethod={selectedPaymentMethod}
-        setSelectedPaymentMethod={setSelectedPaymentMethod}
-        createdOrder={createdOrder}
+        selectedPaymentMethod={order.selectedPaymentMethod}
+        setSelectedPaymentMethod={order.setSelectedPaymentMethod}
+        createdOrder={order.createdOrder}
         totals={totals}
-        handlePaymentSuccess={handlePaymentSuccess}
-        handleConfirmOrder={handleConfirmOrder}
-        isProcessingPayment={isProcessingPayment}
-        cartItems={cartItems}
+        handlePaymentSuccess={order.handlePaymentSuccess}
+        handleConfirmOrder={order.handleConfirmOrder}
+        isProcessingPayment={order.isProcessingPayment}
+        cartItems={cart.cartItems}
       />
     );
   }
 
-  // Main Checkout Section
+  // Main checkout
   return (
-    <div className="bg-gray-50">
-      <div className="max-w-[1500px] mx-auto px-4 py-8">
-        <SessionTimer remainingTime={remainingTime} formatTime={formatTime} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Section - Order Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Shipping Address or Inline Form */}
-            {shippingAddress && !showInlineAddressForm ? (
-              <ShippingAddressCard
-                shippingAddress={shippingAddress}
-                onEdit={() => setShowShippingDrawer(true)}
-              />
-            ) : (
-              <DeliveryInformationForm
-                formData={formData}
-                setFormData={setFormData}
-                selectedRegion={selectedRegion}
-                selectedDistrict={selectedDistrict}
-                selectedThana={selectedThana}
-                regions={regions}
-                districts={districts}
-                thanas={thanas}
-                handleRegionChange={handleRegionChange}
-                handleDistrictChange={handleDistrictChange}
-                handleThanaChange={handleThanaChange}
-                onSave={handleAddInlineAddress}
-                isSubmitting={addMutation.isPending}
-              />
-            )}
-
-            {/* Package Items by Store */}
-            <div className="space-y-4">
-              {Object.entries(groupedByStore).map(
-                ([storeId, storeData], storeIndex) => (
-                  <StorePackageCard
-                    key={storeId}
-                    storeData={storeData}
-                    storeIndex={storeIndex}
-                    totalStores={Object.keys(groupedByStore).length}
-                    shippingAddress={shippingAddress}
-                    calculateItemPrice={calculateItemPrice}
-                    onRemoveItem={handleRemoveItem}
-                  />
-                )
-              )}
-            </div>
-          </div>
-
-          {/* Right Section - Summary */}
-          <div className="lg:col-span-1">
-            <OrderSummary
-              totals={totals}
-              cartItems={cartItems}
-              shippingAddress={shippingAddress}
-              billingAddress={billingAddress}
-              onProceedToPay={() =>
-                handleProceedToPay(
-                  shippingAddress,
-                  billingAddress,
-                  cartItems,
-                  groupedByStore,
-                  totals
-                )
-              }
-              onEditInvoice={() => setShowInvoiceDrawer(true)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Shipping Address Drawer */}
-      <AddressDrawer
-        isOpen={showShippingDrawer}
-        isClosing={isClosingShipping}
-        title="Shipping Address"
-        addresses={addresses}
-        selectedAddress={tempShippingAddress}
-        onSelectAddress={setTempShippingAddress}
-        onAddNew={() => setShowAddAddressModal(true)}
-        onSave={handleSaveShippingAddress}
-        onCancel={cancelEditShippingAddress}
-        isSaving={setDefaultShippingMutation.isPending}
-        addressType="shipping"
+    <>
+      <CheckoutContent
+        remainingTime={cart.remainingTime}
+        formatTime={formatTime}
+        shippingAddress={address.shippingAddress}
+        showInlineAddressForm={address.showInlineAddressForm}
+        setShowShippingDrawer={address.setShowShippingDrawer}
+        formData={addressForm.formData}
+        setFormData={addressForm.setFormData}
+        selectedRegion={addressForm.selectedRegion}
+        selectedDistrict={addressForm.selectedDistrict}
+        selectedThana={addressForm.selectedThana}
+        regions={addressForm.regions}
+        districts={addressForm.districts}
+        thanas={addressForm.thanas}
+        handleRegionChange={addressForm.handleRegionChange}
+        handleDistrictChange={addressForm.handleDistrictChange}
+        handleThanaChange={addressForm.handleThanaChange}
+        handleAddInlineAddress={handlers.handleAddInlineAddress}
+        addMutation={address.addMutation}
+        groupedByStore={groupedByStore}
+        handleRemoveItem={cart.handleRemoveItem}
+        totals={totals}
+        cartItems={cart.cartItems}
+        billingAddress={address.billingAddress}
+        handleProceedToPay={handleProceedToPayWrapper}
+        setShowInvoiceDrawer={address.setShowInvoiceDrawer}
       />
 
-      {/* Invoice Drawer */}
-      <InvoiceDrawer
-        isOpen={showInvoiceDrawer}
-        isClosing={isClosingInvoice}
+      <CheckoutModals
+        showShippingDrawer={address.showShippingDrawer}
+        isClosingShipping={address.isClosingShipping}
+        tempShippingAddress={address.tempShippingAddress}
+        setTempShippingAddress={address.setTempShippingAddress}
+        handleSaveShippingAddress={handlers.handleSaveShippingAddress}
+        cancelEditShippingAddress={address.cancelEditShippingAddress}
+        setDefaultShippingMutation={address.setDefaultShippingMutation}
+        showBillingDrawer={address.showBillingDrawer}
+        isClosingBilling={address.isClosingBilling}
+        tempBillingAddress={address.tempBillingAddress}
+        setTempBillingAddress={address.setTempBillingAddress}
+        handleSaveBillingAddress={handlers.handleSaveBillingAddress}
+        cancelEditBillingAddress={address.cancelEditBillingAddress}
+        setDefaultBillingMutation={address.setDefaultBillingMutation}
+        showInvoiceDrawer={address.showInvoiceDrawer}
+        isClosingInvoice={address.isClosingInvoice}
         userEmail={userEmail}
-        billingAddress={billingAddress}
-        onEditBilling={() => setShowBillingDrawer(true)}
-        onSave={handleSaveInvoiceInfo}
-        onCancel={cancelEditInvoiceInfo}
+        billingAddress={address.billingAddress}
+        setShowBillingDrawer={address.setShowBillingDrawer}
+        handleSaveInvoiceInfo={handlers.handleSaveInvoiceInfo}
+        cancelEditInvoiceInfo={address.cancelEditInvoiceInfo}
+        showAddAddressModal={address.showAddAddressModal}
+        setShowAddAddressModal={address.setShowAddAddressModal}
+        formData={addressForm.formData}
+        setFormData={addressForm.setFormData}
+        selectedRegion={addressForm.selectedRegion}
+        selectedDistrict={addressForm.selectedDistrict}
+        selectedThana={addressForm.selectedThana}
+        regions={addressForm.regions}
+        districts={addressForm.districts}
+        thanas={addressForm.thanas}
+        handleRegionChange={addressForm.handleRegionChange}
+        handleDistrictChange={addressForm.handleDistrictChange}
+        handleThanaChange={addressForm.handleThanaChange}
+        handleAddInlineAddress={handlers.handleAddInlineAddress}
+        addMutation={address.addMutation}
+        addresses={address.addresses}
       />
-
-      {/* Billing Address Drawer */}
-      <AddressDrawer
-        isOpen={showBillingDrawer}
-        isClosing={isClosingBilling}
-        title="Billing Address"
-        addresses={addresses}
-        selectedAddress={tempBillingAddress}
-        onSelectAddress={setTempBillingAddress}
-        onAddNew={() => setShowAddAddressModal(true)}
-        onSave={handleSaveBillingAddress}
-        onCancel={cancelEditBillingAddress}
-        isSaving={setDefaultBillingMutation.isPending}
-        addressType="billing"
-      />
-
-      {/* Add Address Modal */}
-      {showAddAddressModal && (
-        <AddressModal
-          isEdit={false}
-          formData={formData}
-          setFormData={setFormData}
-          selectedRegion={selectedRegion}
-          selectedDistrict={selectedDistrict}
-          selectedThana={selectedThana}
-          regions={regions}
-          districts={districts}
-          thanas={thanas}
-          onRegionChange={handleRegionChange}
-          onDistrictChange={handleDistrictChange}
-          onThanaChange={handleThanaChange}
-          onSubmit={handleAddInlineAddress}
-          onClose={() => setShowAddAddressModal(false)}
-          isSubmitting={addMutation.isPending}
-        />
-      )}
-    </div>
+    </>
   );
 };
 
