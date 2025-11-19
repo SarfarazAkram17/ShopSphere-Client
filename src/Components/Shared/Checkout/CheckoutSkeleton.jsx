@@ -163,6 +163,7 @@ const CheckoutSkeleton = () => {
             </div>
 
             <StorePackageSkeleton />
+            <StorePackageSkeleton />
           </div>
 
           {/* Order Summary */}
