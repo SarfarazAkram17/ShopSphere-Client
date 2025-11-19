@@ -8,7 +8,7 @@ const PaymentSummary = ({ totals, cartItems, selectedPaymentMethod }) => {
   const finalTotal = totals.total + cashPaymentFee;
 
   return (
-    <div className="bg-white rounded-lg shadow-xl p-6 sticky top-6">
+    <div className="bg-white rounded-lg shadow-xl p-6 sticky top-16">
       <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
 
       <div className="space-y-3 text-sm mb-6">

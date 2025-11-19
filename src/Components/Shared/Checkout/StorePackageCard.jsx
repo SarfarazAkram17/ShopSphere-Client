@@ -36,6 +36,9 @@ const StorePackageCard = ({
                   : 150}
               </p>
               <p className="text-sm text-gray-600">Standard Delivery</p>
+              <p className="text-sm text-gray-600">
+                Guaranteed by 28 Oct-1 Nov
+              </p>
             </div>
           </div>
         </div>
