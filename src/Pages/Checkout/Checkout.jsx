@@ -66,7 +66,7 @@ const Checkout = () => {
     return null;
   }
 
-  if (!cart.isLoading || !address.addressesLoading) {
+  if (cart.isLoading || address.addressesLoading) {
     return <CheckoutSkeleton />;
   }
 
