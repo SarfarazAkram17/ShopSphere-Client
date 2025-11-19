@@ -4,7 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import { useState, useRef, useEffect } from "react";
 import { RiMenu2Line } from "react-icons/ri";
 import useAuth from "../../../Hooks/useAuth";
-import { FaRegBell } from "react-icons/fa6";
+// import { FaRegBell } from "react-icons/fa6";
 import CartIcon from "../Cart/CartIcon";
 import NavLinks from "./NavLinks";
 import ProfileDropdown from "./ProfileDropdown";
@@ -82,14 +82,14 @@ const Navbar = () => {
             )}
 
             {/* Notification Bell */}
-            {user && (
+            {/* {user && (
               <div className="indicator cursor-pointer">
                 <FaRegBell size={23} />
                 <span className="text-xs bg-error text-white flex justify-center items-center rounded-full h-4.5 w-4.5 indicator-item">
                   3
                 </span>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Profile Dropdown or Auth Buttons */}

@@ -8,6 +8,42 @@ const StorePackageCard = ({
   calculateItemPrice,
   onRemoveItem,
 }) => {
+  // Calculate delivery date range
+  const getDeliveryDateRange = (isSameDistrict) => {
+    const today = new Date();
+    const startDay = isSameDistrict ? 1 : 7;
+    const endDay = isSameDistrict ? 3 : 10;
+
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() + startDay);
+
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + endDay);
+
+    const formatDate = (date) => {
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return `${date.getDate()} ${months[date.getMonth()]}`;
+    };
+
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  };
+
+  const isSameDistrict =
+    shippingAddress?.district === storeData.storeInfo?.district;
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex justify-between items-center mb-4">
@@ -29,15 +65,10 @@ const StorePackageCard = ({
               <span className="text-white text-xs">✓</span>
             </div>
             <div>
-              <p className="font-medium">
-                ৳{" "}
-                {shippingAddress.district === storeData.storeInfo?.district
-                  ? 80
-                  : 150}
-              </p>
+              <p className="font-medium">৳ {isSameDistrict ? 80 : 150}</p>
               <p className="text-sm text-gray-600">Standard Delivery</p>
               <p className="text-sm text-gray-600">
-                Guaranteed by 28 Oct-1 Nov
+                Guaranteed by {getDeliveryDateRange(isSameDistrict)}
               </p>
             </div>
           </div>
