@@ -302,7 +302,7 @@ const Cart = () => {
   }
 
   return (
-    <section className="bg-gray-100 min-h-screen w-full">
+    <section className="bg-gray-100 w-full">
       <div className="max-w-[1500px] mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Cart Items Section */}
