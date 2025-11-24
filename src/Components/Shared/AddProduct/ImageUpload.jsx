@@ -117,7 +117,7 @@ export const ImageUpload = ({
               <img
                 src={url}
                 alt={`Product ${index + 1}`}
-                className="w-full h-44 sm:h-52 object-cover rounded-xl border-2 border-gray-200 shadow-md transition-transform group-hover:scale-105"
+                className="w-full h-44 sm:h-52 object-contain rounded-xl border-2 border-gray-200 shadow-md transition-transform group-hover:scale-105"
               />
               <button
                 type="button"

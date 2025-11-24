@@ -177,7 +177,7 @@ const MyOrders = () => {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Order ID</p>
                       <p className="font-mono text-sm font-semibold text-gray-900">
-                        #{order._id.toUpperCase()}
+                        {order._id.toUpperCase()}
                       </p>
                     </div>
                     <div className="hidden sm:block w-px h-10 bg-gray-300"></div>

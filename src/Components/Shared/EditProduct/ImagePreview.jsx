@@ -21,7 +21,7 @@ export const ImagePreview = ({
             <img
               src={typeof image === "string" ? image : image.url}
               alt={`${label} ${index + 1}`}
-              className={`w-full h-44 sm:h-52 object-cover rounded-xl border-2 shadow-md transition-transform group-hover:scale-105 ${
+              className={`w-full h-44 sm:h-52 object-contain rounded-xl border-2 shadow-md transition-transform group-hover:scale-105 ${
                 badgeColor === "green" ? "border-green-200" : "border-gray-200"
               }`}
             />
