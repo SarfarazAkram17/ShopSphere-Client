@@ -82,7 +82,7 @@ const MyOrders = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      <div className="bg-white rounded-lg shadow-md hover:shadow-lg p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1">
