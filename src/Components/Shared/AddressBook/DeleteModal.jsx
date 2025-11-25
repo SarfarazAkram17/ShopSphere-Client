@@ -3,7 +3,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 
 const DeleteModal = ({ address, onConfirm, onCancel, isDeleting }) => {
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-100 p-4">
       <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
         <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6">
           <h3 className="text-2xl font-bold text-white flex items-center gap-3">

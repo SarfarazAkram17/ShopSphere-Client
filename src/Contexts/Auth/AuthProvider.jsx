@@ -92,6 +92,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     queryClient.clear();
     await axiosInstance.post("/auth/logout");
+    localStorage.clear();
     return signOut(auth);
   };
 

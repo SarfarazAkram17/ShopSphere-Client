@@ -26,7 +26,7 @@ const DeliveryInformationForm = ({
         {/* Full Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Full name
+            Full name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -40,7 +40,7 @@ const DeliveryInformationForm = ({
         {/* Phone Number */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone Number
+            Phone Number <span className="text-red-500">*</span>
           </label>
           <input
             type="tel"
@@ -56,7 +56,7 @@ const DeliveryInformationForm = ({
         {/* Region */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Region
+            Region <span className="text-red-500">*</span>
           </label>
           <Select
             options={regions.map((r) => ({ value: r, label: r }))}
@@ -77,7 +77,7 @@ const DeliveryInformationForm = ({
         {/* District */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            District
+            District <span className="text-red-500">*</span>
           </label>
           <Select
             options={districts.map((d) => ({ value: d, label: d }))}
@@ -102,7 +102,7 @@ const DeliveryInformationForm = ({
         {/* Thana */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Thana
+            Thana <span className="text-red-500">*</span>
           </label>
           <Select
             options={thanas.map((t) => ({ value: t, label: t }))}
@@ -143,7 +143,7 @@ const DeliveryInformationForm = ({
         {/* Full Address */}
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Address
+            Full Address <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
