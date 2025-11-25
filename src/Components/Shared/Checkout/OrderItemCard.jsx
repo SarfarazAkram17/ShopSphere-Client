@@ -24,7 +24,7 @@ const OrderItemCard = ({ item, calculateItemPrice, onRemove }) => {
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
           <p className="text-orange-500 font-semibold whitespace-nowrap">৳ {price.toFixed(2)}</p>
           {item.product?.discount > 0 && (
-            <div className="flex gap-2 items-center flex-row mb-4">
+            <div className="flex gap-2 items-center flex-row">
               <p className="text-gray-400 line-through text-sm whitespace-nowrap">
                 ৳ {originalPrice}
               </p>

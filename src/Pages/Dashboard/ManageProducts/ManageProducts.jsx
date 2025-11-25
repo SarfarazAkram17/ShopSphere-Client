@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
-import { Pagination } from "antd";
 import useAuth from "../../../Hooks/useAuth";
 import ProductCardSkeleton from "../../../Components/Shared/ManageProducts/ProductCardSkeleton";
 import ProductCard from "../../../Components/Shared/ManageProducts/ProductCard";
+import Pagination from "@mui/material/Pagination";
 
 const ManageProducts = () => {
   const { userEmail } = useAuth();
@@ -82,16 +82,16 @@ const ManageProducts = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-end mt-10">
             <Pagination
-              current={page}
-              align="center"
-              total={total}
-              pageSize={12}
-              showSizeChanger={false}
-              onChange={(newPage) => {
-                setPage(newPage);
-              }}
+              count={Math.ceil(total / 12)}
+              page={page}
+              variant="outlined"
+              shape="rounded"
+              color="primary"
+              showFirstButton
+              showLastButton
+              onChange={(e, value) => setPage(value)}
             />
           </div>
         </>

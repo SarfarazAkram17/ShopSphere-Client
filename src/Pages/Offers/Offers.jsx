@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pagination, Drawer } from "antd";
+import { Drawer } from "antd";
 import useAxios from "../../Hooks/useAxios";
 import ProductCardSkeleton from "../../Components/Shared/Products/ProductCardSkeleton";
 import ProductCard from "../../Components/Shared/Products/ProductCard";
 import { RiMenuSearchLine } from "react-icons/ri";
 import RenderFilters from "../../lib/RenderFilters";
+import Pagination from "@mui/material/Pagination";
 
 const Offers = () => {
   const axiosInstance = useAxios();
@@ -176,13 +177,16 @@ const Offers = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-end mt-10">
             <Pagination
-              current={page}
-              total={total}
-              pageSize={24}
-              showSizeChanger={false}
-              onChange={(newPage) => setPage(newPage)}
+              count={Math.ceil(total / 20)}
+              page={page}
+              variant="outlined"
+              shape="rounded"
+              color="primary"
+              showFirstButton
+              showLastButton
+              onChange={(e, value) => setPage(value)}
             />
           </div>
         </>
