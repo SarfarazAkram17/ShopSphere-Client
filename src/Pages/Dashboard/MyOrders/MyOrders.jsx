@@ -18,6 +18,7 @@ const MyOrders = () => {
     value: "all",
     label: "All Orders",
   });
+  const [stats, setStats] = useState(null);
 
   const statusOptions = [
     { value: "all", label: "All Orders" },
@@ -64,6 +65,7 @@ const MyOrders = () => {
           status: statusFilter.value !== "all" ? statusFilter.value : undefined,
         },
       });
+      setStats(res.data?.stats);
       return res.data;
     },
 
@@ -120,7 +122,7 @@ const MyOrders = () => {
           {["all", "pending", "confirmed", "shipped", "delivered"].map(
             (status) => (
               <div key={status} className="text-center">
-                {isPending ? (
+                {!stats ? (
                   <div className="flex justify-center">
                     <div className="relative w-12 h-10 bg-base-300 rounded overflow-hidden">
                       <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
@@ -128,7 +130,7 @@ const MyOrders = () => {
                   </div>
                 ) : (
                   <p className="text-3xl font-bold text-gray-900">
-                    {data?.stats[status]}
+                    {stats[status]}
                   </p>
                 )}
                 <p className="text-sm text-gray-600 capitalize mt-1">
