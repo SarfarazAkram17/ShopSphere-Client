@@ -117,6 +117,7 @@ const Checkout = () => {
         billingAddress={address.billingAddress}
         handleProceedToPay={handleProceedToPayWrapper}
         setShowInvoiceDrawer={address.setShowInvoiceDrawer}
+        isCreatingOrder={order.isCreatingOrder}
       />
 
       <CheckoutModals

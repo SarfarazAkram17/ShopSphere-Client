@@ -5,6 +5,7 @@ const OrderSummary = ({
   billingAddress,
   onProceedToPay,
   onEditInvoice,
+  isCreatingOrder
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-xl p-6 sticky top-18 space-y-6">
@@ -54,7 +55,7 @@ const OrderSummary = ({
 
       <button
         onClick={onProceedToPay}
-        disabled={!shippingAddress || !billingAddress}
+        disabled={isCreatingOrder || !shippingAddress || !billingAddress}
         className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
       >
         Proceed to Pay (

@@ -107,6 +107,7 @@ export const useCheckoutOrder = () => {
     createdOrder,
     selectedPaymentMethod,
     isProcessingPayment,
+    isCreatingOrder: createOrderMutation.isPending,
     setSelectedPaymentMethod,
     handleProceedToPay,
     handleConfirmOrder,
