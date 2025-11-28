@@ -18,6 +18,7 @@ const MyOrders = () => {
     value: "all",
     label: "All Orders",
   });
+  const [stats, setStats] = useState(null);
 
   const statusOptions = [
     { value: "all", label: "All Orders" },
@@ -64,6 +65,7 @@ const MyOrders = () => {
           status: statusFilter.value !== "all" ? statusFilter.value : undefined,
         },
       });
+      setStats(res.data?.stats);
       return res.data;
     },
 
@@ -77,8 +79,8 @@ const MyOrders = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Orders</h1>
-        <p className="text-gray-600">Track and manage your orders</p>
+        <h1 className="text-3xl font-bold text-primary mb-2">My Orders</h1>
+        <p className="text-gray-700 font-medium">Track and manage your orders</p>
       </div>
 
       {/* Filters and Search */}
@@ -116,27 +118,30 @@ const MyOrders = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4 pt-4 border-t">
-          {["all", "pending", "confirmed", "shipped", "delivered"].map(
-            (status) => (
-              <div key={status} className="text-center">
-                {isPending ? (
-                  <div className="flex justify-center">
-                    <div className="relative w-12 h-10 bg-base-300 rounded overflow-hidden">
-                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-                    </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mt-4 pt-4 border-t">
+          {[
+            "all",
+            "pending",
+            "confirmed",
+            "shipped",
+            "delivered",
+            "cancelled",
+          ].map((status) => (
+            <div key={status} className="text-center">
+              {!stats ? (
+                <div className="flex justify-center">
+                  <div className="relative w-12 h-10 bg-base-300 rounded overflow-hidden">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   </div>
-                ) : (
-                  <p className="text-3xl font-bold text-gray-900">
-                    {data?.stats[status]}
-                  </p>
-                )}
-                <p className="text-sm text-gray-600 capitalize mt-1">
-                  {status}
+                </div>
+              ) : (
+                <p className="text-3xl font-bold text-gray-900">
+                  {stats[status]}
                 </p>
-              </div>
-            )
-          )}
+              )}
+              <p className="text-sm text-gray-600 capitalize mt-1">{status}</p>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -237,7 +237,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
         {/* Sidebar layout wrapper */}
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-4 pb-2 shrink-0 border-b border-gray-300">
+          <div className="p-4 pb-2 shrink-0 border-b border-gray-400">
             <Link to="/" className="flex items-center gap-2">
               <img
                 src="/logo.png"
@@ -282,7 +282,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
           </nav>
 
           {/* User info */}
-          <div className="shrink-0 border-t-[1.5px] border-gray-300 bg-gray-100 py-2 px-4 flex gap-2 items-center">
+          <div className="shrink-0 border-t-[1.5px] border-gray-400 bg-gray-100 py-2 px-4 flex gap-2 items-center">
             <img
               src={user?.photoURL}
               alt={user?.displayName}

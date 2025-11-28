@@ -31,6 +31,7 @@ const CheckoutContent = ({
   billingAddress,
   handleProceedToPay,
   setShowInvoiceDrawer,
+  isCreatingOrder
 }) => {
   return (
     <div className="bg-gray-50">
@@ -91,6 +92,7 @@ const CheckoutContent = ({
               billingAddress={billingAddress}
               onProceedToPay={handleProceedToPay}
               onEditInvoice={() => setShowInvoiceDrawer(true)}
+              isCreatingOrder={isCreatingOrder}
             />
           </div>
         </div>

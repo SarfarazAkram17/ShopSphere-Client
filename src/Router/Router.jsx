@@ -51,6 +51,7 @@ import ProtectAuthRoutes from "../Routes/ProtectAuthRoutes";
 import Register from "../Pages/Register/Register";
 import Login from "../Pages/Login/Login";
 import Checkout from "../Pages/Checkout/Checkout";
+import CancelOrder from "../Pages/Dashboard/CancelOrder/CancelOrder";
 
 const Home = lazy(() => import("../Pages/Home/Home/Home"));
 const About = lazy(() => import("../Pages/About/About"));
@@ -196,6 +197,14 @@ export const router = createBrowserRouter([
         element: (
           <CustomerRoutes>
             <MyOrders></MyOrders>
+          </CustomerRoutes>
+        ),
+      },
+      {
+        path: "cancelOrder/:orderId",
+        element: (
+          <CustomerRoutes>
+            <CancelOrder></CancelOrder>
           </CustomerRoutes>
         ),
       },
