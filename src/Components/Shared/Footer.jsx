@@ -4,6 +4,7 @@ import logo from "/logo.png";
 import { FaGithub, FaXTwitter } from "react-icons/fa6";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { IoMdHeart } from "react-icons/io";
+import LazyImage from "../../Components/LazyImage/LazyImage";
 
 const Footer = () => {
   const quickLinks = [
@@ -21,7 +22,12 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="ShopSphere Logo" className="h-12 w-auto" />
+              <LazyImage
+                src={logo}
+                alt="ShopSphere Logo"
+                className="h-12 w-auto"
+                priority={true}
+              />
               <span className="text-[#392B12] font-bold text-2xl">
                 ShopSphere
               </span>

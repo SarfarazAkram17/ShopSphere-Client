@@ -22,6 +22,7 @@ import useAuth from "../../../Hooks/useAuth";
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import { toast } from "react-toastify";
 import { FaAddressBook } from "react-icons/fa6";
+import LazyImage from "../../LazyImage/LazyImage";
 
 export default function DashboardSidebar({ isOpen, setIsOpen }) {
   const { user, logOutUser } = useAuth();
@@ -239,10 +240,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
           {/* Logo */}
           <div className="p-4 pb-2 shrink-0 border-b border-gray-400">
             <Link to="/" className="flex items-center gap-2">
-              <img
+              <LazyImage
                 src="/logo.png"
                 alt="ShopSphere Logo"
                 className="h-8 lg:h-10 w-auto"
+                priority={true}
               />
               <span className="text-[#392B12] font-bold text-lg">
                 ShopSphere
@@ -283,10 +285,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
 
           {/* User info */}
           <div className="shrink-0 border-t-[1.5px] border-gray-400 bg-gray-100 py-2 px-4 flex gap-2 items-center">
-            <img
+            <LazyImage
               src={user?.photoURL}
               alt={user?.displayName}
               className="h-12 w-12 border-primary border-[1.5px] object-cover rounded-full"
+              priority={true}
             />
             <div>
               <p className="font-bold text-xs">{user?.displayName}</p>

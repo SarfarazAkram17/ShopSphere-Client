@@ -46,7 +46,7 @@ const CancellationSummary = ({
       <div className="pt-3 border-t mb-4">
         <div className="flex justify-between items-center">
           <span className="font-bold text-gray-900">Total Refund:</span>
-          <span className="text-2xl font-bold text-blue-600">
+          <span className="text-2xl font-bold text-error">
             ৳{refundDetails.totalRefund.toFixed(2)}
           </span>
         </div>

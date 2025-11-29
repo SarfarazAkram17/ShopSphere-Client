@@ -10,6 +10,7 @@ import NavLinks from "./NavLinks";
 import ProfileDropdown from "./ProfileDropdown";
 import MobileMenu from "./MobileMenu";
 import useUserRole from "../../../Hooks/useUserRole";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const Navbar = () => {
   const { user } = useAuth();
@@ -57,10 +58,11 @@ const Navbar = () => {
           </div>
 
           <Link to="/" className="flex items-center gap-1">
-            <img
+            <LazyImage
               src={logo}
               alt="ShopSphere Logo"
               className="h-10 md:h-12 w-auto"
+              priority={true}
             />
             <span className="text-[#392B12] font-bold md:text-xl whitespace-nowrap">
               ShopSphere

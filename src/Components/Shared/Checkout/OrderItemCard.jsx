@@ -1,4 +1,5 @@
 import { FaRegTrashAlt } from "react-icons/fa";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const OrderItemCard = ({ item, calculateItemPrice, onRemove }) => {
   const price = calculateItemPrice(item);
@@ -6,10 +7,10 @@ const OrderItemCard = ({ item, calculateItemPrice, onRemove }) => {
 
   return (
     <div className="flex gap-4 border-t pt-4 first:border-t-0 first:pt-0">
-      <img
+      <LazyImage
         src={item.product?.image}
         alt={item.product?.name || "Product"}
-        className="w-24 h-24 object-contain rounded"
+        className="w-24 h-24 rounded"
       />
       <div className="flex-1">
         <h3 className="text-sm font-medium mb-1">{item.product?.name}</h3>

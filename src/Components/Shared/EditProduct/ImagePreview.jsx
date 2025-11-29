@@ -1,3 +1,5 @@
+import LazyImage from "../../LazyImage/LazyImage";
+
 export const ImagePreview = ({
   images,
   label,
@@ -18,12 +20,13 @@ export const ImagePreview = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {images.map((image, index) => (
           <div key={index} className="relative group">
-            <img
-              src={typeof image === "string" ? image : image.url}
+            <LazyImage
+              src={image}
               alt={`${label} ${index + 1}`}
-              className={`w-full h-44 sm:h-52 object-contain rounded-xl border-2 shadow-md transition-transform group-hover:scale-105 ${
+              className={`w-full h-44 sm:h-52 rounded-xl border-2 shadow-md transition-transform group-hover:scale-105 ${
                 badgeColor === "green" ? "border-green-200" : "border-gray-200"
               }`}
+              rootMargin="40px"
             />
             <button
               type="button"

@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import ManageSellersTableSkeleton from "../../../Components/Shared/ManageSellers/ManageSellersTableSkeleton";
 import ManageSellersSearchAndFilter from "../../../Components/Shared/ManageSellers/ManageSellersSearchAndFilter";
+import LazyImage from "../../../Components/LazyImage/LazyImage";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -282,12 +283,12 @@ const ManageSellers = () => {
               <p>
                 <strong>Experience:</strong> {selectedSeller.experience} years
               </p>
-              <img
+              <LazyImage
                 src={selectedSeller.storeLogo}
                 alt={selectedSeller.storeName}
                 className="h-12 w-auto"
               />
-              <img
+              <LazyImage
                 src={selectedSeller.coverImage}
                 alt={selectedSeller.storeName}
                 className="h-40 rounded-md w-full"

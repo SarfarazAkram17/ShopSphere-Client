@@ -9,6 +9,7 @@ import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useEffect, useState } from "react";
 import { useCartCount } from "../../../Hooks/useCartCount";
+import LazyImage from '../../LazyImage/LazyImage'
 
 const ProductSection = ({
   selectedImage,
@@ -141,10 +142,11 @@ const ProductSection = ({
       {/* product image */}
       <div>
         <div className="border relative rounded-lg overflow-hidden">
-          <img
+          <LazyImage
             src={selectedImage || product.images[0]}
             alt={product.name}
-            className="w-full h-auto object-contain"
+            className="w-full h-auto"
+            priority={true}
           />
           {product.discount > 0 && (
             <span className="absolute top-2 right-2 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
@@ -162,10 +164,10 @@ const ProductSection = ({
                 selectedImage === img ? "border-primary" : "border-gray-300"
               }`}
             >
-              <img
+              <LazyImage
                 src={img}
                 alt="thumbnail"
-                className="h-full object-contain rounded"
+                className="h-full rounded"
               />
             </div>
           ))}

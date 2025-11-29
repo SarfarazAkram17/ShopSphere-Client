@@ -7,6 +7,7 @@ import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useCartCount } from "../../../Hooks/useCartCount";
 import { useEffect, useState } from "react";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const ProductCard = ({ product, discountedPrice }) => {
   const { user, userEmail } = useAuth();
@@ -50,15 +51,13 @@ const ProductCard = ({ product, discountedPrice }) => {
     try {
       const requestBody = {
         productId: product._id,
-        quantity: 1, // ProductCard always adds 1 at a time
+        quantity: 1,
       };
 
-      // Only add color if product has color options (use first color as default)
       if (product.color && product.color.length > 0) {
         requestBody.color = product.color[0];
       }
 
-      // Only add size if product has size options (use first size as default)
       if (product.size && product.size.length > 0) {
         requestBody.size = product.size[0];
       }
@@ -68,7 +67,6 @@ const ProductCard = ({ product, discountedPrice }) => {
       toast.success("Product added to cart!");
       refetch();
     } catch (error) {
-      // Handle stock validation error from backend
       if (error.response?.data?.availableToAdd !== undefined) {
         const { availableToAdd, existingQuantity, totalStock } =
           error.response.data;
@@ -83,11 +81,9 @@ const ProductCard = ({ product, discountedPrice }) => {
     }
   };
 
-  // Determine button state
   const isOutOfStock = product.stock <= 0;
   const isMaxedInCart = maxQuantity === 0;
 
-  // Button text
   const getButtonText = () => {
     if (isOutOfStock) return "Out of Stock";
     if (isMaxedInCart) return "Max in Cart";
@@ -96,12 +92,15 @@ const ProductCard = ({ product, discountedPrice }) => {
 
   return (
     <div className="border group rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-500 h-full flex flex-col">
+      {/* Using LazyImage Component */}
       <div className="relative">
-        <img
+        <LazyImage
           src={product.images[0]}
           alt={product.name}
-          className="w-full h-56 sm:h-64 group-hover:scale-108 overflow-hidden transition-all duration-300 object-contain"
+          className="w-full h-56 sm:h-64 group-hover:scale-108 transition-all duration-300"
+          rootMargin="100px"
         />
+
         {/* Discount Badge */}
         {product.discount > 0 && (
           <span className="absolute top-1.5 right-1.5 bg-secondary text-white text-xs font-semibold px-2 py-1 rounded-full shadow z-3">
@@ -155,14 +154,12 @@ const ProductCard = ({ product, discountedPrice }) => {
           <Rate allowHalf disabled defaultValue={product.rating} />
         </ConfigProvider>
 
-        {/* Stock info */}
         {maxQuantity < product.stock && maxQuantity > 0 && (
           <p className="text-xs text-orange-600 mt-2">
             {product.stock - maxQuantity} already in cart
           </p>
         )}
 
-        {/* Buttons at the bottom */}
         <div className="mt-auto flex justify-between items-center pt-5">
           <Link to={`/products/${product._id}`}>
             <button className="btn btn-sm btn-outline btn-primary hover:text-white">

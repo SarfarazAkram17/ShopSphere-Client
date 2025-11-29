@@ -1,4 +1,5 @@
 import Select from "react-select";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const SellerStoreInfoEditForm = ({
   formData,
@@ -121,10 +122,10 @@ const SellerStoreInfoEditForm = ({
       <div>
         <p className="font-medium mb-2">Store Logo</p>
         <label htmlFor="logo">
-          <img
+          <LazyImage
             src={logoPreview}
             alt="logo"
-            className="h-24 w-auto rounded mb-2 object-contain"
+            className="h-24 w-auto rounded mb-2"
           />
         </label>
         <button
@@ -146,7 +147,7 @@ const SellerStoreInfoEditForm = ({
       <div>
         <p className="font-medium mb-2">Cover Image</p>
         <label htmlFor="cover">
-          <img
+          <LazyImage
             src={coverPreview}
             alt="cover"
             className="h-28 w-full rounded mb-2"

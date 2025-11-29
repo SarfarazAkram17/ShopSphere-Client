@@ -1,3 +1,5 @@
+import LazyImage from "../../LazyImage/LazyImage";
+
 export const ImageUploadField = ({
   label,
   // eslint-disable-next-line no-unused-vars
@@ -19,7 +21,7 @@ export const ImageUploadField = ({
     />
     {preview && (
       <div className="mt-3">
-        <img
+        <LazyImage
           src={preview}
           alt={`${label} Preview`}
           className={`${previewClassName} rounded-lg border-2 border-gray-200 shadow-sm`}

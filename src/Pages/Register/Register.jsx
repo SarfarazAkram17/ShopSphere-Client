@@ -21,6 +21,7 @@ import useAuth from "../../Hooks/useAuth";
 import Lottie from "lottie-react";
 import registerLottie from "../../assets/animations/register.json";
 import MiniLoader from "../../Components/Loader/MiniLoader";
+import LazyImage from "../../Components/LazyImage/LazyImage";
 
 const Register = () => {
   const { createUser, updateUserProfile, sendVerificationEmail, logOutUser } =
@@ -157,10 +158,12 @@ const Register = () => {
                   className="relative cursor-pointer group"
                 >
                   <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/30 group-hover:border-primary transition-all">
-                    <img
+                    <LazyImage
                       src={preview || userImage}
                       alt="Upload"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      objectFit="cover"
+                      priority={true}
                     />
                   </div>
                   <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

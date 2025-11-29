@@ -1,14 +1,16 @@
 import { Link } from "react-router";
 import { FiEdit3, FiTrash2 } from "react-icons/fi";
 import { FaEye } from "react-icons/fa";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const ProductCard = ({ product, handleDelete }) => {
   return (
     <div className="border h-full rounded-xl overflow-hidden shadow hover:shadow-lg transition duration-500">
-      <img
+      <LazyImage
         src={product.images[0]}
         alt={product.name}
-        className="w-full h-52 sm:h-60 object-contain"
+        className="w-full h-52 sm:h-60"
+        rootMargin="100px"
       />
       <div className="p-4 space-y-2">
         <h3 className="text-xl font-semibold text-primary">{product.name}</h3>
@@ -45,9 +47,16 @@ const ProductCard = ({ product, handleDelete }) => {
           </p>
         )}
 
-          <p className="text-sm capitalize">
-            <strong>Status:</strong> <span className={`${product.status === 'active' ? 'text-green-500' : 'text-red-500'} font-semibold`}>{product.status}</span>
-          </p>
+        <p className="text-sm capitalize">
+          <strong>Status:</strong>{" "}
+          <span
+            className={`${
+              product.status === "active" ? "text-green-500" : "text-red-500"
+            } font-semibold`}
+          >
+            {product.status}
+          </span>
+        </p>
 
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-2">

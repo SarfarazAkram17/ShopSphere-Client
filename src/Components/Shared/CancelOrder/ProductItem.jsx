@@ -1,5 +1,6 @@
 import { FiXCircle } from "react-icons/fi";
 import { formatDate, generateItemKey } from "../../../lib/cancelOrder";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const ProductItem = ({
   item,
@@ -49,7 +50,7 @@ const ProductItem = ({
         />
       )}
 
-      <img
+      <LazyImage
         src={item.productImage}
         alt={item.productName}
         className={`w-20 h-20 object-contain rounded-lg ${

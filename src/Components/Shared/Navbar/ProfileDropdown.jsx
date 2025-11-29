@@ -5,6 +5,7 @@ import useUserRole from "../../../Hooks/useUserRole";
 import { getMenuItemsByRole } from "../../../lib/roleMenuItems";
 import { toast } from "react-toastify";
 import MiniLoader from "../../Loader/MiniLoader";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
   const { user, userEmail, logOutUser } = useAuth();
@@ -21,12 +22,18 @@ const ProfileDropdown = ({ profileRef, isProfileOpen, setIsProfileOpen }) => {
 
   return (
     <div className="relative" ref={profileRef}>
-      <img
-        src={user.photoURL}
-        alt="Profile"
+      <div
         onClick={() => setIsProfileOpen(!isProfileOpen)}
-        className="rounded-full object-cover w-12 h-12 cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all"
-      />
+        className="rounded-full ring-2 ring-primary/20 hover:ring-primary/40 transition-all cursor-pointer w-12 h-12 overflow-hidden"
+      >
+        <LazyImage
+          src={user.photoURL}
+          alt="Profile"
+          className="w-12 h-12"
+          objectFit="cover"
+          priority={true}
+        />
+      </div>
 
       {/* Dropdown Menu */}
       {isProfileOpen && (

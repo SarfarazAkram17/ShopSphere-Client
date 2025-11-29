@@ -16,6 +16,7 @@ import MiniLoader from "../../Loader/MiniLoader";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import LazyImage from "../../LazyImage/LazyImage";
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe(import.meta.env.VITE_payment_key);
@@ -150,10 +151,20 @@ const CardPaymentForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Accepted Cards */}
       <div className="flex gap-2 items-center mb-4">
-        <img src={visa} alt="Visa" className="h-13.5" />
-        <img src={master} alt="Mastercard" className="h-13.5" />
-        <img src={amex} alt="Amex" className="h-13.5" />
-        <img src={discover} alt="Discover" className="h-8" />
+        <LazyImage src={visa} alt="Visa" className="h-13.5" priority={true} />
+        <LazyImage
+          src={master}
+          alt="Mastercard"
+          className="h-13.5"
+          priority={true}
+        />
+        <LazyImage src={amex} alt="Amex" className="h-13.5" priority={true} />
+        <LazyImage
+          src={discover}
+          alt="Discover"
+          className="h-8"
+          priority={true}
+        />
       </div>
 
       {/* Card Details (Stripe CardElement) */}

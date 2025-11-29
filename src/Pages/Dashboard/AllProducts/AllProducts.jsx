@@ -15,6 +15,7 @@ import AllProductsSearchAndFilter from "../../../Components/Shared/AllProducts/A
 import AllProductsTableSkeleton from "../../../Components/Shared/AllProducts/AllProductsTableSkeleton";
 import useAuth from "../../../Hooks/useAuth";
 import { Chip } from "@mui/material";
+import LazyImage from "../../../Components/LazyImage/LazyImage";
 
 const searchOptions = [
   { value: "product name", label: "Search by Product Name" },
@@ -234,11 +235,12 @@ const AllProducts = () => {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center my-2">
                 {selectedProduct.images.map((img, i) => (
-                  <img
+                  <LazyImage
                     src={img}
                     key={i}
                     alt={selectedProduct.name}
-                    className="h-36 md:h-32 border border-primary w-full rounded-sm object-cover"
+                    className="h-36 md:h-32 border border-primary w-full rounded-sm"
+                    objectFit="cover"
                   />
                 ))}
               </div>

@@ -6,13 +6,13 @@ import {
   FiUser,
   FiShield,
   FiCamera,
-  FiCheck,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import useAuth from "../../../Hooks/useAuth";
 import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import MiniLoader from "../../../Components/Loader/MiniLoader";
+import LazyImage from "../../../Components/LazyImage/LazyImage";
 
 const Profile = () => {
   const axiosSecure = useAxiosSecure();
@@ -171,10 +171,11 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row md:items-end gap-8 -mt-20 mb-8">
               <div className="relative group">
                 <div className="w-40 h-40 rounded-3xl overflow-hidden border-secondary border-4 shadow-2xl bg-white">
-                  <img
+                  <LazyImage
                     src={user?.photoURL}
                     alt="Profile"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
+                    objectFit="cover"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -291,10 +292,11 @@ const Profile = () => {
                   onClick={handleImageClick}
                 >
                   <div className="w-40 h-40 rounded-2xl overflow-hidden border-4 border-primary shadow-lg">
-                    <img
+                    <LazyImage
                       src={preview}
                       alt="Profile Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      objectFit="cover"
                     />
                   </div>
                   <div

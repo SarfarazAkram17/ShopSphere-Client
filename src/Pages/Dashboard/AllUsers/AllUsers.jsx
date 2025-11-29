@@ -14,6 +14,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import AllUsersSearchAndFilter from "../../../Components/Shared/AllUsers/AllUsersSearchAndFilter";
 import AllUsersTableSkeleton from "../../../Components/Shared/AllUsers/AllUsersTableSkeleton";
+import LazyImage from "../../../Components/LazyImage/LazyImage";
 
 const searchOptions = [
   { value: "name", label: "Search by Name" },
@@ -130,8 +131,9 @@ const AllUsers = () => {
                       {page * rowsPerPage + i + 1}
                     </TableCell>
                     <TableCell align="center" sx={{ py: 0.5 }}>
-                      <img
-                        className="h-11 object-cover w-11 mx-auto rounded-full"
+                      <LazyImage
+                        className="h-11 w-11 mx-auto rounded-full"
+                        objectFit="cover"
                         src={user.photo}
                         alt={user.name}
                       />

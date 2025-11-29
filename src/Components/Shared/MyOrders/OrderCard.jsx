@@ -8,6 +8,7 @@ import {
   FiClock,
 } from "react-icons/fi";
 import { useNavigate } from "react-router";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const OrderCard = ({ order }) => {
   const navigate = useNavigate();
@@ -184,10 +185,10 @@ const OrderCard = ({ order }) => {
                       </div>
                     )}
 
-                    <img
+                    <LazyImage
                       src={item.productImage}
                       alt={item.productName}
-                      className={`w-20 h-20 object-contain rounded-lg flex-shrink-0 ${
+                      className={`w-20 h-20 rounded-lg flex-shrink-0 ${
                         isCancelled ? "grayscale" : ""
                       }`}
                     />

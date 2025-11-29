@@ -7,6 +7,7 @@ import {
   FaTags,
   FaTimesCircle,
 } from "react-icons/fa";
+import LazyImage from "../../LazyImage/LazyImage";
 
 const StoreInfoCard = ({ store, handleEdit }) => {
   return (
@@ -16,7 +17,9 @@ const StoreInfoCard = ({ store, handleEdit }) => {
           <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
             <FaStore className="text-white" size={24} />
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Store Information</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">
+            Store Information
+          </h2>
         </div>
         <button
           onClick={() => handleEdit("store")}
@@ -153,10 +156,10 @@ const StoreInfoCard = ({ store, handleEdit }) => {
           <div className="p-4 bg-white rounded-xl shadow-sm border border-purple-100 hover:border-purple-300 transition-colors">
             <p className="text-sm text-gray-500 mb-3 font-medium">Store Logo</p>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 flex items-center justify-center border-2 border-dashed border-gray-300">
-              <img
+              <LazyImage
                 src={store?.storeLogo}
                 alt="Store Logo"
-                className="w-auto h-36 object-contain rounded"
+                className="w-auto h-36 rounded"
               />
             </div>
           </div>
@@ -166,10 +169,11 @@ const StoreInfoCard = ({ store, handleEdit }) => {
               Cover Image
             </p>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
-              <img
+              <LazyImage
                 src={store?.coverImage}
                 alt="Cover"
                 className="w-full h-42"
+                objectFit="fit"
               />
             </div>
           </div>
