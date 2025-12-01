@@ -6,6 +6,7 @@ import {
   FiCheckCircle,
   FiXCircle,
   FiClock,
+  FiBox,
 } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import LazyImage from "../../LazyImage/LazyImage";
@@ -16,17 +17,19 @@ const OrderCard = ({ order }) => {
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
       case "delivered":
-        return <FiCheckCircle className="text-green-500" />;
+        return <FiCheckCircle size={16} className="text-green-500" />;
       case "shipped":
-        return <FiTruck className="text-blue-500" />;
+        return <FiTruck size={16} className="text-blue-500" />;
+      case "prepared":
+        return <FiBox size={16} className="text-purple-500" />;
       case "confirmed":
-        return <FiPackage className="text-purple-500" />;
+        return <FiPackage size={16} className="text-indigo-500" />;
       case "pending":
-        return <FiClock className="text-yellow-500" />;
+        return <FiClock size={16} className="text-yellow-500" />;
       case "cancelled":
-        return <FiXCircle className="text-red-500" />;
+        return <FiXCircle size={16} className="text-red-500" />;
       default:
-        return <FiPackage className="text-gray-500" />;
+        return <FiPackage size={16} className="text-gray-500" />;
     }
   };
 
@@ -36,8 +39,10 @@ const OrderCard = ({ order }) => {
         return "bg-green-100 text-green-800 border-green-200";
       case "shipped":
         return "bg-blue-100 text-blue-800 border-blue-200";
-      case "confirmed":
+      case "prepared":
         return "bg-purple-100 text-purple-800 border-purple-200";
+      case "confirmed":
+        return "bg-indigo-100 text-indigo-800 border-indigo-200";
       case "pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "cancelled":
@@ -53,8 +58,6 @@ const OrderCard = ({ order }) => {
         return "bg-green-100 text-green-700";
       case "unpaid":
         return "bg-orange-100 text-orange-700";
-      case "refunded":
-        return "bg-blue-100 text-blue-700";
       default:
         return "bg-gray-100 text-gray-700";
     }

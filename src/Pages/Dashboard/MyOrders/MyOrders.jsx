@@ -24,6 +24,7 @@ const MyOrders = () => {
     { value: "all", label: "All Orders" },
     { value: "pending", label: "Pending" },
     { value: "confirmed", label: "Confirmed" },
+    { value: "prepared", label: "Prepared" },
     { value: "shipped", label: "Shipped" },
     { value: "delivered", label: "Delivered" },
     { value: "cancelled", label: "Cancelled" },
@@ -80,7 +81,9 @@ const MyOrders = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-primary mb-2">My Orders</h1>
-        <p className="text-gray-700 font-medium">Track and manage your orders</p>
+        <p className="text-gray-700 font-medium">
+          Track and manage your orders
+        </p>
       </div>
 
       {/* Filters and Search */}
@@ -118,11 +121,12 @@ const MyOrders = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mt-4 pt-4 border-t">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4 mt-4 pt-4 border-t">
           {[
             "all",
             "pending",
             "confirmed",
+            "prepared",
             "shipped",
             "delivered",
             "cancelled",
