@@ -1,3 +1,5 @@
+import MiniLoader from "../../Loader/MiniLoader";
+
 const OrderSummary = ({
   totals,
   cartItems,
@@ -5,7 +7,7 @@ const OrderSummary = ({
   billingAddress,
   onProceedToPay,
   onEditInvoice,
-  isCreatingOrder
+  isCreatingOrder,
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-xl p-6 sticky top-18 space-y-6">
@@ -58,8 +60,17 @@ const OrderSummary = ({
         disabled={isCreatingOrder || !shippingAddress || !billingAddress}
         className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
       >
-        Proceed to Pay (
-        {cartItems.reduce((total, item) => total + (item.quantity || 0), 0)})
+        {isCreatingOrder ? (
+          <>
+            <MiniLoader /> Processing
+          </>
+        ) : (
+          <>
+            Proceed to Pay (
+            {cartItems.reduce((total, item) => total + (item.quantity || 0), 0)}
+            )
+          </>
+        )}
       </button>
       {(!shippingAddress || !billingAddress) && (
         <p className="text-xs text-red-500 text-center -mt-2">
