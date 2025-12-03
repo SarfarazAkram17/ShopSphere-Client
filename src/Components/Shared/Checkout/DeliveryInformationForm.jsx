@@ -203,7 +203,7 @@ const DeliveryInformationForm = ({
         <button
           onClick={onSave}
           disabled={isSubmitting}
-          className="btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+          className="btn btn-primary text-white disabled:text-black/50"
         >
           {isSubmitting ? (
             <span className="flex items-center gap-2">

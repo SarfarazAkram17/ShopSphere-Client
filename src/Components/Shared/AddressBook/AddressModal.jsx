@@ -81,7 +81,7 @@ const AddressModal = ({
             <button
               onClick={onSubmit}
               disabled={isSubmitting}
-              className="btn btn-primary disabled:text-black/50 disabled:cursor-not-allowed text-white"
+              className="btn btn-primary disabled:text-black/50 text-white"
             >
               {isSubmitting ? (
                 <>

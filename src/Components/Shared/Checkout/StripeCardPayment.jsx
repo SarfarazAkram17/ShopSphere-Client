@@ -192,7 +192,7 @@ const CardPaymentForm = ({
       <button
         type="submit"
         disabled={!stripe || isProcessing}
-        className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+        className="w-full btn btn-primary text-white disabled:text-black/50"
       >
         {isProcessing ? (
           <span className="flex items-center justify-center gap-2">

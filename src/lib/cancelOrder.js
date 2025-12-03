@@ -3,19 +3,6 @@ export const generateItemKey = (storeId, item, itemIndex) => {
   return `${storeId}_${item.productId}_${itemIndex}`;
 };
 
-// Format date string
-export const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
 // Calculate refund based on selected products
 export const calculateRefund = (order, selectedProducts) => {
   if (!order) return { itemsRefund: 0, deliveryRefund: 0, totalRefund: 0 };

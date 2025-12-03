@@ -58,7 +58,7 @@ const OrderSummary = ({
       <button
         onClick={onProceedToPay}
         disabled={isCreatingOrder || !shippingAddress || !billingAddress}
-        className="w-full btn btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+        className="w-full btn btn-primary text-white disabled:text-black/50"
       >
         {isCreatingOrder ? (
           <>

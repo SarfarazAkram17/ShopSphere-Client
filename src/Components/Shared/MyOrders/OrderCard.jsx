@@ -10,6 +10,7 @@ import {
 } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import LazyImage from "../../LazyImage/LazyImage";
+import { formatDate } from "../../../lib/formatDate";
 
 const OrderCard = ({ order }) => {
   const navigate = useNavigate();
@@ -61,18 +62,6 @@ const OrderCard = ({ order }) => {
       default:
         return "bg-gray-100 text-gray-700";
     }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
   };
 
   const formatCurrency = (amount) => {
@@ -277,7 +266,7 @@ const OrderCard = ({ order }) => {
                     : "text-gray-900"
                 }`}
               >
-                {formatCurrency(store.storeTotal)}
+                {formatCurrency(store.storeTotal + store.deliveryCharge)}
               </span>
             </div>
           </div>

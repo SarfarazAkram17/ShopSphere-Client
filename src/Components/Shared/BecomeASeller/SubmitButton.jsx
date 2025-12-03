@@ -5,7 +5,7 @@ export const SubmitButton = ({ submitting }) => (
   <div className="pt-6">
     <button
       type="submit"
-      className="btn w-full btn-primary text-white disabled:text-black/50 disabled:cursor-not-allowed"
+      className="btn w-full btn-primary text-white disabled:text-black/50"
       disabled={submitting}
     >
       {submitting ? (
