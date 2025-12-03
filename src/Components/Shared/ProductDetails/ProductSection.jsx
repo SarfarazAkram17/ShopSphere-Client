@@ -9,7 +9,7 @@ import useUserRole from "../../../Hooks/useUserRole";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useEffect, useState } from "react";
 import { useCartCount } from "../../../Hooks/useCartCount";
-import LazyImage from '../../LazyImage/LazyImage'
+import LazyImage from "../../LazyImage/LazyImage";
 
 const ProductSection = ({
   selectedImage,
@@ -164,11 +164,7 @@ const ProductSection = ({
                 selectedImage === img ? "border-primary" : "border-gray-300"
               }`}
             >
-              <LazyImage
-                src={img}
-                alt="thumbnail"
-                className="h-full rounded"
-              />
+              <LazyImage src={img} alt="thumbnail" className="h-full rounded" />
             </div>
           ))}
         </div>
@@ -309,7 +305,7 @@ const ProductSection = ({
               <button
                 onClick={handleBuyNow}
                 disabled={quantity > product.stock}
-                className="btn btn-primary disabled:text-black/50 text-white flex items-center disabled:cursor-not-allowed"
+                className="btn btn-primary disabled:text-black/50 text-white flex items-center"
               >
                 <PiBagBold size={20} className="mr-2" /> Buy Now
               </button>
@@ -317,7 +313,7 @@ const ProductSection = ({
               <button
                 onClick={handleAddToCart}
                 disabled={maxQuantity === 0}
-                className="btn btn-secondary disabled:text-black/50 text-white flex items-center disabled:cursor-not-allowed"
+                className="btn btn-secondary disabled:text-black/50 text-white flex items-center"
               >
                 <PiShoppingCartBold size={20} className="mr-2" /> Add to Cart
               </button>

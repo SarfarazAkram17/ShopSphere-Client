@@ -1,6 +1,7 @@
 import { FiXCircle } from "react-icons/fi";
-import { formatDate, generateItemKey } from "../../../lib/cancelOrder";
+import { generateItemKey } from "../../../lib/cancelOrder";
 import LazyImage from "../../LazyImage/LazyImage";
+import { formatDate } from "../../../lib/formatDate";
 
 const ProductItem = ({
   item,

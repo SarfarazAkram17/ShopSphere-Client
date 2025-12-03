@@ -7,7 +7,9 @@
 
   --color-primary: #019e97;
   --color-secondary: #bf5b1f;
+  --color-info: #155dfc;
   --color-error: #c10007;
+  --color-neutral: #9810FA;
 }
 
 .active {

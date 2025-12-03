@@ -6,7 +6,7 @@ export const SubmitButton = ({ uploading, isPending, icon: Icon, label }) => {
   return (
     <div className="pt-6">
       <button
-        className="btn w-full btn-primary text-white disabled:cursor-not-allowed disabled:text-black/50"
+        className="btn w-full btn-primary text-white disabled:text-black/50"
         disabled={isLoading}
         type="submit"
       >

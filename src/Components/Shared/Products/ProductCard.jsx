@@ -170,7 +170,7 @@ const ProductCard = ({ product, discountedPrice }) => {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock || isMaxedInCart}
-            className="btn btn-sm btn-outline btn-secondary hover:text-white disabled:text-black/50 disabled:cursor-not-allowed"
+            className="btn btn-sm btn-outline btn-secondary hover:text-white disabled:text-black/50"
           >
             <PiShoppingCartBold size={18} className="mr-1" /> {getButtonText()}
           </button>

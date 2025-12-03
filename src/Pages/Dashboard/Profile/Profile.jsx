@@ -359,14 +359,14 @@ const Profile = () => {
               <div className="flex gap-4 mt-8">
                 <button
                   onClick={() => !loading && setIsModalOpen(false)}
-                  className="btn disabled:cursor-not-allowed disabled:text-black/50 flex-1 border-gray-400 border py-6 rounded-lg"
+                  className="btn disabled:text-black/50 flex-1 border-gray-400 border py-6 rounded-lg"
                   disabled={loading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdate}
-                  className="flex-1 btn btn-primary text-white disabled:text-black/50 py-6 rounded-lg font-semibold disabled:cursor-not-allowed"
+                  className="flex-1 btn btn-primary text-white disabled:text-black/50 py-6 rounded-lg font-semibold"
                   disabled={
                     loading ||
                     !formData.name.trim() ||
