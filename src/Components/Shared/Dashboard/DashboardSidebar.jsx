@@ -290,6 +290,7 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
               alt={user?.displayName}
               className="h-12 w-12 border-primary border-[1.5px] object-cover rounded-full"
               priority={true}
+              objectFit="cover"
             />
             <div>
               <p className="font-bold text-xs">{user?.displayName}</p>
