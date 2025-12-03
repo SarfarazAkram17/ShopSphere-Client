@@ -266,7 +266,7 @@ const OrderCard = ({ order }) => {
                     : "text-gray-900"
                 }`}
               >
-                {formatCurrency(store.storeTotal)}
+                {formatCurrency(store.storeTotal + store.deliveryCharge)}
               </span>
             </div>
           </div>
