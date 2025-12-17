@@ -307,7 +307,7 @@ const OrderCard = ({ order }) => {
                     Payment Details
                   </p>
                   <p className="text-sm text-gray-700 font-medium capitalize mb-1">
-                    {order.paymentMethod.replace("_", " ").replace("_", " ")}
+                    {order.paymentMethod.replace(/_/g, " ")}
                   </p>
                   {order.transactionId && (
                     <p className="text-xs text-gray-600 font-mono">

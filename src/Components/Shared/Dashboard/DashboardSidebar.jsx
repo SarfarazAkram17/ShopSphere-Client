@@ -74,11 +74,6 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             icon: <PiShoppingCartBold size={20} />,
           },
           {
-            name: "Payout Requests",
-            path: "/dashboard/payoutRequests",
-            icon: <GiPayMoney size={20} />,
-          },
-          {
             name: "All Users",
             path: "/dashboard/allUsers",
             icon: <FaUsers size={20} />,
@@ -112,6 +107,11 @@ export default function DashboardSidebar({ isOpen, setIsOpen }) {
             name: "Update Order Status",
             path: "/dashboard/updateOrderStatus",
             icon: <LuCodesandbox size={20} />,
+          },
+          {
+            name: "Payout Requests",
+            path: "/dashboard/payoutRequests",
+            icon: <GiPayMoney size={20} />,
           },
           // {
           //   name: "Live Chat",

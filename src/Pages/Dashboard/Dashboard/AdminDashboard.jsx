@@ -162,9 +162,10 @@ const AdminDashboard = () => {
 
   // User distribution
   const userDistribution = [
-    { name: "Customers", value: 45892, color: "#8b5cf6" },
-    { name: "Sellers", value: 1247, color: "#3b82f6" },
-    { name: "Riders", value: 3854, color: "#10b981" },
+    { name: "Customers", value: 2, color: "#8b5cf6" },
+    { name: "Sellers", value: 5, color: "#3b82f6" },
+    { name: "Riders", value: 1, color: "#10b981" },
+    { name: "Admins", value: 1, color: "#C62828" },
   ];
 
   // Top products

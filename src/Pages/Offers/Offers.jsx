@@ -10,7 +10,7 @@ import Pagination from "@mui/material/Pagination";
 
 const Offers = () => {
   const axiosInstance = useAxios();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState([]);
   const [color, setColor] = useState("");
@@ -180,13 +180,13 @@ const Offers = () => {
           <div className="flex justify-end mt-10">
             <Pagination
               count={Math.ceil(total / 20)}
-              page={page}
+              page={page + 1}
               variant="outlined"
               shape="rounded"
               color="primary"
               showFirstButton
               showLastButton
-              onChange={(e, value) => setPage(value)}
+              onChange={(e, value) => setPage(value - 1)}
             />
           </div>
         </>

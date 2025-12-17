@@ -12,7 +12,7 @@ import EmptyState from "../../../Components/Shared/MyOrders/EmptyState";
 const MyOrders = () => {
   const axiosSecure = useAxiosSecure();
   const { userEmail } = useAuth();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState({
     value: "all",
@@ -79,7 +79,7 @@ const MyOrders = () => {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-4">
         <h1 className="text-3xl font-bold text-primary mb-2">My Orders</h1>
         <p className="text-gray-700 font-medium">
           Track and manage your orders
@@ -98,7 +98,7 @@ const MyOrders = () => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setPage(1);
+                  setPage(0);
                 }}
                 placeholder="Search by order ID, store name, product name, customer name or phone..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -113,7 +113,7 @@ const MyOrders = () => {
               value={statusFilter}
               onChange={(selected) => {
                 setStatusFilter(selected);
-                setPage(1);
+                setPage(0);
               }}
               options={statusOptions}
               styles={customSelectStyles}
@@ -125,29 +125,32 @@ const MyOrders = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4 mt-4 pt-4 border-t">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mt-6">
           {[
-            "all",
-            "pending",
-            "confirmed",
-            "prepared",
-            "shipped",
-            "delivered",
-            "cancelled",
-          ].map((status) => (
-            <div key={status} className="text-center">
+            { key: "all", label: "All", color: "bg-stone-200/70" },
+            { key: "pending", label: "Pending", color: "bg-yellow-100" },
+            { key: "confirmed", label: "Confirmed", color: "bg-indigo-100" },
+            { key: "prepared", label: "Prepared", color: "bg-purple-100" },
+            { key: "shipped", label: "Shipped", color: "bg-blue-100" },
+            { key: "delivered", label: "Delivered", color: "bg-green-100" },
+            { key: "cancelled", label: "Cancelled", color: "bg-red-100" },
+          ].map((stat) => (
+            <div
+              key={stat.key}
+              className={`${stat.color} rounded-lg p-4 text-center`}
+            >
               {!stats ? (
                 <div className="flex justify-center">
-                  <div className="relative w-12 h-10 bg-base-300 rounded overflow-hidden">
+                  <div className="relative w-12 h-10 bg-gray-200 rounded overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   </div>
                 </div>
               ) : (
-                <p className="text-3xl font-bold text-gray-900">
-                  {stats[status]}
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats[stat.key]}
                 </p>
               )}
-              <p className="text-sm text-gray-600 capitalize mt-1">{status}</p>
+              <p className="text-xs text-gray-700 mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -168,13 +171,13 @@ const MyOrders = () => {
           <div className="flex justify-end mt-10">
             <Pagination
               count={Math.ceil(total / 10)}
-              page={page}
+              page={page + 1}
               variant="outlined"
               shape="rounded"
               color="primary"
               showFirstButton
               showLastButton
-              onChange={(e, value) => setPage(value)}
+              onChange={(e, value) => setPage(value - 1)}
             />
           </div>
         </div>

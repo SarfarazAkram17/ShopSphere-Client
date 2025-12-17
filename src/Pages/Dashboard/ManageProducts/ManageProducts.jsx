@@ -10,7 +10,7 @@ import Pagination from "@mui/material/Pagination";
 const ManageProducts = () => {
   const { userEmail } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
 
   // Fetch my products
   const { data, isPending, refetch } = useQuery({
@@ -85,13 +85,13 @@ const ManageProducts = () => {
           <div className="flex justify-end mt-10">
             <Pagination
               count={Math.ceil(total / 12)}
-              page={page}
+              page={page + 1}
               variant="outlined"
               shape="rounded"
               color="primary"
               showFirstButton
               showLastButton
-              onChange={(e, value) => setPage(value)}
+              onChange={(e, value) => setPage(value - 1)}
             />
           </div>
         </>
