@@ -27,8 +27,10 @@ import {
 import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
 import { PiTildeBold } from "react-icons/pi";
 import { FiXCircle } from "react-icons/fi";
+import useAuth from "../../../Hooks/useAuth";
 
 const CustomerDashboard = () => {
+  const { user } = useAuth();
   const [spendingYear, setSpendingYear] = useState("2024");
 
   // Customer stats
@@ -257,14 +259,14 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
           My Dashboard
         </h1>
-        <p className="text-gray-600">
-          Welcome back, Sarah! Here's your shopping overview.
+        <p className="text-gray-700 font-medium">
+          Welcome back, {user.displayName}! Here's your shopping overview.
         </p>
       </div>
 

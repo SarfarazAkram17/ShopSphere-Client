@@ -246,9 +246,9 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-          ShopSphere Dashboard
+          ShopSphere Admin Dashboard
         </h1>
-        <p className="text-gray-700">
+        <p className="text-gray-700 font-medium">
           Welcome back! Here's what's happening with your platform today.
         </p>
       </div>
