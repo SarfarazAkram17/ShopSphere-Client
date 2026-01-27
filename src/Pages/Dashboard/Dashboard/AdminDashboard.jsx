@@ -245,16 +245,16 @@ const AdminDashboard = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
           ShopSphere Dashboard
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Welcome back! Here's what's happening with your platform today.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, index) => (
           <StatCard key={index} stat={stat} />
         ))}
